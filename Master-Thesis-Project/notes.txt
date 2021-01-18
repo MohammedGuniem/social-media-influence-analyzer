@@ -1,0 +1,6 @@
+Influence_Analyzer_for_reddit
+personal use script
+
+https://www.youtube.com/watch?v=gIZJQmX-55U
+
+https://praw.readthedocs.io/en/latest/getting_started/installation.html

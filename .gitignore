@@ -1,0 +1,9 @@
+# Files
+
+## enviroment variables and secrets
+.env
+
+# Folders
+
+## data folders
+Master-Thesis-Project/data/*
