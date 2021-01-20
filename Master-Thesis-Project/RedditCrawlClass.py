@@ -46,7 +46,7 @@ class RedditCrawler:
             "public_description": subreddit.public_description,
             "name": subreddit.name,
             "subscribers": subreddit.subscribers,
-            "moderators": moderators
+            "moderators": moderators,
         })
 
       return extracted_subreddits, extracted_users
@@ -80,11 +80,13 @@ class RedditCrawler:
         "subreddit_ID": submission.subreddit.id,
         "title": submission.title,
         "url": submission.url,
+        "link_flair_template_id": submission.link_flair_template_id if submission.link_flair_template_id else None,
+        "link_flair_text": submission.link_flair_text if submission.link_flair_text else None
       })
 
       if user not in extracted_users:
         extracted_users.append(user)
-      
+
     return extracted_submissions, extracted_users
 
   def crawlComments(self, submission_ID):

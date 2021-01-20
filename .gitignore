@@ -7,3 +7,6 @@
 
 ## data folders
 Master-Thesis-Project/data/*
+
+## cache
+Master-Thesis-Project/__pycache__/*

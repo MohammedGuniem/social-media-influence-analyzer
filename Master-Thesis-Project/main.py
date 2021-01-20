@@ -22,7 +22,7 @@ def importToMongoDB(connection_string, database_name, collection_name, data):
 
 redditCrawler = RedditCrawler(client_id, client_secret, user_agent, username, password)
 
-subreddits, extracted_users = redditCrawler.crawlSubreddits(Type="Popular", limit=3)
+subreddits, extracted_users = redditCrawler.crawlSubreddits(Type="Popular", limit=5)
 print(F"Number of crawled subreddits: {len(subreddits)}, with {len(extracted_users)} crawled user(s)")
 
 importToMongoDB(mongo_connection_string, database_name="Subreddits", collection_name="Popular", data=subreddits)
@@ -32,7 +32,7 @@ importToMongoDB(mongo_connection_string, database_name="Users", collection_name=
 submissions = []
 submissions_authors = []
 for subreddit in subreddits:
-    subreddit_submissions, extracted_users = redditCrawler.crawlSubmissions(subreddit["display_name"], 3)
+    subreddit_submissions, extracted_users = redditCrawler.crawlSubmissions(subreddit["display_name"], 5)
     submissions += subreddit_submissions
     submissions_authors += extracted_users
 print(F"Number of crawled submissions: {len(submissions)}, with {len(submissions_authors)} crawled user(s)")
