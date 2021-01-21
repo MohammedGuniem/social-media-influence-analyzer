@@ -1,5 +1,7 @@
 from RedditCrawlClass import RedditCrawler
 from dotenv import load_dotenv
+from pymongo import UpdateOne
+from datetime import date
 import pymongo
 import os
 
@@ -12,22 +14,25 @@ username = os.environ.get('reddit_username')
 password = os.environ.get('reddit_password')
 mongo_connection_string = os.environ.get('mongo_connnection_string')
 
-def importToMongoDB(connection_string, database_name, collection_name, data):
+def writeToMongoDB(connection_string, database_name, collection_name, data):
     client = pymongo.MongoClient(connection_string)
     database = client[database_name]
     collection = database[collection_name]
+    requests = []
     for entry in data:
         # Insert or update using the upsert option set to True
-        result = collection.update({'id':entry['id']}, entry, True)
+        requests.append(UpdateOne({"id":entry['id']}, {"$set": entry}, upsert=True))
+    collection.bulk_write(requests)
 
 redditCrawler = RedditCrawler(client_id, client_secret, user_agent, username, password)
+
+database_name = str(date.today())
 
 subreddits, extracted_users = redditCrawler.crawlSubreddits(Type="Popular", limit=3)
 print(F"Number of crawled subreddits: {len(subreddits)}, with {len(extracted_users)} crawled user(s)")
 
-importToMongoDB(mongo_connection_string, database_name="Subreddits", collection_name="Popular", data=subreddits)
-
-importToMongoDB(mongo_connection_string, database_name="Users", collection_name="ALL", data=extracted_users)
+writeToMongoDB(mongo_connection_string, database_name=database_name, collection_name="Popular Subreddits", data=subreddits)
+writeToMongoDB(mongo_connection_string, database_name=database_name, collection_name="New Users", data=extracted_users)
 
 submissions = []
 submissions_authors = []
@@ -37,12 +42,8 @@ for subreddit in subreddits:
     submissions_authors += extracted_users
 print(F"Number of crawled submissions: {len(submissions)}, with {len(submissions_authors)} crawled user(s)")
 
-
-print( subreddit_flairs)
-
-importToMongoDB(mongo_connection_string, database_name="Submissions", collection_name="New", data=submissions)
-
-importToMongoDB(mongo_connection_string, database_name="Users", collection_name="ALL", data=submissions_authors)
+writeToMongoDB(mongo_connection_string, database_name=database_name, collection_name="New Submissions", data=submissions)
+writeToMongoDB(mongo_connection_string, database_name=database_name, collection_name="New Users", data=submissions_authors)
 
 comments = []
 comments_authors = []
@@ -52,7 +53,5 @@ for submission in submissions:
     comments_authors += extracted_users
 print(F"Number of crawled comments: {len(comments)}, with {len(comments_authors)} crawled user(s)")
 
-importToMongoDB(mongo_connection_string, database_name="Comments", collection_name="ALL", data=comments)
-
-importToMongoDB(mongo_connection_string, database_name="Users", collection_name="ALL", data=comments_authors)
-
+writeToMongoDB(mongo_connection_string, database_name=database_name, collection_name="New Comments", data=comments)
+writeToMongoDB(mongo_connection_string, database_name=database_name, collection_name="New Users", data=comments_authors)
