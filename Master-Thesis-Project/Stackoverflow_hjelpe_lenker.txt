@@ -1,1 +1,2 @@
-
+# insert or update multiple docs at once
+https://stackoverflow.com/questions/62220625/insert-many-documents-into-empty-collection-update-if-document-with-same-key-al
