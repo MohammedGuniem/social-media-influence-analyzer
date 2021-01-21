@@ -1,3 +1,4 @@
+from datetime import datetime
 import praw
 
 class RedditCrawler:
@@ -42,6 +43,7 @@ class RedditCrawler:
             "display_name": subreddit_displayname,
             "id": subreddit.id,
             "created_utc": subreddit.created_utc,
+            "updated_utc": round(datetime.utcnow().timestamp()),
             "description": subreddit.description,
             "public_description": subreddit.public_description,
             "name": subreddit.name,
@@ -71,7 +73,8 @@ class RedditCrawler:
       if hasattr(submission, 'link_flair_template_id') and hasattr(submission, 'link_flair_text'):
         flair = {
           "link_flair_template_id": submission.link_flair_template_id,
-          "link_flair_text": submission.link_flair_text
+          "link_flair_text": submission.link_flair_text,
+          "updated_utc": round(datetime.utcnow().timestamp())
         }
         if flair not in extracted_flairs:
           extracted_flairs.append(flair) 
@@ -83,6 +86,7 @@ class RedditCrawler:
         "author_id": user["id"],
         "author_name": user["name"],
         "created_utc": submission.created_utc,
+        "updated_utc": round(datetime.utcnow().timestamp()),
         "name": submission.name,
         "num_comments": submission.num_comments,
         "upvotes": submission.score,
@@ -122,6 +126,7 @@ class RedditCrawler:
         "author_id": user["id"],
         "comment_body": comment.body,
         "created_utc": comment.created_utc,
+        "updated_utc": round(datetime.utcnow().timestamp()),
         "is_submitter": comment.is_submitter,
         "upvotes": comment.score,
       })
@@ -139,6 +144,7 @@ class RedditCrawler:
         "id": redditor.id,
         "name": redditor.name,
         "created_utc": redditor.created_utc,
+        "updated_utc": round(datetime.utcnow().timestamp()),
         "has_verified_email": redditor.has_verified_email,
         "icon_img": redditor.icon_img,
         "is_employee": redditor.is_employee,
