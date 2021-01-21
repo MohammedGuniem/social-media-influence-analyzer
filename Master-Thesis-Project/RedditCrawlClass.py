@@ -60,11 +60,21 @@ class RedditCrawler:
 
     extracted_submissions = []
     extracted_users = []
-    
+    extracted_flairs = []
+
     for submission in top:
 
       if not hasattr(submission.author, 'id') or not hasattr(submission.author, 'name'):
         continue
+      
+      flair = None
+      if hasattr(submission, 'link_flair_template_id') and hasattr(submission, 'link_flair_text'):
+        flair = {
+          "link_flair_template_id": submission.link_flair_template_id,
+          "link_flair_text": submission.link_flair_text
+        }
+        if flair not in extracted_flairs:
+          extracted_flairs.append(flair) 
 
       user = self.crawlUser(submission.author.name)
       
@@ -80,14 +90,13 @@ class RedditCrawler:
         "subreddit_ID": submission.subreddit.id,
         "title": submission.title,
         "url": submission.url,
-        "link_flair_template_id": submission.link_flair_template_id if submission.link_flair_template_id else None,
-        "link_flair_text": submission.link_flair_text if submission.link_flair_text else None
+        "flair": flair
       })
 
       if user not in extracted_users:
         extracted_users.append(user)
 
-    return extracted_submissions, extracted_users
+    return extracted_submissions, extracted_users, extracted_flairs
 
   def crawlComments(self, submission_ID):
     submission = self.redditCrawler.submission(id=submission_ID)
