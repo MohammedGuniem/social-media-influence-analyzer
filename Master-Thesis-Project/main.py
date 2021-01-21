@@ -32,10 +32,13 @@ importToMongoDB(mongo_connection_string, database_name="Users", collection_name=
 submissions = []
 submissions_authors = []
 for subreddit in subreddits:
-    subreddit_submissions, extracted_users = redditCrawler.crawlSubmissions(subreddit["display_name"], 3)
+    subreddit_submissions, extracted_users, subreddit_flairs = redditCrawler.crawlSubmissions(subreddit["display_name"], 3)
     submissions += subreddit_submissions
     submissions_authors += extracted_users
 print(F"Number of crawled submissions: {len(submissions)}, with {len(submissions_authors)} crawled user(s)")
+
+
+print( subreddit_flairs)
 
 importToMongoDB(mongo_connection_string, database_name="Submissions", collection_name="New", data=submissions)
 
