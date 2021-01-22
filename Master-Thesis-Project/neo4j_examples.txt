@@ -1,0 +1,51 @@
+-> create a node
+
+CREATE (u1:User { name: "User A", age: 25, work: "engineer" })
+CREATE (u2:User { name: "User B", age: 40, work: "doctor" })
+CREATE (u3:User { name: "User C", age: 31, work: "barber" })
+CREATE (u4:User { name: "User D", age: 46, work: "retired" })
+
+-------------------------------------------------------------------
+-> find a node
+
+MATCH (ee:User) WHERE ee.age >= 40 RETURN ee;
+-------------------------------------------------------------------
+-> create multiple nodes at once
+CREATE (u1:User { name: "User A", age: 25, work: "engineer" }),
+(u2:User { name: "User B", age: 40, work: "doctor" }),
+(u3:User { name: "User C", age: 31, work: "barber" }),
+(u4:User { name: "User D", age: 46, work: "retired" })
+
+--------------------------------------------------------------------
+-> set multiple relations at once
+
+(u1)-[:INFLUENCES {weight: 2, Area:["Politics", "Social"]}]->(u2)
+(u1)-[:INFLUENCES {weight}]->(u3)
+--------------------------------------------------------------------
+-> return the whole graph
+
+MATCH (u:User) RETURN u;
+
+--------------------------------------------------------------------
+-> return a limited number of nodes in graph
+
+MATCH (u:User) RETURN u LIMIT 2;
+--------------------------------------------------------------------
+
+
+CREATE (u1:User { name: "User A", age: 25, work: "engineer" }),
+(u2:User { name: "User B", age: 40, work: "doctor" }),
+(u3:User { name: "User C", age: 31, work: "barber" }),
+(u4:User { name: "User D", age: 46, work: "retired" });
+
+CREATE
+(u1)-[:KNOWS]->(u2),
+(u1)-[:KNOWS]->(u3),
+(u2)-[:KNOWS]->(u4),
+(u2)-[:KNOWS]->(u3),
+(u4)-[:KNOWS]->(u2)
+
+
+
+MATCH (uu:User)-[:KNOWS]->(uu:User)
+RETURN *
