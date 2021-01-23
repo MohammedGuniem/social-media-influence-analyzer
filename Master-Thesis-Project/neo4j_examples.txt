@@ -1,0 +1,32 @@
+--> create one user
+CREATE (u1:User { name: "User A", age: 25, work: "engineer" })
+
+--> create multiple users and relationships at once
+CREATE 
+(u1:User { name: "User A", age: 25, work: "engineer" }),
+(u2:User { name: "User B", age: 40, work: "doctor" }),
+(u3:User { name: "User C", age: 31, work: "barber" }),
+(u4:User { name: "User D", age: 46, work: "retired" }),
+(u1)-[:KNOWS {weight: 2, area: ["Politics"]}]->(u2),
+(u1)-[:KNOWS {weight: 1, area: ["Politics","Social"]}]->(u3),
+(u2)-[:KNOWS {weight: 0.5, area: ["Sport"]}]->(u3),
+(u2)-[:KNOWS {weight: 3, area: []}]->(u4),
+(u4)-[:KNOWS {weight: 4, area: []}]->(u2)
+
+--> select firends of all users
+MATCH (ee:User)-[:KNOWS]-(friends)
+RETURN ee, friends
+
+--> delete all nodes and relationships
+MATCH (n)
+DETACH DELETE n
+
+--> return all
+MATCH (n)
+RETURN (n)
+-------------------------
+--> update is found, create if not found
+MATCH (j:Person {name: 'Jennifer'})
+MATCH (m:Person {name: 'Mark'})
+MERGE (j)-[r:IS_FRIENDS_WITH]->(m)
+RETURN j, r, m
