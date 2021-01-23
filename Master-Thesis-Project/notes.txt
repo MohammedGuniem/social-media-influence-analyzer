@@ -6,3 +6,7 @@ https://www.youtube.com/watch?v=gIZJQmX-55U
 https://praw.readthedocs.io/en/latest/getting_started/installation.html
 
 https://pymongo.readthedocs.io/en/stable/
+
+https://neo4j.com/developer/python/
+
+https://neo4j.com/developer/cypher/updating/

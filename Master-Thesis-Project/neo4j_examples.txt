@@ -20,3 +20,13 @@ RETURN ee, friends
 --> delete all nodes and relationships
 MATCH (n)
 DETACH DELETE n
+
+--> return all
+MATCH (n)
+RETURN (n)
+-------------------------
+--> update is found, create if not found
+MATCH (j:Person {name: 'Jennifer'})
+MATCH (m:Person {name: 'Mark'})
+MERGE (j)-[r:IS_FRIENDS_WITH]->(m)
+RETURN j, r, m
