@@ -1,0 +1,61 @@
+Recap since last time
+
+1. Decided to use reddit as my research social platform, 
+for many reasons 
+such as 
+- anonymity of users and 
+- similiary to most popular paltforms such as twitter and facebook which does not offer anonymity 
+- and also i can imagine that crawling popular networks would be far more time consuming
+- vewry well documented crawling python library for reddit crawling, praw
+ 
+some down sides are
+- voting on submissions and comments is totally anonymous, but can be helpfull
+- Not much information about single users such as country and are of interest
+- lack of well-defined interest areas beside flairs which are not obligatory to use.
+
+2. The architecture of the solution could look like this
+
+-> crawl -> 
+-> store as documents in mongoDB for later use -> 
+-> build various neo4j models and store models in neo4j DB -> 
+-> visualize models for users with no knowlegde to programming by the use of a thin client such as React -> 
+
+3. Created a github repository with 5 branches per the moment
+	A) main
+	B) crawlingData
+	C) importingToMongoDB
+	D) GraphModelling
+	E) cleaningUp
+
+4. Successfully managed to crawl Data and store it in MongoDB database
+	-> the crawling of most popular submissions is very slow
+	-> still need to optimize and analyze the crawling algorithm
+
+5. Successfully managed to build a Graph model and store it in MongoDB database
+	-> built a basic model to construct relations between moderators and submission authors
+
+6. Cleaning up in the project and trying to mange the code in a better way
+
+7. I have some questions
+
+-> What is your opinion about the architecture in point 2?
+
+-> Should i focus on 1 subreddit, or is it better to focus on a group of subreddits, top 10 popular subreddits f.example?
+
+-> Can i take a look at some master thesis about similar topics to understand more about the preffered structure of the thesis report?
+
+-> How can i test my graph models, any ideas?
+
+-> Am i on the right track? should i do any thing in a different way?
+
+-> Is this possible to provide me with the following
+	1) a virtual machine with windows server 2019 installed to run the react web application on
+	2) mongo database on a university server
+	3) neo4j database on a university server
+	4) GPU to periodically run crawling and model building on, plus future machine learning models 
+
+8. Next plan
+build different graph models, compare and evaluate
+
+9. bringing in some supervised and/or unsupervised machine learning to identify the influence areas.
+
