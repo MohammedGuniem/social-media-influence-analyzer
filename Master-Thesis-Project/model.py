@@ -1,5 +1,5 @@
-from Neo4jConnector import Neo4jConnector
-from GraphModelling import GraphModel
+from classes.Neo4jConnector import Neo4jConnector
+from classes.GraphModelling import GraphModel
 from dotenv import load_dotenv
 import os
 
