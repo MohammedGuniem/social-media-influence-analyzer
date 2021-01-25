@@ -1,4 +1,4 @@
-from MongoDBConnector import MongoDBConnector
+from classes.MongoDBConnector import MongoDBConnector
 
 
 class GraphModel:

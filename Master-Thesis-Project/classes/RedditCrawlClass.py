@@ -65,7 +65,7 @@ class RedditCrawler:
 
         for submission in submissions:
 
-            if not hasattr(submission.author, 'id') or not hasattr(submission.author, 'name'):
+            if not hasattr(submission, 'author') or not hasattr(submission.author, 'id') or not hasattr(submission.author, 'name'):
                 continue
 
             flair = None
