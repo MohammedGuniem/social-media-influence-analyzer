@@ -1,4 +1,5 @@
 from pymongo import UpdateOne
+from datetime import date
 import pymongo
 
 
@@ -17,3 +18,18 @@ class MongoDBConnector:
                 requests.append(UpdateOne({"id": entry['id']}, {
                                 "$set": entry}, upsert=True))
             collection.bulk_write(requests)
+        client.close()
+
+    def getSubreddit(self, display_name):
+        client = pymongo.MongoClient(self.connection_string)
+        database = client["Subreddits_DB"]
+        collection = database[str(date.today())]
+        client.close()
+        return collection.find({"display_name": display_name})
+
+    def getSubmissions(self, subreddit_id):
+        client = pymongo.MongoClient(self.connection_string)
+        database = client["Submissions_DB"]
+        collection = database[str(date.today())]
+        client.close()
+        return collection.find({"subreddit_ID": subreddit_id})
