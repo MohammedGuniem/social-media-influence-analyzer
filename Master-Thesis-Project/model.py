@@ -7,16 +7,14 @@ load_dotenv()
 
 MongoDB_connection_string = os.environ.get('mongo_connnection_string')
 
-graph_model = GraphModel("Model A", MongoDB_connection_string)
-
+graph_model = GraphModel(MongoDB_connection_string)
 
 # Available crawled subreddits
 # Home, AskReddit, Politics
 
-graph_model.buildUserModel("AskReddit", moderator_weight=1,
-                           submission_author_weight=1, parent_comment_author_weight=1)
+#model = graph_model.buildUserModel(subreddit_display_name="Home")
 
-#model = graph_model.buildSubredditFlowModel(subreddit_display_name="Home")
+model = graph_model.buildSubredditFlowModel(subreddit_display_name="Home")
 
 neo4j_connector = Neo4jConnector("bolt://localhost:7687", "neo4j", "1234")
 
