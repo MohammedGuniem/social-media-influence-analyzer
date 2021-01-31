@@ -47,4 +47,4 @@ class MongoDBConnector:
         database = client["Comments_DB"]
         collection = database[self.database]
         client.close()
-        return list(collection.find({"id": comment_id}))
+        return list(collection.find({"id": comment_id}))[0]
