@@ -9,10 +9,16 @@ MongoDB_connection_string = os.environ.get('mongo_connnection_string')
 
 graph_model = GraphModel("Model A", MongoDB_connection_string)
 
-model = graph_model.buildModel("Home")
 
-neo4j_connector = Neo4jConnector(
-    "bolt://localhost:7687", "neo4j", "1234")
+# Available crawled subreddits
+# Home, AskReddit, Politics
+
+graph_model.buildUserModel("AskReddit", moderator_weight=1,
+                           submission_author_weight=1, parent_comment_author_weight=1)
+
+#model = graph_model.buildSubredditFlowModel(subreddit_display_name="Home")
+
+neo4j_connector = Neo4jConnector("bolt://localhost:7687", "neo4j", "1234")
 
 for relation_id, relation_node in model.items():
     neo4j_connector.create_pair(relation_node["FROM"]["type"], relation_node["FROM"]["id"], relation_node["FROM"]["data"],
