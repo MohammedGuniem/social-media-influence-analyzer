@@ -6,7 +6,24 @@ import pymongo
 class MongoDBConnector:
     def __init__(self, connection_string):
         self.connection_string = connection_string
-        self.database = "2021-01-30"
+        self.valid_collections, self.non_valid_collections = self.validateCollections()
+        self.database = self.valid_collections[0]
+
+    def validateCollections(self):
+        client = pymongo.MongoClient(self.connection_string)
+        collections = [
+            set(client["Subreddits_DB"].collection_names()),
+            set(client["Submissions_DB"].collection_names()),
+            set(client["Comments_DB"].collection_names()),
+            set(client["Users_DB"].collection_names()),
+        ]
+        valid_collections = sorted(
+            collections[0] & collections[1] & collections[2] & collections[3], reverse=True)
+        non_valid_collections = sorted(
+            collections[0] ^ collections[1] ^ collections[2] ^ collections[3], reverse=True)
+
+        client.close()
+        return valid_collections, non_valid_collections
 
     def writeToMongoDB(self, database_name, collection_name, data):
         client = pymongo.MongoClient(self.connection_string)

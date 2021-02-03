@@ -1,0 +1,10 @@
+{
+    "display_name": "display_name",
+    "name": "name",
+    "id": "id",
+    "created_utc": "created_utc",
+    "description": "description",
+    "public_description": "public_description",
+    "count_of_subscribers": "subscribers",
+    "moderators": "moderators"
+}

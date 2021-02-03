@@ -55,10 +55,16 @@ class RedditCrawler:
     def crawlSubmissions(self, Type, limit, subreddit_display_name):
         subreddit = self.redditCrawler.subreddit(subreddit_display_name)
 
-        if Type == "New Submissions":
+        if Type == "New":
             submissions = subreddit.new(limit=limit)
+        elif Type == "Hot":
+            submissions = subreddit.hot(limit=limit)
+        elif Type == "Top":
+            submissions = subreddit.top(limit=limit)
+        elif Type == "Rising":
+            submissions = subreddit.rising(limit=limit)
         else:
-            print("You need to specify a submissions type")
+            print("You need to specify a submission type")
             return []
 
         submissions_data = []
@@ -86,7 +92,7 @@ class RedditCrawler:
                 "num_comments": submission.num_comments,
                 "upvotes": submission.score,
                 "upvote_ratio": submission.upvote_ratio,
-                "subreddit_ID": submission.subreddit.id,
+                "subreddit_id": submission.subreddit.id,
                 "title": submission.title,
                 "url": submission.url,
                 "flair": flair
@@ -110,8 +116,8 @@ class RedditCrawler:
             comments_data.append({
                 "id": comment.id,
                 "subreddit_id": comment.subreddit_id,
-                "submission_ID": comment.link_id,
-                "parent_ID": comment.parent_id,
+                "submission_id": comment.link_id,
+                "parent_id": comment.parent_id,
                 "author_id": comment.author.id,
                 "author_name": comment.author.name,
                 "comment_body": comment.body,
