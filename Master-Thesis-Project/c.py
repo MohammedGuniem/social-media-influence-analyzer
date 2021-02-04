@@ -22,32 +22,34 @@ subreddit_limit = 3
 # A limit for the number of submissions to crawl
 submission_limit = 1
 
-users = []
-# Target Subreddits (subreddit_limit? Most pupolar)
-subreddits_info, users_info = redditCrawler.crawlPopularSubreddits(
-    subreddit_limit=subreddit_limit)
-users += users_info
-print("#subreddits: ", len(subreddits_info))
-print("#users: ", len(users))
-print("-----------------------")
+for Type in ["New"]:
+    # Target Subreddits (subreddit_limit? Most pupolar)
+    subreddits_info, running_times = redditCrawler.crawlPopularSubreddits(
+        subreddit_limit=subreddit_limit)
+    print("#subreddits: ", len(subreddits_info))
+    print("-----------------------")
 
-submissions = []
-for subreddit in subreddits_info:
-    submissions_info, users_info = redditCrawler.crawlSubmissions(
-        subreddit['display_name'], Type="New", submission_limit=submission_limit)
-    submissions += submissions_info
-    users += users_info
-print("#submissions: ", len(submissions))
-print("#users: ", len(users))
-print("-----------------------")
+    users = []
+    submissions = []
+    for subreddit in subreddits_info:
+        submissions_info, users_info, running_times = redditCrawler.crawlSubmissions(
+            subreddit['display_name'], Type=Type, submission_limit=submission_limit)
+        submissions += submissions_info
+        users += users_info
+    print("#submissions: ", len(submissions))
+    print("#users: ", len(users))
+    print("-----------------------")
+    print(running_times)
+    print("-----------------------")
 
-comments = []
-for submission in submissions_info:
-    comments_info, users_info = redditCrawler.crawlComments(
-        submission_id=submission['id'])
-    comments += comments_info
-    users += users_info
-print("#comments: ", len(comments))
-print("#users: ", len(users))
-print("-----------------------")
-print(users[len(users)-1])
+    comments = []
+    for submission in submissions_info:
+        comments_info, users_info, running_times = redditCrawler.crawlComments(
+            submission_id=submission['id'])
+        comments += comments_info
+        users += users_info
+    print("#comments: ", len(comments))
+    print("#users: ", len(users))
+    print("-----------------------")
+    print(running_times)
+    print("-----------------------")
