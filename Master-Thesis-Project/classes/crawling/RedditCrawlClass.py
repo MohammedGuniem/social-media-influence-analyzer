@@ -38,8 +38,7 @@ class RedditCrawler:
             limit=subreddit_limit)
 
         subreddits_info = []
-        running_times = {"subreddits": {}, "method": {}}
-        #users_info = []
+        running_times = []
 
         for subreddit in subreddits:
             subreddit_start_reading = self.getTimeStamp()
@@ -56,7 +55,7 @@ class RedditCrawler:
                     "permissions": moderator.mod_permissions
                 }
                 moderators.append(moderator)
-                # users_info.append(self.crawlUser(redditor_name=moderator['name']))
+
             extracted_subreddit = {}
             for local_key, external_key in self.subreddit_model.items():
                 if external_key == "moderators":
@@ -69,19 +68,23 @@ class RedditCrawler:
             subreddits_info.append(extracted_subreddit)
 
             subreddit_end_reading = self.getTimeStamp()
-            running_times["subreddits"][subreddit.__getattribute__(
-                "display_name")] = {
-                    'start_reading_time': subreddit_start_reading,
-                    'end_reading_time': subreddit_end_reading,
-                    'elapsed_time': subreddit_end_reading - subreddit_start_reading
-            }
+            running_times.append({
+                'subreddit_id': subreddit.__getattribute__(
+                    "id"),
+                'subreddit_display_name': subreddit.__getattribute__(
+                    "display_name"),
+                'start_reading_time': subreddit_start_reading,
+                'end_reading_time': subreddit_end_reading,
+                'elapsed_time': subreddit_end_reading - subreddit_start_reading
+            })
         method_end = self.getTimeStamp()
-        running_times["method"] = {
+        total_running_time = {
             'start_reading_time': method_start,
             'end_reading_time': method_end,
             'elapsed_time': method_end - method_start
         }
-        return subreddits_info, running_times  # , users_info
+        execution_time_data = [running_times, total_running_time]
+        return subreddits_info, execution_time_data
 
     # Method to crawl submissions from a certain subreddit
     def crawlSubmissions(self, subreddit_display_name, Type, submission_limit):
@@ -103,7 +106,7 @@ class RedditCrawler:
 
         submissions_info = []
         users_info = []
-        running_times = {"submissions": {}, "method": {}}
+        running_times = []
 
         for submission in submissions:
             submission_start_reading = self.getTimeStamp()
@@ -138,19 +141,21 @@ class RedditCrawler:
             submissions_info.append(extracted_submission)
 
             submission_end_reading = self.getTimeStamp()
-            running_times["submissions"][submission.__getattribute__(
-                "id")] = {
-                    'start_reading_time': submission_start_reading,
-                    'end_reading_time': submission_end_reading,
-                    'elapsed_time': submission_end_reading - submission_start_reading
-            }
+            running_times.append({
+                'submission_id': submission.__getattribute__(
+                    "id"),
+                'start_reading_time': submission_start_reading,
+                'end_reading_time': submission_end_reading,
+                'elapsed_time': submission_end_reading - submission_start_reading
+            })
         method_end = self.getTimeStamp()
-        running_times["method"] = {
+        total_running_time = {
             'start_reading_time': method_start,
             'end_reading_time': method_end,
             'elapsed_time': method_end - method_start
         }
-        return submissions_info, users_info, running_times
+        execution_time_data = [running_times, total_running_time]
+        return submissions_info, users_info, execution_time_data
 
     # Method to crawl comments from a certain submission
     def crawlComments(self, submission_id):
@@ -159,7 +164,7 @@ class RedditCrawler:
         submission = self.redditCrawler.submission(id=submission_id)
         comments_info = []
         users_info = []
-        running_times = {"comments": {}, "method": {}}
+        running_times = []
 
         comments = submission.comments
         submission.comments.replace_more(limit=3)
@@ -192,20 +197,23 @@ class RedditCrawler:
             users_info.append(user_info)
 
             comment_end_reading = self.getTimeStamp()
-            running_times["comments"][comment.__getattribute__(
-                "id")] = {
-                    'start_reading_time': comment_start_reading,
-                    'end_reading_time': comment_end_reading,
-                    'elapsed_time': comment_end_reading - comment_start_reading
-            }
+            running_times.append({
+                'comment_id': comment.__getattribute__(
+                    "id"),
+                'start_reading_time': comment_start_reading,
+                'end_reading_time': comment_end_reading,
+                'elapsed_time': comment_end_reading - comment_start_reading
+            })
 
         method_end = self.getTimeStamp()
-        running_times["method"] = {
+        total_running_time = {
             'start_reading_time': method_start,
             'end_reading_time': method_end,
             'elapsed_time': method_end - method_start
         }
-        return comments_info, users_info, running_times
+        execution_time_data = [running_times, total_running_time]
+
+        return comments_info, users_info, execution_time_data
 
     # Method to crawl user meta data
     def crawlUser(self, redditor_name):
