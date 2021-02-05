@@ -5,16 +5,22 @@ import os
 MongoDB_connection_string = os.environ.get('mongo_connnection_string')
 
 # Database connector
-MongoDBConnector = MongoDBConnector(MongoDB_connection_string, "New")
+MongoDBConnector = MongoDBConnector(MongoDB_connection_string)
 
-target_subreddits = ["Home", "AskReddit", "politics"]
+# For each subreddit:
+# 1) get all new submissions, and make pandas dataframe
+# 2) calculate basic statistics for: num_comments, upvotes, upvote_ratio
+# 3) calculate time since previous submissions for each submission
 
-data = []
+
+target_subreddits = MongoDBConnector.getSubredditsInfo()
+submissions = []
 for subreddit in target_subreddits:
-    data.append(MongoDBConnector.getSubredditInfo(display_name=subreddit))
+    print(F"Subreddit: {subreddit['display_name']} {subreddit['id']}")
+    submissions += MongoDBConnector.getSubmissionsOnSubreddit(
+        subreddit_id=subreddit['id'], Type="New")
 
-print(len(data))
-df = pd.DataFrame(list(data))
-print(df.head(n=3))
-
-print(df[["display_name", "id"]])
+submissions_df = pd.DataFrame(submissions)
+submissions_df = submissions_df[[
+    "id", "author_id", "author_name", "num_comments", "upvotes", "upvote_ratio"]]
+print(submissions_df.head(10))

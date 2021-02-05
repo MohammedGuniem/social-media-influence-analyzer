@@ -20,7 +20,7 @@ redditCrawler = RedditCrawler(
 subreddit_limit = 3
 
 # A limit for the number of submissions to crawl
-submission_limit = 33
+submission_limit = 3
 
 # Type of submissions to crawl
 Types = []
@@ -33,7 +33,7 @@ Types.append("Rising")
 MongoDBConnector = MongoDBConnector(MongoDB_connection_string)
 
 execution_time_data = {
-    "id": redditCrawler.getTimeStamp(),
+    "start_time": redditCrawler.getTimeStamp(),
     "subreddits": [],
     "submissions": [],
     "comments": [],
@@ -89,6 +89,7 @@ for Type in Types:
     MongoDBConnector.writeToMongoDB(
         database_name=F"{Type}_Users_DB", collection_name=str(date.today()), data=users)
 
-execution_time_data['id'] = F"{execution_time_data['id']}_{redditCrawler.getTimeStamp()}"
+execution_time_data['end_time'] = redditCrawler.getTimeStamp()
+execution_time_data['id'] = F"{execution_time_data['start_time']}_{redditCrawler.getTimeStamp()}"
 MongoDBConnector.writeToMongoDB(
     database_name="admin", collection_name=str(date.today()), data=[execution_time_data])

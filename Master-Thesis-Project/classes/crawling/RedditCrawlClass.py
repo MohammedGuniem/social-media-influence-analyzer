@@ -132,9 +132,9 @@ class RedditCrawler:
                         if key in dir(extracted_value):
                             extracted_value = extracted_value.__getattribute__(
                                 key)
-                    extracted_submission[local_key] = extracted_value
                 else:
                     continue
+                extracted_submission[local_key] = extracted_value
 
             extracted_submission["updated_utc"] = round(
                 datetime.utcnow().timestamp())

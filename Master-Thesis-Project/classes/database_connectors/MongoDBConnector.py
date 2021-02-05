@@ -4,30 +4,31 @@ import pymongo
 
 
 class MongoDBConnector:
-    def __init__(self, connection_string, Type=None):
+    def __init__(self, connection_string):
         self.connection_string = connection_string
-        self.Type = Type
-        if self.Type:
-            self.valid_collections, self.non_valid_collections = self.validateCollections(
-                self.Type)
-            self.collection = self.valid_collections[0]
-            print(self.collection)
+        self.collection = self.getMostRecentValidCollection()
 
-    def validateCollections(self, Type):
+    def getMostRecentValidCollection(self):
         client = pymongo.MongoClient(self.connection_string)
         collections = [
             set(client["Subreddits_DB"].collection_names()),
-            set(client[F"{Type}_Submissions_DB"].collection_names()),
-            set(client[F"{Type}_Comments_DB"].collection_names()),
-            set(client[F"{Type}_Users_DB"].collection_names()),
+            set(client["New_Submissions_DB"].collection_names()),
+            set(client["New_Comments_DB"].collection_names()),
+            set(client["New_Users_DB"].collection_names()),
+            set(client["Rising_Submissions_DB"].collection_names()),
+            set(client["Rising_Comments_DB"].collection_names()),
+            set(client["Rising_Users_DB"].collection_names())
         ]
-        valid_collections = sorted(
-            collections[0] & collections[1] & collections[2] & collections[3], reverse=True)
-        non_valid_collections = sorted(
-            collections[0] ^ collections[1] ^ collections[2] ^ collections[3], reverse=True)
+        valid_collections = collections[0]
+        for collection_set in collections:
+            valid_collections &= collection_set
+        valid_collections = sorted(valid_collections, reverse=True)
 
         client.close()
-        return valid_collections, non_valid_collections
+        if len(valid_collections) > 0:
+            return valid_collections[0]
+        else:
+            return "no valid collection!"
 
     def writeToMongoDB(self, database_name, collection_name, data):
         client = pymongo.MongoClient(self.connection_string)
@@ -45,23 +46,21 @@ class MongoDBConnector:
             collection.bulk_write(requests)
         client.close()
 
-    def getSubredditInfo(self, display_name):
+    def getSubredditsInfo(self):
         client = pymongo.MongoClient(self.connection_string)
         database = client["Subreddits_DB"]
         collection = database[self.collection]
         client.close()
-        data = list(collection.find({"display_name": display_name}))
-        if len(data) > 0:
-            return data[0]
-        else:
-            return []
+        data = list(collection.find())
+        return data
 
-    def getSubmissionsOnSubreddit(self, subreddit_id):
+    def getSubmissionsOnSubreddit(self, subreddit_id, Type):
         client = pymongo.MongoClient(self.connection_string)
-        database = client[F"{self.Type}_Submissions_DB"]
+        database = client[F"{Type}_Submissions_DB"]
         collection = database[self.collection]
         client.close()
-        return list(collection.find({"subreddit_ID": subreddit_id}))
+        return list(collection.find({"subreddit_id": subreddit_id}))
+#
 
     def getCommentsOnSubmission(self, submission_id):
         client = pymongo.MongoClient(self.connection_string)
