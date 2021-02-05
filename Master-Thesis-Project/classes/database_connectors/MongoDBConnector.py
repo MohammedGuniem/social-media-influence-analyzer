@@ -33,8 +33,11 @@ class MongoDBConnector:
             requests = []
             for entry in data:
                 # Insert or update using the upsert option set to True
-                requests.append(UpdateOne({"id": entry['id']}, {
-                                "$set": entry}, upsert=True))
+                if 'id' in entry:
+                    requests.append(UpdateOne({"id": entry['id']}, {
+                                    "$set": entry}, upsert=True))
+                else:
+                    print(entry)
             collection.bulk_write(requests)
         client.close()
 

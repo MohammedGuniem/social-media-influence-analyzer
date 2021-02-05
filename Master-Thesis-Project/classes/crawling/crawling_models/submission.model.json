@@ -8,6 +8,5 @@
     "upvotes": "score",
     "upvote_ratio": "upvote_ratio",
     "subreddit_id": "subreddit.id",
-    "url": "url",
-    "flair": "flair"
+    "url": "url"
 }

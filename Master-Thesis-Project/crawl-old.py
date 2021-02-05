@@ -1,4 +1,4 @@
-from classes.RedditCrawlClass import RedditCrawler
+from classes.OldRedditCrawlClass import RedditCrawler
 from classes.MongoDBConnector import MongoDBConnector
 from dotenv import load_dotenv
 from pymongo import UpdateOne
