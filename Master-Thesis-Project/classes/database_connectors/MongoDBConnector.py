@@ -4,9 +4,12 @@ import pymongo
 
 
 class MongoDBConnector:
-    def __init__(self, connection_string):
+    def __init__(self, connection_string, collection_name=None):
         self.connection_string = connection_string
-        self.collection = self.getMostRecentValidCollection()
+        if collection_name:
+            self.collection = collection_name
+        else:
+            self.collection = self.getMostRecentValidCollection()
 
     def getMostRecentValidCollection(self):
         client = pymongo.MongoClient(self.connection_string)
@@ -60,6 +63,14 @@ class MongoDBConnector:
         collection = database[self.collection]
         client.close()
         return list(collection.find({"subreddit_id": subreddit_id}))
+
+    def getRunningTime(self):
+        client = pymongo.MongoClient(self.connection_string)
+        database = client["admin"]
+        collection = database[self.collection]
+        client.close()
+        return list(collection.find())
+
 #
 
     def getCommentsOnSubmission(self, submission_id):
