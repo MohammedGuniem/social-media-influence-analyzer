@@ -1,6 +1,9 @@
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
 import pandas as pd
 import os
+import matplotlib
+import matplotlib.pyplot as plt
+import datetime
 
 MongoDB_connection_string = os.environ.get('mongo_connnection_string')
 
@@ -13,11 +16,7 @@ MongoDBConnector = MongoDBConnector(
 # 2) calculate basic statistics for: created_utc, num_comments, upvotes, upvote_ratio
 #   basic statistics are: count -ok, mean -ok, median -ok, mode -ok, standard diviation -ok, variance -ok, minimum -ok, maximum -ok, percentiles -ok
 # 3) calculate the duration of the crawling algorithm. -ok
-
-# 4) calculate time since previous submissions for each submission
-#    -> sort in ascending order by created_utc
-#    -> make new column, that includes the value current create_utc - previous created_utc
-#    -> calculate basic statistics on created_utc, you can include them in summary_statistics dataframe
+# 4) plot number of published submissions per day- -ok
 
 target_subreddits = MongoDBConnector.getSubredditsInfo()
 submissions = []
@@ -84,3 +83,25 @@ print(F"Total Crawling Time: {total_runtime} hours")
 print(F"Subreddits Info. Crawling Time: {subreddits_runtime} seconds")
 print(F"Submissions Info. Crawling Time: {submissions_runtime} hours")
 print(F"Comments Info. Crawling Time: {comments_runtime} hours")
+
+submissions_per_day = {}
+for sub in submissions:
+    created_utc = int(sub['created_utc'])
+    timestamp = datetime.datetime.fromtimestamp(created_utc)
+    day = timestamp.strftime('%Y-%m-%d')
+
+    if day in submissions_per_day:
+        submissions_per_day[day] += 1
+    else:
+        submissions_per_day[day] = 1
+
+utc_times = sorted(list(submissions_per_day.keys()))
+num_submissions = [submissions_per_day[utc_time] for utc_time in utc_times]
+fig, ax = plt.subplots()
+ax.plot(utc_times, num_submissions, 'o-')
+ax.set(xlabel='time in days', ylabel='number of published submissions',
+       title='number of published submissions per day')
+ax.set_xticklabels(ax.get_xticks(), rotation=45)
+ax.grid()
+fig.savefig("test.png")
+plt.show()
