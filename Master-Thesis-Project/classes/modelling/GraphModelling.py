@@ -87,8 +87,8 @@ class GraphModel:
                 submission_id=submission_id)
 
             for comment in comments:
-                prefix = comment["parent_ID"][0:3]
-                parent_id = comment["parent_ID"][3:]
+                prefix = comment["parent_id"][0:3]
+                parent_id = comment["parent_id"][3:]
 
                 if prefix == "t3_":
                     root_comment_node = self.makeCommentNode(
@@ -103,7 +103,7 @@ class GraphModel:
                         comment=comment, Type="ThreadComment")
                     parent_comment = mongo_db_connector.getCommentInfo(
                         comment_id=parent_id)
-                    if parent_comment['submission_ID'] == parent_comment['parent_ID']:
+                    if parent_comment['submission_id'] == parent_comment['parent_id']:
                         parent_comment_type = "Comment"
                     else:
                         parent_comment_type = "ThreadComment"
@@ -155,8 +155,8 @@ class GraphModel:
                 submission_id=submission_id)
 
             for comment in comments:
-                prefix = comment["parent_ID"][0:3]
-                parent_id = comment["parent_ID"][3:]
+                prefix = comment["parent_id"][0:3]
+                parent_id = comment["parent_id"][3:]
 
                 relation_id = F"{submission['author_id']}_{comment['author_id']}"
                 comment_upvotes = comment['upvotes']

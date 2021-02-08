@@ -1,0 +1,1 @@
+https://stackoverflow.com/questions/40416072/reading-file-using-relative-path-in-python-project/40416154

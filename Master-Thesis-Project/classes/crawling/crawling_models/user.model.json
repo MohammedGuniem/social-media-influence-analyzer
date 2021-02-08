@@ -1,0 +1,11 @@
+{
+    "id": "id",
+    "name": "name",
+    "created_utc": "created_utc",
+    "has_verified_email": "has_verified_email",
+    "icon_img": "icon_img",
+    "is_employee": "is_employee",
+    "is_gold": "is_gold"
+}
+
+
