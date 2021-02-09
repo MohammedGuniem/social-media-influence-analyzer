@@ -1,50 +1,76 @@
 from neo4j import GraphDatabase
 
 
-class Neo4jConnector:
+class Graph:
 
     def __init__(self, uri, user, password):
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
 
-    def close(self):
+    def addNode(self, ID, Type, props):
+        with self.driver.session() as session:
+
+            # Preparing props for ON CREATE and On MATCH for update
+            props = self.prepare_props(pointer="n", props=props)
+
+            session.write_transaction(
+                self._create_or_update_node, ID, Type, props)
+
+    def addEdge(self, relation_Type, relation_props, from_ID, from_Type, to_ID, to_Type):
+        with self.driver.session() as session:
+
+            # Preparing props for ON CREATE and On MATCH for update
+            relation_props = self.prepare_props(
+                pointer="r", props=relation_props)
+
+            session.write_transaction(
+                self._create_or_update_edge, relation_Type, relation_props, from_ID, from_Type, to_ID, to_Type)
+
+    def __del__(self):
         self.driver.close()
 
-    def prepare_props(self, node_type, props):
-        props_str = ""
-        if len(props.keys()) == 0:
-            return props_str
-
-        for key, value in props.items():
-            props_str += F"{node_type.lower()[0]}.{key} = '{value}', "
-
-        if node_type == "TO":
-            return props_str[:-2].replace("'[", "[").replace("]'", "]")
-        else:
-            return props_str.replace("'[", "[").replace("]'", "]")
-
-    def create_pair(self, from_node_type, from_node_id, from_node_props, relationship_type, relationship_id, relationship_props, to_node_type, to_node_id, to_node_props):
-
-        from_node_props = self.prepare_props("FROM", from_node_props)
-        relationship_props = self.prepare_props(
-            "RELATIONSHIP", relationship_props)
-        to_node_props = self.prepare_props("TO", to_node_props)
-
-        with self.driver.session() as session:
-            session.write_transaction(
-                self._create_or_update_pair, from_node_type, from_node_id, from_node_props, relationship_type, relationship_id, relationship_props, to_node_type, to_node_id, to_node_props)
+    def prepare_props(self, pointer, props):
+        props_query = ""
+        for key, prop in props.items():
+            props_query += pointer+"."+key.lower()
+            if isinstance(prop, list):
+                props_query += " = "+str(prop)+",\n"
+            elif isinstance(prop, dict):
+                props_query += " = '"+json.dumps(prop)+"',\n"
+            else:
+                props_query += " = '"+str(prop)+"',\n"
+        props_query = props_query[:-2]
+        return props_query
 
     @staticmethod
-    def _create_or_update_pair(tx, from_node_type, from_node_id, from_node_props, relationship_type, relationship_id, relationship_props, to_node_type, to_node_id, to_node_props):
-        result = tx.run("MERGE (f:" + from_node_type + " { id: $from_node_id })"
-                        "MERGE (t:" + to_node_type + " { id: $to_node_id })"
-                        "MERGE(f)-[r:" + relationship_type + "]->(t)"
-                        "ON CREATE SET "
-                        F"{from_node_props}"
-                        F"{relationship_props}"
-                        F"{to_node_props}"
-                        "ON MATCH SET "
-                        F"{from_node_props}"
-                        F"{relationship_props}"
-                        F"{to_node_props}"
-                        "RETURN f, r, t", from_node_id=from_node_id, to_node_id=to_node_id)
-        return result.single()
+    def _create_or_update_node(tx, ID, Type, props):
+        Type = Type.upper()[0] + Type.lower()[1:]
+        pointer = "n"
+
+        # Constructing query
+        query = "MERGE ("+pointer+":"+Type+" {network_ID: '"+ID+"'})"
+        query += "\nON CREATE SET\n"
+        query += props
+        query += "\nON MATCH SET\n"
+        query += props
+
+        # Sending query to DB
+        result = tx.run(query)
+
+    @staticmethod
+    def _create_or_update_edge(tx, relation_Type, relation_props, from_ID, from_Type, to_ID, to_Type):
+        relation_Type = relation_Type.upper()[0] + relation_Type.lower()[1:]
+        relation_pointer = "r"
+        relation_ID = from_ID+"_"+to_ID
+
+        # Constructing query
+        query = ""
+        query += "MATCH (from:"+from_Type+" { network_ID: '"+from_ID+"' })\n"
+        query += "MATCH (to:"+to_Type+" { network_ID: '"+to_ID+"' })\n"
+        query += "MERGE(from)-[r:"+relation_Type+"]->(to)"
+        query += "\nON CREATE SET\n"
+        query += relation_props
+        query += "\nON MATCH SET\n"
+        query += relation_props
+
+        # Sending query to DB
+        result = tx.run(query)
