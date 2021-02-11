@@ -1,188 +1,114 @@
-from classes.MongoDBConnector import MongoDBConnector
+class UserGraphModel:
+    def __init__(self, mongo_db_connector, graph_db_connector):
+        self.mongo_db_connector = mongo_db_connector
+        self.graph_db_connector = graph_db_connector
+        self.nodes = {}
+        self.edges = {}
 
+    def addNode(self, activity_object, Type):
+        props = {}
 
-class GraphModel:
-    def __init__(self, mongo_connnection_string):
-        self.mongo_connnection_string = mongo_connnection_string
+        if Type == "Redditor":
+            node_id = activity_object["author_id"]
+            props["name"] = activity_object["author_name"]
 
-    """ Common Methods for all models """
+        elif Type == "Subreddit":
+            node_id = activity_object['id']
+            props["name"] = activity_object['display_name']
+            props["moderators_names"] = []
+            props["moderators_ids"] = []
+            for moderator in activity_object["moderators"]:
+                props["moderators_ids"].append(moderator['id'])
+                props["moderators_names"].append(moderator['name'])
 
-    def makeRelation(self, Type, weight):
-        relation = {
-            "type": Type,
-            "data": {"weight": weight}
-        }
-        return relation
+        if not node_id in self.nodes:
+            self.graph_db_connector.addNode(
+                node_id, Type, props)
+            self.nodes[node_id] = True
 
-    def makeRelationship(self, from_node, to_node, Type, weight):
-        relationship = {
-            "FROM": from_node,
-            "RELATIONSHIP": self.makeRelation(Type=Type, weight=weight),
-            "TO": to_node
-        }
-        return relationship
-
-    def setRelationship(self, model, relation_id, relationship):
-        if relation_id in model:
-            model[relation_id]['RELATIONSHIP']['data']['weight'] += relationship['RELATIONSHIP']['data']['weight']
+    def addEdge(self, from_ID, from_Type, to_ID, to_Type, score):
+        edge_id = F"{from_ID}_{to_ID}"
+        if edge_id in self.edges:
+            self.edges[edge_id] += score
         else:
-            model[relation_id] = relationship
-        return model
+            self.edges[edge_id] = score
 
-    def makeSubredditNode(self, subreddit):
-        node = {
-            "type": "Subreddit",
-            "id": subreddit['id'],
-            "data": {
-                "name": subreddit['display_name'],
-                "moderators_ids": [],
-                "moderators_names": []
-            }
-        }
-        for moderator in subreddit['moderators']:
-            node['data']['moderators_ids'].append(moderator['id'])
-            node['data']['moderators_names'].append(moderator['name'])
-        return node
+        self.graph_db_connector.addEdge(
+            relation_Type="Influences",
+            relation_props={"weight": self.edges[edge_id]},
+            from_ID=from_ID,
+            from_Type=from_Type,
+            to_ID=to_ID,
+            to_Type=to_Type
+        )
 
-    """ Methods used in (Subreddit Object Flow Model) """
-
-    def makeSubmissionNode(self, submission):
-        nodes = {
-            "type": "Submission",
-            "id": submission['id'],
-            "data": {"name": submission['author_name']}
-        }
-        return nodes
-
-    def makeCommentNode(self, comment, Type):
-        node = {
-            "type": Type,
-            "id": comment['id'],
-            "data": {"name": comment['author_name']}
-        }
-        return node
-
-    # Building Subreddit Object Flow Model
-    def buildSubredditObjectFlowModel(self, subreddit_display_name):
-        model = {}
-        mongo_db_connector = MongoDBConnector(self.mongo_connnection_string)
-        subreddit = mongo_db_connector.getSubredditInfo(
+    def buildModel(self, subreddit_display_name=None, submission_type=None):
+        # Get subreddit information.
+        subreddit = self.mongo_db_connector.getSubredditInfo(
             subreddit_display_name)
 
-        subreddit_node = self.makeSubredditNode(subreddit)
-        submissions = mongo_db_connector.getSubmissionsOnSubreddit(
-            subreddit_id=subreddit['id'])
+        # Draw subreddit, containing its moderators
+        self.addNode(activity_object=subreddit, Type="Subreddit")
 
+        # Get all submissions on this subreddit.
+        subreddit_id = subreddit['id']
+        submissions = self.mongo_db_connector.getSubmissionsOnSubreddit(
+            subreddit_id, submission_type)
+
+        comments = []
         for submission in submissions:
-            submission_node = self.makeSubmissionNode(submission)
-            submission_weight = round(
-                submission["upvotes"] * submission["upvote_ratio"], 2)
-            submission_id = submission_node['id']
-            relation_id = F"{subreddit_node['id']}_{submission_id}"
-            relationship = self.makeRelationship(
-                from_node=subreddit_node, to_node=submission_node, Type="Includes", weight=submission_weight)
-            model[relation_id] = relationship
+            submission_author_id = submission["author_id"]
 
-            comments = mongo_db_connector.getCommentsOnSubmission(
-                submission_id=submission_id)
+            # Draw submission authors
+            self.addNode(activity_object=submission, Type="Redditor")
 
-            for comment in comments:
-                prefix = comment["parent_id"][0:3]
-                parent_id = comment["parent_id"][3:]
+            # Draw influence relation between subreddit and submission author
+            self.addEdge(
+                from_ID=subreddit_id,
+                from_Type="Subreddit",
+                to_ID=submission_author_id,
+                to_Type="Redditor",
+                score=1
+            )
 
-                if prefix == "t3_":
-                    root_comment_node = self.makeCommentNode(
-                        comment=comment, Type="Comment")
-                    relation_id = F"{submission_id}_{root_comment_node['id']}"
-                    relationship = self.makeRelationship(
-                        from_node=submission_node, to_node=root_comment_node, Type="Has", weight=comment['upvotes'])
-                    model[relation_id] = relationship
+            # Get all comments on submissions on this subreddit
+            comments += self.mongo_db_connector.getCommentsOnSubmission(
+                submission['id'],
+                submission_type
+            )
 
-                elif prefix == "t1_":
-                    thread_comment_node = self.makeCommentNode(
-                        comment=comment, Type="ThreadComment")
-                    parent_comment = mongo_db_connector.getCommentInfo(
-                        comment_id=parent_id)
-                    if parent_comment['submission_id'] == parent_comment['parent_id']:
-                        parent_comment_type = "Comment"
-                    else:
-                        parent_comment_type = "ThreadComment"
-                    parent_comment_node = self.makeCommentNode(
-                        comment=parent_comment, Type=parent_comment_type)
-                    relation_id = F"{parent_comment_node['id']}_{thread_comment_node['id']}"
-                    relationship = self.makeRelationship(
-                        from_node=parent_comment_node, to_node=thread_comment_node, Type="Has", weight=comment['upvotes'])
-                    model[relation_id] = relationship
+        for comment in comments:
+            comment_author_id = comment['author_id']
 
-        return model
+            # Draw commenters
+            self.addNode(activity_object=comment, Type="Redditor")
 
-    """ Methods used in (Subreddit User Flow Model) """
+            parent_id_prefix = comment['parent_id'][0:2]
+            parent_id = comment['parent_id'][3:]
 
-    def makeRedditorNode(self, submission_or_comment):
-        node = {
-            "type": "Redditor",
-            "id": submission_or_comment['author_id'],
-            "data": {"name": submission_or_comment['author_name']}
-        }
-        return node
+            # Comment is top-level
+            if parent_id_prefix == "t3":
+                # Draw influence relation between submission author and top-level commenters
+                self.addEdge(
+                    from_ID=submission_author_id,
+                    from_Type="Redditor",
+                    to_ID=comment_author_id,
+                    to_Type="Redditor",
+                    score=1
+                )
 
-    # Building Subreddit User Flow Model
-    def buildSubredditUserModel(self, subreddit_display_name):
-        model = {}
-        mongo_db_connector = MongoDBConnector(self.mongo_connnection_string)
-        subreddit = mongo_db_connector.getSubredditInfo(subreddit_display_name)
+            # Comment is a thread comment
+            elif parent_id_prefix == "t1":
+                parent_comment = self.mongo_db_connector.getCommentInfo(
+                    comment_id=parent_id,
+                    Type=submission_type
+                )
 
-        submissions = mongo_db_connector.getSubmissionsOnSubreddit(
-            subreddit_id=subreddit['id'])
-
-        moderators_node = self.makeSubredditNode(subreddit)
-
-        for submission in submissions:
-            submission_author_node = self.makeRedditorNode(
-                submission_or_comment=submission)
-            submission_author_weight = round(
-                submission["upvotes"] * submission["upvote_ratio"], 2)
-
-            relation_id = F"{subreddit['id']}_{submission['author_id']}"
-            relationship = self.makeRelationship(
-                from_node=moderators_node, to_node=submission_author_node, Type="Influences", weight=submission_author_weight)
-
-            model = self.setRelationship(
-                model=model, relation_id=relation_id, relationship=relationship)
-
-            submission_id = submission['id']
-            comments = mongo_db_connector.getCommentsOnSubmission(
-                submission_id=submission_id)
-
-            for comment in comments:
-                prefix = comment["parent_id"][0:3]
-                parent_id = comment["parent_id"][3:]
-
-                relation_id = F"{submission['author_id']}_{comment['author_id']}"
-                comment_upvotes = comment['upvotes']
-
-                if prefix == "t3_":
-                    comment_author_node = self.makeRedditorNode(
-                        submission_or_comment=comment)
-                    relationship = self.makeRelationship(
-                        from_node=submission_author_node, to_node=comment_author_node, Type="Influences", weight=comment_upvotes)
-
-                elif prefix == "t1_":
-                    parent_comment = mongo_db_connector.getCommentInfo(
-                        comment_id=parent_id)
-
-                    parent_comment_author_node = self.makeRedditorNode(
-                        submission_or_comment=parent_comment)
-
-                    thread_comment_author_node = self.makeRedditorNode(
-                        submission_or_comment=comment)
-
-                    relation_id = F"{parent_comment['author_id']}_{comment['author_id']}"
-
-                    relationship = self.makeRelationship(
-                        from_node=parent_comment_author_node, to_node=thread_comment_author_node, Type="Influences", weight=comment_upvotes)
-
-                model = self.setRelationship(
-                    model=model, relation_id=relation_id, relationship=relationship)
-
-        return model
+                # Draw influence relation between parent commenters and child commenters
+                self.addEdge(
+                    from_ID=parent_comment["author_id"],
+                    from_Type="Redditor",
+                    to_ID=comment_author_id,
+                    to_Type="Redditor",
+                    score=1
+                )
