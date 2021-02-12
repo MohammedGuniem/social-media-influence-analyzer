@@ -1,4 +1,4 @@
-class UserGraphModel:
+class ActionGraphModel:
     def __init__(self, mongo_db_connector, graph_db_connector):
         self.mongo_db_connector = mongo_db_connector
         self.graph_db_connector = graph_db_connector
@@ -8,11 +8,7 @@ class UserGraphModel:
     def addNode(self, activity_object, Type):
         props = {}
 
-        if Type == "Redditor":
-            node_id = activity_object["author_id"]
-            props["name"] = activity_object["author_name"]
-
-        elif Type == "Subreddit":
+        if Type == "Subreddit":
             node_id = activity_object['id']
             props["name"] = activity_object['display_name']
             props["moderators_names"] = []
@@ -21,12 +17,17 @@ class UserGraphModel:
                 props["moderators_ids"].append(moderator['id'])
                 props["moderators_names"].append(moderator['name'])
 
+        elif Type in ["Submission", "Top_comment", "Subcomment"]:
+            node_id = activity_object["id"]
+            props["name"] = activity_object["author_name"]
+            props["author_id"] = activity_object["author_id"]
+
         if not node_id in self.nodes:
             self.graph_db_connector.addNode(
                 node_id, Type, props)
-            self.nodes[node_id] = True
+            self.nodes[node_id] = Type
 
-    def addEdge(self, from_ID, from_Type, to_ID, to_Type, score):
+    def addEdge(self, from_ID, to_ID, score):
         edge_id = F"{from_ID}_{to_ID}"
         if edge_id in self.edges:
             self.edges[edge_id] += score
@@ -37,9 +38,9 @@ class UserGraphModel:
             relation_Type="Influences",
             relation_props={"weight": self.edges[edge_id]},
             from_ID=from_ID,
-            from_Type=from_Type,
+            from_Type=self.nodes[from_ID],
             to_ID=to_ID,
-            to_Type=to_Type
+            to_Type=self.nodes[to_ID],
         )
 
     def buildModel(self, subreddit_display_name=None, submission_type=None):
@@ -57,48 +58,47 @@ class UserGraphModel:
 
         comments = []
         for submission in submissions:
-            submission_author_id = submission["author_id"]
+            submission_id = submission["id"]
 
             # Draw submission authors
-            self.addNode(activity_object=submission, Type="Redditor")
+            self.addNode(activity_object=submission, Type="Submission")
 
-            # Draw influence relation between subreddit and submission author
+            # Draw influence relation between subreddit and submission
             self.addEdge(
                 from_ID=subreddit_id,
-                from_Type="Subreddit",
-                to_ID=submission_author_id,
-                to_Type="Redditor",
-                score=1
+                to_ID=submission_id,
+                score=round(submission["upvote_ratio"]*submission["upvotes"])
             )
 
             # Get all comments on submissions on this subreddit
             comments += self.mongo_db_connector.getCommentsOnSubmission(
-                submission['id'],
+                submission_id,
                 submission_type
             )
 
         for comment in comments:
-            comment_author_id = comment['author_id']
-
-            # Draw commenters
-            self.addNode(activity_object=comment, Type="Redditor")
+            comment_id = comment['id']
 
             parent_id_prefix = comment['parent_id'][0:2]
             parent_id = comment['parent_id'][3:]
 
             # Comment is top-level
             if parent_id_prefix == "t3":
-                # Draw influence relation between submission author and top-level commenters
+                # Draw top-level comment
+                self.addNode(activity_object=comment, Type="Top_comment")
+
+                # Draw influence relation between submissions author and top-level
                 self.addEdge(
-                    from_ID=submission_author_id,
-                    from_Type="Redditor",
-                    to_ID=comment_author_id,
-                    to_Type="Redditor",
-                    score=1
+                    from_ID=submission_id,
+                    to_ID=comment_id,
+                    score=comment["upvotes"]
                 )
 
-            # Comment is a thread comment
+            # Comment is a subcomment
             elif parent_id_prefix == "t1":
+                # Draw subcomment
+                self.addNode(activity_object=comment, Type="Subcomment")
+
                 parent_comment = self.mongo_db_connector.getCommentInfo(
                     comment_id=parent_id,
                     Type=submission_type
@@ -106,9 +106,7 @@ class UserGraphModel:
 
                 # Draw influence relation between parent commenters and child commenters
                 self.addEdge(
-                    from_ID=parent_comment["author_id"],
-                    from_Type="Redditor",
-                    to_ID=comment_author_id,
-                    to_Type="Redditor",
-                    score=1
+                    from_ID=parent_comment["id"],
+                    to_ID=comment_id,
+                    score=comment["upvotes"]
                 )

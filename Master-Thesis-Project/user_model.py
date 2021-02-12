@@ -1,6 +1,6 @@
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
-from classes.database_connectors.Neo4jConnector import Graph
-from classes.modelling.GraphModelling import UserGraphModel
+from classes.database_connectors.Neo4jConnector import GraphDBConnector
+from classes.modelling.UserGraphModelling import UserGraphModel
 
 from dotenv import load_dotenv
 import os
@@ -11,7 +11,7 @@ MongoDB_connection_string = os.environ.get('mongo_connnection_string')
 
 # Database connectors
 mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
-graph_db_connector = Graph("bolt://localhost:7687", "neo4j", "1234")
+graph_db_connector = GraphDBConnector("bolt://localhost:7687", "neo4j", "1234")
 
 user_graph_model = UserGraphModel(mongo_db_connector, graph_db_connector)
 
