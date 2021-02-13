@@ -92,3 +92,10 @@ class MongoDBConnector:
         collection = database[self.collection]
         client.close()
         return list(collection.find({"id": comment_id}))[0]
+
+    def getCommentChildren(self, comment_id, Type):
+        client = pymongo.MongoClient(self.connection_string)
+        database = client[F"{Type}_Comments_DB"]
+        collection = database[self.collection]
+        client.close()
+        return list(collection.find({"parent_id": F"t1_{comment_id}"}))

@@ -30,12 +30,13 @@ class UserGraphModel:
         edge_id = F"{from_ID}_{to_ID}"
         if edge_id in self.edges:
             self.edges[edge_id] += score
+            score = self.edges[edge_id]
         else:
             self.edges[edge_id] = score
 
         self.graph_db_connector.addEdge(
-            relation_Type="Influences",
-            relation_props={"weight": self.edges[edge_id]},
+            relation_Type=F"Influences_{score}_",
+            relation_props={"weight": score},
             from_ID=from_ID,
             from_Type=self.nodes[from_ID],
             to_ID=to_ID,
