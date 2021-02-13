@@ -20,7 +20,7 @@ redditCrawler = RedditCrawler(
 subreddit_limit = 3
 
 # A limit for the number of submissions to crawl
-submission_limit = 50
+submission_limit = 3
 
 # Type of submissions to crawl
 Types = []
@@ -76,7 +76,7 @@ for Type in Types:
         database_name=F"{Type}_Submissions_DB", collection_name=str(date.today()), data=submissions)
 
     comments, commenters = [], []
-    for submission in submissions_info:
+    for submission in submissions:
         comments_info, users_info, execution_time = redditCrawler.crawlComments(
             submission_id=submission['id'])
         comments += comments_info

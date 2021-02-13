@@ -57,13 +57,6 @@ class MongoDBConnector:
         data = list(collection.find())
         return data
 
-    def getSubmissionsOnSubreddit(self, subreddit_id, Type):
-        client = pymongo.MongoClient(self.connection_string)
-        database = client[F"{Type}_Submissions_DB"]
-        collection = database[self.collection]
-        client.close()
-        return list(collection.find({"subreddit_id": subreddit_id}))
-
     def getRunningTime(self):
         client = pymongo.MongoClient(self.connection_string)
         database = client["admin"]
@@ -71,18 +64,38 @@ class MongoDBConnector:
         client.close()
         return list(collection.find())
 
-#
-
-    def getCommentsOnSubmission(self, submission_id):
+    def getSubredditInfo(self, display_name):
         client = pymongo.MongoClient(self.connection_string)
-        database = client[F"{self.Type}_Comments_DB"]
+        database = client["Subreddits_DB"]
         collection = database[self.collection]
         client.close()
-        return list(collection.find({"submission_ID": F"t3_{submission_id}"}))
+        data = list(collection.find({"display_name": display_name}))
+        return data[0]
 
-    def getCommentInfo(self, comment_id):
+    def getSubmissionsOnSubreddit(self, subreddit_id, Type):
         client = pymongo.MongoClient(self.connection_string)
-        database = client[F"{self.Type}_Comments_DB"]
+        database = client[F"{Type}_Submissions_DB"]
+        collection = database[self.collection]
+        client.close()
+        return list(collection.find({"subreddit_id": subreddit_id}))
+
+    def getCommentsOnSubmission(self, submission_id, Type):
+        client = pymongo.MongoClient(self.connection_string)
+        database = client[F"{Type}_Comments_DB"]
+        collection = database[self.collection]
+        client.close()
+        return list(collection.find({"submission_id": "t3_"+submission_id}))
+
+    def getCommentInfo(self, comment_id, Type):
+        client = pymongo.MongoClient(self.connection_string)
+        database = client[F"{Type}_Comments_DB"]
         collection = database[self.collection]
         client.close()
         return list(collection.find({"id": comment_id}))[0]
+
+    def getCommentChildren(self, comment_id, Type):
+        client = pymongo.MongoClient(self.connection_string)
+        database = client[F"{Type}_Comments_DB"]
+        collection = database[self.collection]
+        client.close()
+        return list(collection.find({"parent_id": F"t1_{comment_id}"}))
