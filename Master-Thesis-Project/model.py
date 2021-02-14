@@ -61,15 +61,15 @@ print(action_model_statistics)
 
 print("user graph model values count")
 l = list(user_graph_model.edges.values())
-for i in range(0, 7):
+for i in sorted(set(l)):
     print(F"value: {i}, count: {l.count(i)}")
 
 print("action graph model values count")
 l = list(action_graph_model.edges.values())
-for i in range(0, 7):
+for i in sorted(set(l)):
     print(F"value: {i}, count: {l.count(i)}")
 
 print("combined graph model values count")
 l = list(combined_graph_model.edges.values())
-for i in range(0, 7):
+for i in sorted(set(l)):
     print(F"value: {i}, count: {l.count(i)}")
