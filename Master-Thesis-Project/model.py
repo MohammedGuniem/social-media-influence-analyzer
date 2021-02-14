@@ -3,7 +3,8 @@ from classes.database_connectors.Neo4jConnector import GraphDBConnector
 from classes.modelling.ActionGraphModelling import ActionGraphModel
 from classes.modelling.UserGraphModelling import UserGraphModel
 from dotenv import load_dotenv
-import sys
+import pandas as pd
+import numpy as np
 import os
 
 # Loading Enviroment variables
@@ -14,29 +15,61 @@ MongoDB_connection_string = os.environ.get('mongo_connnection_string')
 mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
 graph_db_connector = GraphDBConnector("bolt://localhost:7687", "neo4j", "1234")
 
-#user_choice = input(    "Enter (U) for User Model, (A) for Action Model, (*) for both and (0 or any other key) to exit:").upper()
 
-user_choice = "U"
+def getSummaryStatistics(df):
+    # Rename '50%' percentile to '50% - median' since it is the same.
+    summary_statistics = df.describe(
+        percentiles=[0.1, 0.25, 0.5, 0.75, 0.9]).rename(index={'50%': '50% - median'})
 
-if user_choice == "U":
-    graph_model = UserGraphModel(mongo_db_connector, graph_db_connector)
-elif user_choice == "A":
-    graph_model = ActionGraphModel(mongo_db_connector, graph_db_connector)
-elif user_choice == "*":
-    print("Making mixed/hyper graph...")
-else:
-    sys.exit(0)
+    # Calculate mode and append to statistics dataframe.
+    mode_statistics = df.mode().rename(index={0: 'mode'}).iloc[0]
+    summary_statistics = summary_statistics.append(mode_statistics)
 
-subreddits = mongo_db_connector.getSubredditsInfo()
-submissions_types = ["New", "Rising"]
+    # Calculate variance and append to statistics dataframe.
+    var_statistics = pd.DataFrame(
+        df.var()).transpose().rename(index={0: 'var'})
+    summary_statistics = summary_statistics.append(var_statistics)
 
-for submissions_type in submissions_types:
-    for subreddit in subreddits:
-        graph_model.buildModel(
-            subreddit_display_name=subreddit["display_name"],
-            submission_type=submissions_type
-        )
+    return summary_statistics
 
-print(F"Number of nodes: {len(graph_model.nodes)}")
-print(F"Number of edges: {len(graph_model.edges)}")
-print(F"Sum of all edge's weights: {sum(graph_model.edges.values())}")
+
+user_graph_model = UserGraphModel(mongo_db_connector, graph_db_connector)
+user_graph_model.buildModel(add_activity_weight=False)
+user_edge_weights = user_graph_model.edges.values()
+
+combined_graph_model = UserGraphModel(mongo_db_connector, graph_db_connector)
+combined_graph_model.buildModel(add_activity_weight=True)
+edge_weights_combined = combined_graph_model.edges.values()
+
+user_models_edge_weights_df = pd.DataFrame({
+    'User model': user_edge_weights,
+    'Combined model': edge_weights_combined
+})
+
+user_models_statistics = getSummaryStatistics(df=user_models_edge_weights_df)
+print(user_models_statistics)
+
+action_graph_model = ActionGraphModel(mongo_db_connector, graph_db_connector)
+action_graph_model.buildModel()
+action_edge_weights = action_graph_model.edges.values()
+
+action_model_edge_weights_df = pd.DataFrame({
+    'Action Model': action_edge_weights
+})
+action_model_statistics = getSummaryStatistics(df=action_model_edge_weights_df)
+print(action_model_statistics)
+
+print("user graph model values count")
+l = list(user_graph_model.edges.values())
+for i in range(0, 7):
+    print(F"value: {i}, count: {l.count(i)}")
+
+print("action graph model values count")
+l = list(action_graph_model.edges.values())
+for i in range(0, 7):
+    print(F"value: {i}, count: {l.count(i)}")
+
+print("combined graph model values count")
+l = list(combined_graph_model.edges.values())
+for i in range(0, 7):
+    print(F"value: {i}, count: {l.count(i)}")

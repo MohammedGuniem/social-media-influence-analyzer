@@ -1,10 +1,12 @@
 class UserGraphModel:
+    ###
     def __init__(self, mongo_db_connector, graph_db_connector):
         self.mongo_db_connector = mongo_db_connector
         self.graph_db_connector = graph_db_connector
         self.nodes = {}
         self.edges = {}
 
+    ###
     def addNode(self, activity_object, Type):
         props = {}
 
@@ -26,6 +28,7 @@ class UserGraphModel:
                 node_id, Type, props)
             self.nodes[node_id] = Type
 
+    ###
     def addEdge(self, from_ID, to_ID, score):
         edge_id = F"{from_ID}_{to_ID}"
         if edge_id in self.edges:
@@ -43,13 +46,24 @@ class UserGraphModel:
             to_Type=self.nodes[to_ID]
         )
 
-    def buildModel(self, subreddit_display_name=None, submission_type=None):
+    ###
+    def getCommentChildrenCount(self, comments_array, submission_type):
+        for comment in comments_array:
+            children = self.mongo_db_connector.getCommentChildren(
+                comment_id=comment['id'], Type=submission_type)
+
+            children_num = len(children)
+            if children_num == 0:
+                return 0
+            else:
+                score = len(children) + self.getCommentChildrenCount(
+                    comments_array=children, submission_type=submission_type)
+            return score
+
+    def buildModelForSubredditAndType(self, subreddit_display_name, submission_type, add_activity_weight):
         # Get subreddit information.
         subreddit = self.mongo_db_connector.getSubredditInfo(
             subreddit_display_name)
-
-        # Draw subreddit, containing its moderators
-        self.addNode(activity_object=subreddit, Type="Subreddit")
 
         # Get all submissions on this subreddit.
         subreddit_id = subreddit['id']
@@ -62,18 +76,15 @@ class UserGraphModel:
             # Draw submission authors
             self.addNode(activity_object=submission, Type="Redditor")
 
-            # Draw influence relation between subreddit and submission author
-            self.addEdge(
-                from_ID=subreddit_id,
-                to_ID=submission_author_id,
-                score=1
-            )
-
             # Get all comments on submissions on this subreddit
             comments = self.mongo_db_connector.getCommentsOnSubmission(
                 submission['id'],
                 submission_type
             )
+            if add_activity_weight:
+                score = 1 + len(comments)
+            else:
+                score = 1
 
             for comment in comments:
                 comment_author_id = comment['author_id']
@@ -84,13 +95,19 @@ class UserGraphModel:
                 parent_id_prefix = comment['parent_id'][0:2]
                 parent_id = comment['parent_id'][3:]
 
+                if add_activity_weight:
+                    score = 1 + self.getCommentChildrenCount(
+                        comments_array=[comment], submission_type=submission_type)
+                else:
+                    score = 1
+
                 # Comment is top-level
                 if parent_id_prefix == "t3":
                     # Draw influence relation between submission author and top-level commenters
                     self.addEdge(
                         from_ID=submission_author_id,
                         to_ID=comment_author_id,
-                        score=1
+                        score=score
                     )
 
                 # Comment is a thread comment
@@ -104,5 +121,17 @@ class UserGraphModel:
                     self.addEdge(
                         from_ID=parent_comment["author_id"],
                         to_ID=comment_author_id,
-                        score=1
+                        score=score
                     )
+
+    def buildModel(self, add_activity_weight):
+        subreddits = self.mongo_db_connector.getSubredditsInfo()
+        submissions_types = ["New", "Rising"]
+
+        for submissions_type in submissions_types:
+            for subreddit in subreddits:
+                self.buildModelForSubredditAndType(
+                    subreddit_display_name=subreddit["display_name"],
+                    submission_type=submissions_type,
+                    add_activity_weight=add_activity_weight
+                )
