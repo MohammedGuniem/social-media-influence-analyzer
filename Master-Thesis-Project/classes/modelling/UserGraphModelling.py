@@ -35,7 +35,7 @@ class UserGraphModel:
             self.edges[edge_id] = score
 
         self.graph_db_connector.addEdge(
-            relation_Type=F"Influences_{score}_",
+            relation_Type=F"Influences",
             relation_props={"weight": score},
             from_ID=from_ID,
             from_Type=self.nodes[from_ID],
@@ -56,7 +56,6 @@ class UserGraphModel:
         submissions = self.mongo_db_connector.getSubmissionsOnSubreddit(
             subreddit_id, submission_type)
 
-        comments = []
         for submission in submissions:
             submission_author_id = submission["author_id"]
 
@@ -71,39 +70,39 @@ class UserGraphModel:
             )
 
             # Get all comments on submissions on this subreddit
-            comments += self.mongo_db_connector.getCommentsOnSubmission(
+            comments = self.mongo_db_connector.getCommentsOnSubmission(
                 submission['id'],
                 submission_type
             )
 
-        for comment in comments:
-            comment_author_id = comment['author_id']
+            for comment in comments:
+                comment_author_id = comment['author_id']
 
-            # Draw commenters
-            self.addNode(activity_object=comment, Type="Redditor")
+                # Draw commenters
+                self.addNode(activity_object=comment, Type="Redditor")
 
-            parent_id_prefix = comment['parent_id'][0:2]
-            parent_id = comment['parent_id'][3:]
+                parent_id_prefix = comment['parent_id'][0:2]
+                parent_id = comment['parent_id'][3:]
 
-            # Comment is top-level
-            if parent_id_prefix == "t3":
-                # Draw influence relation between submission author and top-level commenters
-                self.addEdge(
-                    from_ID=submission_author_id,
-                    to_ID=comment_author_id,
-                    score=1
-                )
+                # Comment is top-level
+                if parent_id_prefix == "t3":
+                    # Draw influence relation between submission author and top-level commenters
+                    self.addEdge(
+                        from_ID=submission_author_id,
+                        to_ID=comment_author_id,
+                        score=1
+                    )
 
-            # Comment is a thread comment
-            elif parent_id_prefix == "t1":
-                parent_comment = self.mongo_db_connector.getCommentInfo(
-                    comment_id=parent_id,
-                    Type=submission_type
-                )
+                # Comment is a thread comment
+                elif parent_id_prefix == "t1":
+                    parent_comment = self.mongo_db_connector.getCommentInfo(
+                        comment_id=parent_id,
+                        Type=submission_type
+                    )
 
-                # Draw influence relation between parent commenters and child commenters
-                self.addEdge(
-                    from_ID=parent_comment["author_id"],
-                    to_ID=comment_author_id,
-                    score=1
-                )
+                    # Draw influence relation between parent commenters and child commenters
+                    self.addEdge(
+                        from_ID=parent_comment["author_id"],
+                        to_ID=comment_author_id,
+                        score=1
+                    )

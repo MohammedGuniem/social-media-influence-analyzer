@@ -14,8 +14,10 @@ MongoDB_connection_string = os.environ.get('mongo_connnection_string')
 mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
 graph_db_connector = GraphDBConnector("bolt://localhost:7687", "neo4j", "1234")
 
-user_choice = input(
-    "Enter (U) for User Model, (A) for Action Model, (*) for both and (0 or any other key) to exit:").upper()
+#user_choice = input(    "Enter (U) for User Model, (A) for Action Model, (*) for both and (0 or any other key) to exit:").upper()
+
+user_choice = "U"
+
 if user_choice == "U":
     graph_model = UserGraphModel(mongo_db_connector, graph_db_connector)
 elif user_choice == "A":
@@ -34,3 +36,7 @@ for submissions_type in submissions_types:
             subreddit_display_name=subreddit["display_name"],
             submission_type=submissions_type
         )
+
+print(F"Number of nodes: {len(graph_model.nodes)}")
+print(F"Number of edges: {len(graph_model.edges)}")
+print(F"Sum of all edge's weights: {sum(graph_model.edges.values())}")

@@ -37,7 +37,7 @@ class ActionGraphModel:
             self.edges[edge_id] = score
 
         self.graph_db_connector.addEdge(
-            relation_Type=F"Influences_{score}_",
+            relation_Type=F"Influences",
             relation_props={"weight": score},
             from_ID=from_ID,
             from_Type=self.nodes[from_ID],
