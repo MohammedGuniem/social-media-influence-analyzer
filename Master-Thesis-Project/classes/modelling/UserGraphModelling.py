@@ -1,7 +1,8 @@
 class UserGraphModel:
-    def __init__(self, mongo_db_connector, graph_db_connector):
+    def __init__(self, mongo_db_connector, graph_db_connector, write_to_database):
         self.mongo_db_connector = mongo_db_connector
         self.graph_db_connector = graph_db_connector
+        self.write_to_database = write_to_database
         self.nodes = {}
         self.edges = {}
 
@@ -22,8 +23,8 @@ class UserGraphModel:
                 props["moderators_names"].append(moderator['name'])
 
         if not node_id in self.nodes:
-            self.graph_db_connector.addNode(
-                node_id, Type, props)
+            if self.write_to_database:
+                self.graph_db_connector.addNode(node_id, Type, props)
             self.nodes[node_id] = Type
 
     def addEdge(self, from_ID, to_ID, score):
@@ -34,76 +35,105 @@ class UserGraphModel:
         else:
             self.edges[edge_id] = score
 
-        self.graph_db_connector.addEdge(
-            relation_Type=F"Influences_{score}_",
-            relation_props={"weight": score},
-            from_ID=from_ID,
-            from_Type=self.nodes[from_ID],
-            to_ID=to_ID,
-            to_Type=self.nodes[to_ID]
-        )
+        if self.write_to_database:
+            self.graph_db_connector.addEdge(
+                relation_Type=F"Influences",
+                relation_props={"weight": score},
+                from_ID=from_ID,
+                from_Type=self.nodes[from_ID],
+                to_ID=to_ID,
+                to_Type=self.nodes[to_ID]
+            )
 
-    def buildModel(self, subreddit_display_name=None, submission_type=None):
+    def getCommentChildrenCount(self, comments_array, submission_type):
+        for comment in comments_array:
+            children = self.mongo_db_connector.getCommentChildren(
+                comment_id=comment['id'], Type=submission_type)
+
+            children_num = len(children)
+            if children_num == 0:
+                return 0
+            else:
+                score = len(children) + self.getCommentChildrenCount(
+                    comments_array=children, submission_type=submission_type)
+            return score
+
+    def buildModelForSubredditAndType(self, subreddit_display_name, submission_type, connection_count_score, activity_weight_score, upvotes_count_score):
         # Get subreddit information.
         subreddit = self.mongo_db_connector.getSubredditInfo(
             subreddit_display_name)
-
-        # Draw subreddit, containing its moderators
-        self.addNode(activity_object=subreddit, Type="Subreddit")
 
         # Get all submissions on this subreddit.
         subreddit_id = subreddit['id']
         submissions = self.mongo_db_connector.getSubmissionsOnSubreddit(
             subreddit_id, submission_type)
 
-        comments = []
         for submission in submissions:
             submission_author_id = submission["author_id"]
 
             # Draw submission authors
             self.addNode(activity_object=submission, Type="Redditor")
 
-            # Draw influence relation between subreddit and submission author
-            self.addEdge(
-                from_ID=subreddit_id,
-                to_ID=submission_author_id,
-                score=1
-            )
-
             # Get all comments on submissions on this subreddit
-            comments += self.mongo_db_connector.getCommentsOnSubmission(
+            comments = self.mongo_db_connector.getCommentsOnSubmission(
                 submission['id'],
                 submission_type
             )
 
-        for comment in comments:
-            comment_author_id = comment['author_id']
+            for comment in comments:
+                comment_author_id = comment['author_id']
 
-            # Draw commenters
-            self.addNode(activity_object=comment, Type="Redditor")
+                # Draw commenters
+                self.addNode(activity_object=comment, Type="Redditor")
 
-            parent_id_prefix = comment['parent_id'][0:2]
-            parent_id = comment['parent_id'][3:]
+                parent_id_prefix = comment['parent_id'][0:2]
+                parent_id = comment['parent_id'][3:]
 
-            # Comment is top-level
-            if parent_id_prefix == "t3":
-                # Draw influence relation between submission author and top-level commenters
-                self.addEdge(
-                    from_ID=submission_author_id,
-                    to_ID=comment_author_id,
-                    score=1
-                )
+                score = 1 if connection_count_score else 0
+                score += self.getCommentChildrenCount(
+                    comments_array=[comment], submission_type=submission_type) if activity_weight_score else 0
 
-            # Comment is a thread comment
-            elif parent_id_prefix == "t1":
-                parent_comment = self.mongo_db_connector.getCommentInfo(
-                    comment_id=parent_id,
-                    Type=submission_type
-                )
+                # Comment is top-level
+                if parent_id_prefix == "t3":
 
-                # Draw influence relation between parent commenters and child commenters
-                self.addEdge(
-                    from_ID=parent_comment["author_id"],
-                    to_ID=comment_author_id,
-                    score=1
-                )
+                    score += submission["upvotes"] if upvotes_count_score else 0
+
+                    # Draw influence relation between submission author and top-level commenters
+                    self.addEdge(
+                        from_ID=submission_author_id,
+                        to_ID=comment_author_id,
+                        score=score
+                    )
+
+                # Comment is a thread comment
+                elif parent_id_prefix == "t1":
+
+                    score += comment["upvotes"] if upvotes_count_score else 0
+
+                    parent_comment = self.mongo_db_connector.getCommentInfo(
+                        comment_id=parent_id,
+                        Type=submission_type
+                    )
+
+                    if parent_comment:
+                        # Draw influence relation between parent commenters and child commenters
+                        self.addEdge(
+                            from_ID=parent_comment["author_id"],
+                            to_ID=comment_author_id,
+                            score=score
+                        )
+
+    def buildModel(self, add_connection_count=False, add_activity_weight=False, add_upvotes_count=False):
+        self.nodes = {}
+        self.edges = {}
+        subreddits = self.mongo_db_connector.getSubredditsInfo()
+        submissions_types = ["New", "Rising"]
+
+        for submissions_type in submissions_types:
+            for subreddit in subreddits:
+                self.buildModelForSubredditAndType(
+                    subreddit_display_name=subreddit["display_name"],
+                    submission_type=submissions_type,
+                    connection_count_score=add_connection_count,
+                    activity_weight_score=add_activity_weight,
+                    upvotes_count_score=add_upvotes_count)

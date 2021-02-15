@@ -37,7 +37,7 @@ class ActionGraphModel:
             self.edges[edge_id] = score
 
         self.graph_db_connector.addEdge(
-            relation_Type=F"Influences_{score}_",
+            relation_Type=F"Influences",
             relation_props={"weight": score},
             from_ID=from_ID,
             from_Type=self.nodes[from_ID],
@@ -58,13 +58,10 @@ class ActionGraphModel:
                     comments_array=children, submission_type=submission_type)
             return score
 
-    def buildModel(self, subreddit_display_name=None, submission_type=None):
+    def buildModelForSubredditAndType(self, subreddit_display_name, submission_type):
         # Get subreddit information.
         subreddit = self.mongo_db_connector.getSubredditInfo(
             subreddit_display_name)
-
-        # Draw subreddit, containing its moderators
-        self.addNode(activity_object=subreddit, Type="Subreddit")
 
         # Get all submissions on this subreddit.
         subreddit_id = subreddit['id']
@@ -83,13 +80,7 @@ class ActionGraphModel:
                 submission_type
             )
 
-            # Draw influence relation between subreddit and submission
             submission_score = len(comments) + 1
-            self.addEdge(
-                from_ID=subreddit_id,
-                to_ID=submission_id,
-                score=round(submission_score)
-            )
 
             for comment in comments:
                 comment_id = comment['id']
@@ -118,4 +109,16 @@ class ActionGraphModel:
                     from_ID=from_node_id,
                     to_ID=comment_id,
                     score=comment_score
+                )
+
+    ##
+    def buildModel(self):
+        subreddits = self.mongo_db_connector.getSubredditsInfo()
+        submissions_types = ["New", "Rising"]
+
+        for submissions_type in submissions_types:
+            for subreddit in subreddits:
+                self.buildModelForSubredditAndType(
+                    subreddit_display_name=subreddit["display_name"],
+                    submission_type=submissions_type
                 )

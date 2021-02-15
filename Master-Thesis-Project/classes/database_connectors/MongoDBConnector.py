@@ -10,6 +10,7 @@ class MongoDBConnector:
             self.collection = collection_name
         else:
             self.collection = self.getMostRecentValidCollection()
+        print(F"Data feed from: {self.collection}")
 
     def getMostRecentValidCollection(self):
         client = pymongo.MongoClient(self.connection_string)
@@ -91,7 +92,9 @@ class MongoDBConnector:
         database = client[F"{Type}_Comments_DB"]
         collection = database[self.collection]
         client.close()
-        return list(collection.find({"id": comment_id}))[0]
+        data = list(collection.find({"id": comment_id}))
+        result = data[0] if len(data) > 0 else None
+        return result
 
     def getCommentChildren(self, comment_id, Type):
         client = pymongo.MongoClient(self.connection_string)
