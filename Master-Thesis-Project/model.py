@@ -17,36 +17,50 @@ graph_db_connector = GraphDBConnector("bolt://localhost:7687", "neo4j", "1234")
 user_model = UserGraphModel(
     mongo_db_connector, graph_db_connector, write_to_database=False)
 
+print("building User Graph model without any edge weight...")
+# u - User Graph model without any edge weight
+user_model.buildModel()
+u_edge_weights = user_model.edges.values()
+
 # uc - User Graph model with connection score only
+print("building User Graph model with connection score only...")
 user_model.buildModel(add_connection_count=True)
 uc_edge_weights = user_model.edges.values()
 
+print("building User Graph model with activity score only...")
 # ua - User Graph model with activity score only
 user_model.buildModel(add_activity_weight=True)
 ua_edge_weights = user_model.edges.values()
 
+print("building User Graph model with upvote score only")
 # uu - User Graph model with upvote score only
 user_model.buildModel(add_upvotes_count=True)
 uu_edge_weights = user_model.edges.values()
 
+print("building User Graph model with connection and activity scores...")
 # uca - User Graph model with connection and activity scores
 user_model.buildModel(add_connection_count=True, add_activity_weight=True)
 uca_edge_weights = user_model.edges.values()
 
+print("building User Graph model with connection and upvote scores...")
 # uca - User Graph model with connection and upvote scores
 user_model.buildModel(add_connection_count=True, add_upvotes_count=True)
 ucu_edge_weights = user_model.edges.values()
 
+print("building User Graph model with activity and upvote scores...")
 # uau - User Graph model with activity and upvote scores
 user_model.buildModel(add_activity_weight=True, add_upvotes_count=True)
 uau_edge_weights = user_model.edges.values()
 
+print("building User Graph model with connection, activity and upvote scores...")
 # ucau - User Graph model with connection, activity and upvote scores
 user_model.buildModel(add_connection_count=True,
                       add_upvotes_count=True, add_activity_weight=True)
 ucau_edge_weights = user_model.edges.values()
 
+print("Calculating Summary Statistics...")
 user_models_edge_weights = {
+    'no score': u_edge_weights,
     'connection': uc_edge_weights,
     'activity': ua_edge_weights,
     'upvotes': uu_edge_weights,
@@ -58,6 +72,9 @@ user_models_edge_weights = {
 
 user_models_statistics = s.getSummaryStatistics(
     data_dict=user_models_edge_weights)
+
+print("Summary statistics cross validation for user graph models")
+print("using 3 different scoring techniques for user relations")
 print(user_models_statistics)
 
 """

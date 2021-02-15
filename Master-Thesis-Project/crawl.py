@@ -17,10 +17,10 @@ redditCrawler = RedditCrawler(
     client_id, client_secret, user_agent, username, password)
 
 # A limit for the number of subreddits to crawl
-subreddit_limit = 3
+subreddit_limit = 6
 
 # A limit for the number of submissions to crawl
-submission_limit = 3
+submission_limit = 6
 
 # Type of submissions to crawl
 Types = []

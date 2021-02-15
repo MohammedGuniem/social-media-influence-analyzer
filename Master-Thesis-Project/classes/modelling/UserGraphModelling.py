@@ -115,12 +115,13 @@ class UserGraphModel:
                         Type=submission_type
                     )
 
-                    # Draw influence relation between parent commenters and child commenters
-                    self.addEdge(
-                        from_ID=parent_comment["author_id"],
-                        to_ID=comment_author_id,
-                        score=score
-                    )
+                    if parent_comment:
+                        # Draw influence relation between parent commenters and child commenters
+                        self.addEdge(
+                            from_ID=parent_comment["author_id"],
+                            to_ID=comment_author_id,
+                            score=score
+                        )
 
     def buildModel(self, add_connection_count=False, add_activity_weight=False, add_upvotes_count=False):
         self.nodes = {}
