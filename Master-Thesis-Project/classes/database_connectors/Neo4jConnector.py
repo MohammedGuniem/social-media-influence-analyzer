@@ -20,7 +20,6 @@ class GraphDBConnector:
 
             # Preparing props for ON CREATE and On MATCH for update
 
-            relation_props["label"] = "Yes"
             relation_props = self.prepare_props(
                 pointer="r", props=relation_props)
 

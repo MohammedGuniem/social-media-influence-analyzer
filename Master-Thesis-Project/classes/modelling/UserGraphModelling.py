@@ -1,12 +1,11 @@
 class UserGraphModel:
-    ###
-    def __init__(self, mongo_db_connector, graph_db_connector):
+    def __init__(self, mongo_db_connector, graph_db_connector, write_to_database):
         self.mongo_db_connector = mongo_db_connector
         self.graph_db_connector = graph_db_connector
+        self.write_to_database = write_to_database
         self.nodes = {}
         self.edges = {}
 
-    ###
     def addNode(self, activity_object, Type):
         props = {}
 
@@ -24,11 +23,10 @@ class UserGraphModel:
                 props["moderators_names"].append(moderator['name'])
 
         if not node_id in self.nodes:
-            self.graph_db_connector.addNode(
-                node_id, Type, props)
+            if self.write_to_database:
+                self.graph_db_connector.addNode(node_id, Type, props)
             self.nodes[node_id] = Type
 
-    ###
     def addEdge(self, from_ID, to_ID, score):
         edge_id = F"{from_ID}_{to_ID}"
         if edge_id in self.edges:
@@ -37,16 +35,16 @@ class UserGraphModel:
         else:
             self.edges[edge_id] = score
 
-        self.graph_db_connector.addEdge(
-            relation_Type=F"Influences",
-            relation_props={"weight": score},
-            from_ID=from_ID,
-            from_Type=self.nodes[from_ID],
-            to_ID=to_ID,
-            to_Type=self.nodes[to_ID]
-        )
+        if self.write_to_database:
+            self.graph_db_connector.addEdge(
+                relation_Type=F"Influences",
+                relation_props={"weight": score},
+                from_ID=from_ID,
+                from_Type=self.nodes[from_ID],
+                to_ID=to_ID,
+                to_Type=self.nodes[to_ID]
+            )
 
-    ###
     def getCommentChildrenCount(self, comments_array, submission_type):
         for comment in comments_array:
             children = self.mongo_db_connector.getCommentChildren(
@@ -60,7 +58,7 @@ class UserGraphModel:
                     comments_array=children, submission_type=submission_type)
             return score
 
-    def buildModelForSubredditAndType(self, subreddit_display_name, submission_type, add_activity_weight):
+    def buildModelForSubredditAndType(self, subreddit_display_name, submission_type, connection_count_score, activity_weight_score, upvotes_count_score):
         # Get subreddit information.
         subreddit = self.mongo_db_connector.getSubredditInfo(
             subreddit_display_name)
@@ -81,10 +79,6 @@ class UserGraphModel:
                 submission['id'],
                 submission_type
             )
-            if add_activity_weight:
-                score = 1 + len(comments)
-            else:
-                score = 1
 
             for comment in comments:
                 comment_author_id = comment['author_id']
@@ -95,14 +89,15 @@ class UserGraphModel:
                 parent_id_prefix = comment['parent_id'][0:2]
                 parent_id = comment['parent_id'][3:]
 
-                if add_activity_weight:
-                    score = 1 + self.getCommentChildrenCount(
-                        comments_array=[comment], submission_type=submission_type)
-                else:
-                    score = 1
+                score = 1 if connection_count_score else 0
+                score += self.getCommentChildrenCount(
+                    comments_array=[comment], submission_type=submission_type) if activity_weight_score else 0
 
                 # Comment is top-level
                 if parent_id_prefix == "t3":
+
+                    score += submission["upvotes"] if upvotes_count_score else 0
+
                     # Draw influence relation between submission author and top-level commenters
                     self.addEdge(
                         from_ID=submission_author_id,
@@ -112,6 +107,9 @@ class UserGraphModel:
 
                 # Comment is a thread comment
                 elif parent_id_prefix == "t1":
+
+                    score += comment["upvotes"] if upvotes_count_score else 0
+
                     parent_comment = self.mongo_db_connector.getCommentInfo(
                         comment_id=parent_id,
                         Type=submission_type
@@ -124,7 +122,9 @@ class UserGraphModel:
                         score=score
                     )
 
-    def buildModel(self, add_activity_weight):
+    def buildModel(self, add_connection_count=False, add_activity_weight=False, add_upvotes_count=False):
+        self.nodes = {}
+        self.edges = {}
         subreddits = self.mongo_db_connector.getSubredditsInfo()
         submissions_types = ["New", "Rising"]
 
@@ -133,5 +133,6 @@ class UserGraphModel:
                 self.buildModelForSubredditAndType(
                     subreddit_display_name=subreddit["display_name"],
                     submission_type=submissions_type,
-                    add_activity_weight=add_activity_weight
-                )
+                    connection_count_score=add_connection_count,
+                    activity_weight_score=add_activity_weight,
+                    upvotes_count_score=add_upvotes_count)
