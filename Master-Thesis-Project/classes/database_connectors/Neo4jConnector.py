@@ -19,6 +19,7 @@ class GraphDBConnector:
         with self.driver.session() as session:
 
             # Preparing props for ON CREATE and On MATCH for update
+
             relation_props = self.prepare_props(
                 pointer="r", props=relation_props)
 
