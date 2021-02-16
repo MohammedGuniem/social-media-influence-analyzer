@@ -11,8 +11,10 @@ load_dotenv()
 MongoDB_connection_string = os.environ.get('mongo_connnection_string')
 
 # Database connectors
-mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
+mongo_db_connector = MongoDBConnector(
+    MongoDB_connection_string, collection_name="2021-02-16")
 graph_db_connector = GraphDBConnector("bolt://localhost:7687", "neo4j", "1234")
+print(F"Data feed from: {mongo_db_connector.collection_name}")
 
 user_model = UserGraphModel(
     mongo_db_connector, graph_db_connector, write_to_database=False)

@@ -17,10 +17,10 @@ redditCrawler = RedditCrawler(
     client_id, client_secret, user_agent, username, password)
 
 # A limit for the number of subreddits to crawl
-subreddit_limit = 6
+subreddit_limit = 3
 
 # A limit for the number of submissions to crawl
-submission_limit = 6
+submission_limit = 3
 
 # Type of submissions to crawl
 Types = []
@@ -50,7 +50,7 @@ execution_time_data["__total__subreddits"] = execution_time[1]
 print("#subreddits: ", len(subreddits_info))
 print("-----------------------")
 
-MongoDBConnector.writeToMongoDB(
+MongoDBConnector.writeToDB(
     database_name="Subreddits_DB", collection_name=str(date.today()), data=subreddits_info)
 
 for Type in Types:
@@ -72,7 +72,7 @@ for Type in Types:
     print(
         F"Total: crawled {len(submissions)} submissions and {len(authors)} authors.")
 
-    MongoDBConnector.writeToMongoDB(
+    MongoDBConnector.writeToDB(
         database_name=F"{Type}_Submissions_DB", collection_name=str(date.today()), data=submissions)
 
     comments, commenters = [], []
@@ -90,13 +90,13 @@ for Type in Types:
     print(
         F"Total: crawled {len(comments)} comments and {len(commenters)} commenters.")
 
-    MongoDBConnector.writeToMongoDB(
+    MongoDBConnector.writeToDB(
         database_name=F"{Type}_Comments_DB", collection_name=str(date.today()), data=comments)
 
-    MongoDBConnector.writeToMongoDB(
+    MongoDBConnector.writeToDB(
         database_name=F"{Type}_Users_DB", collection_name=str(date.today()), data=users)
 
 execution_time_data['end_time'] = redditCrawler.getTimeStamp()
 execution_time_data['id'] = F"{execution_time_data['start_time']}_{redditCrawler.getTimeStamp()}"
-MongoDBConnector.writeToMongoDB(
+MongoDBConnector.writeToDB(
     database_name="admin", collection_name=str(date.today()), data=[execution_time_data])

@@ -7,7 +7,7 @@ MongoDB_connection_string = os.environ.get('mongo_connnection_string')
 
 # Database connector instance.
 MongoDBConnector = MongoDBConnector(
-    MongoDB_connection_string)
+    MongoDB_connection_string, collection_name="2021-02-15")
 
 statistics_instance = RedditCrawlingStatistics(MongoDBConnector)
 
