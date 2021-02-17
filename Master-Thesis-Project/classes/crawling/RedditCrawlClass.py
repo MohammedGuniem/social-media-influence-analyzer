@@ -27,9 +27,6 @@ class RedditCrawler:
             self.model = json.load(model_file)
             return self.model
 
-    def getTimeStamp(self):
-        return round(datetime.utcnow().timestamp())
-
     # Method to fetch the top (subreddit_limit?) popular subreddits
     def crawlPopularSubreddits(self, subreddit_limit):
         method_start = self.getTimeStamp()

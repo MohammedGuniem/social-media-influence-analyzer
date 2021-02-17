@@ -1,8 +1,7 @@
-from classes.database_connectors.MongoDBConnector import MongoDBConnector
-from classes.statistics.CrawlingRegister import CrawlingRegister
 from classes.crawling.RedditCrawlClass import RedditCrawler
-from classes.statistics.RunningTime import Timer
+from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from dotenv import load_dotenv
+from datetime import date
 import os
 
 load_dotenv()
@@ -14,7 +13,7 @@ username = os.environ.get('reddit_username')
 password = os.environ.get('reddit_password')
 MongoDB_connection_string = os.environ.get('mongo_connnection_string')
 
-crawler = RedditCrawler(
+redditCrawler = RedditCrawler(
     client_id, client_secret, user_agent, username, password)
 
 # A limit for the number of subreddits to crawl
@@ -33,27 +32,23 @@ Types.append("Rising")
 # Database connector
 MongoDBConnector = MongoDBConnector(MongoDB_connection_string)
 
-# Crawling Runtime Register
-register = CrawlingRegister(MongoDBConnector)
-
-# Clock timer
-timer = Timer()
-start_time = timer.tic()
-register.set_crawling_start(start_time)
+execution_time_data = {
+    "start_time": redditCrawler.getTimeStamp(),
+    "subreddits": [],
+    "submissions": [],
+    "comments": [],
+    "__total__subreddits": {},
+    "__total__submissions": {},
+    "__total__comments": {},
+}
 
 # Target Subreddits (subreddit_limit? Most pupolar)
-subreddits_info, execution_time = crawler.crawlPopularSubreddits(
-    subreddit_limit=subreddit_limit
-)
+subreddits_info, execution_time = redditCrawler.crawlPopularSubreddits(
+    subreddit_limit=subreddit_limit)
 execution_time_data["subreddits"] += execution_time[0]
 execution_time_data["__total__subreddits"] = execution_time[1]
-
-subreddits_num = len(subreddits_info)
-register.set_subreddits_num(number_of_crawled_subreddits=subreddits_num)
-register.set_subreddits_total_runtime(runtime=timer.toc())
-register.set_subreddit_runtime
-print("#subreddits: ", subreddits_num)
-print("-----------------------------")
+print("#subreddits: ", len(subreddits_info))
+print("-----------------------")
 
 MongoDBConnector.writeToDB(
     database_name="Subreddits_DB", collection_name=str(date.today()), data=subreddits_info)
@@ -103,8 +98,5 @@ for Type in Types:
 
 execution_time_data['end_time'] = redditCrawler.getTimeStamp()
 execution_time_data['id'] = F"{execution_time_data['start_time']}_{redditCrawler.getTimeStamp()}"
-
-# MongoDBConnector.writeToDB(
-#    database_name="admin", collection_name=str(date.today()), data=[execution_time_data])
-
-register.set_crawling_start(timer.toc())
+MongoDBConnector.writeToDB(
+    database_name="admin", collection_name=str(date.today()), data=[execution_time_data])
