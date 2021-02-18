@@ -10,11 +10,9 @@ class Timer:
 
     def tic(self):
         self.start = self.getCurrentTime()
-        return self.start
 
     def toc(self):
-        start = self.start
-        return self.getCurrentTime() - start
+        return self.getCurrentTime() - self.start
 
-    def reset(self):
-        self.start = 0.00
+    def calculate_time_difference(self, last_time_checkpoint):
+        return round(self.getCurrentTime() - last_time_checkpoint, 2)

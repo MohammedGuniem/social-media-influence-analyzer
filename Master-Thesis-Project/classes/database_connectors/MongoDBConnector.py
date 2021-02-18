@@ -45,8 +45,10 @@ class MongoDBConnector:
                     requests.append(pymongo.UpdateOne({"id": entry['id']}, {
                                     "$set": entry}, upsert=True))
                 else:
-                    print(entry)
-            collection.bulk_write(requests)
+                    requests.append(pymongo.InsertOne(entry))
+
+            if len(requests) > 0:
+                collection.bulk_write(requests)
 
     def readFromDB(self, database_name, query={}, single=False):
         database = self.client[database_name]

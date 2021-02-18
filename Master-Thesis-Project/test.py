@@ -1,3 +1,4 @@
+from datetime import date
 from classes.statistics.RunningTime import Timer
 import time
 
@@ -13,3 +14,5 @@ timer.tic()
 time.sleep(4)
 runtime = timer.toc()
 print(runtime)
+
+print(date.today())
