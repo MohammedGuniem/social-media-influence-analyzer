@@ -10,7 +10,6 @@ class CrawlingRegister:
         self.subreddits_num = 0
         self.subreddits_total_runtime = 0
         self.subreddits_runtimes = {}
-
         self.subreddit_events = {}
 
     def set_crawling_start(self, crawling_start_time):
@@ -18,7 +17,8 @@ class CrawlingRegister:
 
     def set_crawling_end(self, crawling_end_time):
         self.crawling_end = crawling_end_time
-        self.total_crawling_time = self.crawling_end - self.crawling_start
+        self.total_crawling_time = round(
+            self.crawling_end - self.crawling_start)
 
     def set_subreddits_num(self, number_of_crawled_subreddits):
         self.subreddits_num = number_of_crawled_subreddits
@@ -65,7 +65,7 @@ class CrawlingRegister:
 
     def get_running_times(self):
         running_time_data = {
-            "crawling_start": self.crawling_end,
+            "crawling_start": self.crawling_start,
             "crawling_end": self.crawling_end,
             "total_crawling_time": self.total_crawling_time,
             "subreddits_num": self.subreddits_num,

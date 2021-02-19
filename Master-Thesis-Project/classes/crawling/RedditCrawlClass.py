@@ -70,7 +70,7 @@ class RedditCrawler:
                 self.timer.getCurrentTime())
             all_subreddits.append(extracted_subreddit)
 
-            subreddit_crawling_runtime = self.timer.calculate_time_difference(
+            subreddit_crawling_runtime = self.timer.calculate_runtime(
                 subreddit_crawling_start)
 
             self.register.set_subreddit_runtime(
@@ -78,7 +78,7 @@ class RedditCrawler:
                 runtime=subreddit_crawling_runtime
             )
 
-        all_subreddits_crawling_runtime = self.timer.calculate_time_difference(
+        all_subreddits_crawling_runtime = self.timer.calculate_runtime(
             last_time_checkpoint=all_subreddits_crawling_start
         )
 
@@ -154,7 +154,7 @@ class RedditCrawler:
                 )
                 extracted_submissions.append(extracted_submission)
 
-                submission_crawling_runtime = self.timer.calculate_time_difference(
+                submission_crawling_runtime = self.timer.calculate_runtime(
                     submission_crawling_start)
 
                 self.register.set_submission_runtime(
@@ -174,7 +174,7 @@ class RedditCrawler:
             submissions_type=submissions_type
         )
 
-        all_submissions_crawling_runtime = self.timer.calculate_time_difference(
+        all_submissions_crawling_runtime = self.timer.calculate_runtime(
             last_time_checkpoint=all_submissions_crawling_start
         )
 
@@ -237,7 +237,7 @@ class RedditCrawler:
                     redditor_name=extracted_comment['author_name'])
                 extracted_users.append(user_info)
 
-                comment_crawling_runtime = self.timer.calculate_time_difference(
+                comment_crawling_runtime = self.timer.calculate_runtime(
                     comment_crawling_start
                 )
 
@@ -257,7 +257,7 @@ class RedditCrawler:
             submissions_type=submissions_type
         )
 
-        all_comments_crawling_runtime = self.timer.calculate_time_difference(
+        all_comments_crawling_runtime = self.timer.calculate_runtime(
             last_time_checkpoint=all_comments_crawling_start
         )
 
@@ -293,7 +293,7 @@ class RedditCrawler:
         else:
             return "Redditor has no attribute id and/or name"
 
-    def get_running_times(self):
+    def get_crawling_runtime(self):
         self.register.set_crawling_end(
             crawling_end_time=self.timer.getCurrentTime()
         )

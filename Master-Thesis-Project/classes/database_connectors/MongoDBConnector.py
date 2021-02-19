@@ -1,3 +1,4 @@
+from classes.statistics.RunningTime import Timer
 import pymongo
 
 
@@ -10,6 +11,9 @@ class MongoDBConnector:
                 self.collection_name = collection_name
             else:
                 self.collection_name = self.getMostRecentValidCollection()
+            self.timer = Timer()
+            self.writing_runtimes = {"created": self.timer.getCurrentTime()}
+            self.reading_runtimes = {"created": self.timer.getCurrentTime()}
 
     """ Collection validator """
 
@@ -35,6 +39,7 @@ class MongoDBConnector:
     """ Writing and reading methods """
 
     def writeToDB(self, database_name, collection_name, data):
+        start_time = self.timer.getCurrentTime()
         if len(data) > 0:
             database = self.client[database_name]
             collection = database[collection_name]
@@ -49,15 +54,26 @@ class MongoDBConnector:
 
             if len(requests) > 0:
                 collection.bulk_write(requests)
+        runtime = self.timer.calculate_runtime(start_time)
+        self.writing_runtimes[database_name] = runtime
+
+    def get_writing_runtimes(self):
+        return self.writing_runtimes
 
     def readFromDB(self, database_name, query={}, single=False):
+        start_time = self.timer.getCurrentTime()
         database = self.client[database_name]
         collection = database[self.collection_name]
         if single:
             docs = collection.find_one(query)
         else:
             docs = list(collection.find(query))
+        runtime = self.timer.calculate_runtime(start_time)
+        self.reading_runtimes[database_name] = runtime
         return docs
+
+    def get_reading_runtimes(self):
+        return self.reading_runtimes
 
     """ Data Accessors """
 

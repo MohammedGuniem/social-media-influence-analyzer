@@ -1,5 +1,6 @@
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from classes.crawling.RedditCrawlClass import RedditCrawler
+from classes.statistics.RunningTime import Timer
 from dotenv import load_dotenv
 from datetime import date
 import os
@@ -17,10 +18,10 @@ crawler = RedditCrawler(
     client_id, client_secret, user_agent, username, password)
 
 # A limit for the number of subreddits to crawl
-subreddit_limit = 2
+subreddit_limit = 3
 
 # A limit for the number of submissions to crawl
-submission_limit = 2
+submission_limit = 3
 
 # submissions_type of submissions to crawl
 submissions_types = []
@@ -82,10 +83,17 @@ for submissions_type in submissions_types:
         data=users
     )
 
-running_times = crawler.get_running_times()
+crawling_runtime = crawler.get_crawling_runtime()
 
 MongoDBConnector.writeToDB(
     database_name="admin",
-    collection_name=str(date.today()),
-    data=[running_times]
+    collection_name="crawling_runtime",
+    data=[crawling_runtime]
+)
+
+writing_runtimes = MongoDBConnector.get_writing_runtimes()
+MongoDBConnector.writeToDB(
+    database_name="admin",
+    collection_name="writing_runtime",
+    data=[writing_runtimes]
 )
