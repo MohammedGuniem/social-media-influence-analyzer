@@ -57,13 +57,10 @@ class MongoDBConnector:
         runtime = self.timer.calculate_runtime(start_time)
         self.writing_runtimes[database_name] = runtime
 
-    def get_writing_runtimes(self):
-        return self.writing_runtimes
-
-    def readFromDB(self, database_name, query={}, single=False):
+    def readFromDB(self, database_name, query={}, single=False, collection_name=None):
         start_time = self.timer.getCurrentTime()
         database = self.client[database_name]
-        collection = database[self.collection_name]
+        collection = database[collection_name if collection_name else self.collection_name]
         if single:
             docs = collection.find_one(query)
         else:
@@ -72,8 +69,53 @@ class MongoDBConnector:
         self.reading_runtimes[database_name] = runtime
         return docs
 
+    """ Crawling, writing and reading runtimes loggers """
+
+    def logg_crawling_runtimes(self, crawling_runtime):
+        mongo_db_connector.writeToDB(
+            database_name="admin",
+            collection_name="crawling_runtime",
+            data=[crawling_runtime]
+        )
+
+    def logg_writing_runtimes(self):
+        writing_runtimes = self.writing_runtimes
+        mongo_db_connector.writeToDB(
+            database_name="admin",
+            collection_name="writing_runtime",
+            data=[writing_runtimes]
+        )
+
+    def logg_reading_runtimes(self):
+        reading_runtimes = self.reading_runtimes
+        mongo_db_connector.writeToDB(
+            database_name="admin",
+            collection_name="reading_runtime",
+            data=[reading_runtimes]
+        )
+
+    """ Crawling, writing and reading runtimes getters """
+
+    def get_crawling_runtimes(self):
+        data = self.readFromDB(
+            database_name="admin",
+            collection_name="crawling_runtime"
+        )
+        return data
+
+    def get_writing_runtimes(self):
+        data = self.readFromDB(
+            database_name="admin",
+            collection_name="writing_runtime"
+        )
+        return data
+
     def get_reading_runtimes(self):
-        return self.reading_runtimes
+        data = self.readFromDB(
+            database_name="admin",
+            collection_name="reading_runtime"
+        )
+        return data
 
     """ Data Accessors """
 

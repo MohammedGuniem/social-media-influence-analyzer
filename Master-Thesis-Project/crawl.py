@@ -1,4 +1,4 @@
-from classes.database_connectors.MongoDBConnector import MongoDBConnector
+from classes.database_connectors.mongo_db_connector import mongo_db_connector
 from classes.crawling.RedditCrawlClass import RedditCrawler
 from classes.statistics.RunningTime import Timer
 from dotenv import load_dotenv
@@ -31,7 +31,7 @@ submissions_types.append("Rising")
 # submissions_types.append("Top")
 
 # Database connector
-MongoDBConnector = MongoDBConnector(MongoDB_connection_string)
+mongo_db_connector = mongo_db_connector(MongoDB_connection_string)
 
 # Target Subreddits (subreddit_limit? Most pupolar)
 subreddits = crawler.crawlPopularSubreddits(
@@ -42,7 +42,7 @@ print("----------------------------------------------")
 print("#subreddits: ", subreddits_num)
 print("----------------------------------------------")
 
-MongoDBConnector.writeToDB(
+mongo_db_connector.writeToDB(
     database_name="Subreddits_DB",
     collection_name=str(date.today()),
     data=subreddits
@@ -59,7 +59,7 @@ for submissions_type in submissions_types:
         subreddits, submissions_type, submission_limit)
     users += authors
 
-    MongoDBConnector.writeToDB(
+    mongo_db_connector.writeToDB(
         database_name=F"{submissions_type}_Submissions_DB",
         collection_name=str(date.today()),
         data=submissions
@@ -71,29 +71,19 @@ for submissions_type in submissions_types:
     )
     users += commenters
 
-    MongoDBConnector.writeToDB(
+    mongo_db_connector.writeToDB(
         database_name=F"{submissions_type}_Comments_DB",
         collection_name=str(date.today()),
         data=comments
     )
 
-    MongoDBConnector.writeToDB(
+    mongo_db_connector.writeToDB(
         database_name=F"{submissions_type}_Users_DB",
         collection_name=str(date.today()),
         data=users
     )
 
 crawling_runtime = crawler.get_crawling_runtime()
+mongo_db_connector.logg_crawling_runtimes(crawling_runtime)
 
-MongoDBConnector.writeToDB(
-    database_name="admin",
-    collection_name="crawling_runtime",
-    data=[crawling_runtime]
-)
-
-writing_runtimes = MongoDBConnector.get_writing_runtimes()
-MongoDBConnector.writeToDB(
-    database_name="admin",
-    collection_name="writing_runtime",
-    data=[writing_runtimes]
-)
+mongo_db_connector.logg_writing_runtimes()

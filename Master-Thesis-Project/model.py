@@ -12,7 +12,9 @@ MongoDB_connection_string = os.environ.get('mongo_connnection_string')
 
 # Database connectors
 mongo_db_connector = MongoDBConnector(
-    MongoDB_connection_string, collection_name="2021-02-16")
+    MongoDB_connection_string
+    # , collection_name="2021-02-16"
+)
 graph_db_connector = GraphDBConnector("bolt://localhost:7687", "neo4j", "1234")
 print(F"Data feed from: {mongo_db_connector.collection_name}")
 
@@ -78,6 +80,13 @@ user_models_statistics = s.getSummaryStatistics(
 print("Summary statistics cross validation for user graph models")
 print("using 3 different scoring techniques for user relations")
 print(user_models_statistics)
+
+reading_runtimes = mongo_db_connector.get_reading_runtimes()
+mongo_db_connector.writeToDB(
+    database_name="admin",
+    collection_name="reading_runtime",
+    data=[reading_runtimes]
+)
 
 """
 # Action Graph model
