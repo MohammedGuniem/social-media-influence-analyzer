@@ -1,21 +1,19 @@
-from classes.database_connectors.MongoDBConnector import MongoDBConnector
-from classes.database_connectors.Neo4jConnector import GraphDBConnector
-from classes.modelling.ActionGraphModelling import ActionGraphModel
 from classes.modelling.UserGraphModelling import UserGraphModel
-from classes.statistics.Statistics import Statistics as s
+from classes.statistics.Statistics import Statistics as statistics_methods
 from dotenv import load_dotenv
 import os
 
-# Loading Enviroment variables
+# Loading Enviroment variables and initiating a user graph model instance
 load_dotenv()
-MongoDB_connection_string = os.environ.get('mongo_connnection_string')
-
-# Database connectors
-mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
-graph_db_connector = GraphDBConnector("bolt://localhost:7687", "neo4j", "1234")
-
 user_model = UserGraphModel(
-    mongo_db_connector, graph_db_connector, write_to_database=False)
+    mongodb_connection_string=os.environ.get('mongo_connnection_string'),
+    neo4j_connection_string=os.environ.get('neo4j_connection_string'),
+    neo4j_username=os.environ.get('neo4j_username'),
+    neo4j_password=os.environ.get('neo4j_password'),
+    construct_neo4j_graph=False
+)
+
+print(F"Data feed from: {user_model.mongo_db_connector.collection_name}")
 
 print("building User Graph model without any edge weight...")
 # u - User Graph model without any edge weight
@@ -70,12 +68,14 @@ user_models_edge_weights = {
     'connection+activity+upvotes': ucau_edge_weights
 }
 
-user_models_statistics = s.getSummaryStatistics(
+user_models_statistics = statistics_methods.getSummaryStatistics(
     data_dict=user_models_edge_weights)
 
 print("Summary statistics cross validation for user graph models")
 print("using 3 different scoring techniques for user relations")
 print(user_models_statistics)
+
+user_model.mongo_db_connector.logg_reading_runtimes()
 
 """
 # Action Graph model
