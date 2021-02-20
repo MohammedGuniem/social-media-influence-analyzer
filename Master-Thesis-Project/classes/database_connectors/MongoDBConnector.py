@@ -72,7 +72,7 @@ class MongoDBConnector:
     """ Crawling, writing and reading runtimes loggers """
 
     def logg_crawling_runtimes(self, crawling_runtime):
-        mongo_db_connector.writeToDB(
+        self.writeToDB(
             database_name="admin",
             collection_name="crawling_runtime",
             data=[crawling_runtime]
@@ -80,7 +80,7 @@ class MongoDBConnector:
 
     def logg_writing_runtimes(self):
         writing_runtimes = self.writing_runtimes
-        mongo_db_connector.writeToDB(
+        self.writeToDB(
             database_name="admin",
             collection_name="writing_runtime",
             data=[writing_runtimes]
@@ -88,7 +88,7 @@ class MongoDBConnector:
 
     def logg_reading_runtimes(self):
         reading_runtimes = self.reading_runtimes
-        mongo_db_connector.writeToDB(
+        self.writeToDB(
             database_name="admin",
             collection_name="reading_runtime",
             data=[reading_runtimes]

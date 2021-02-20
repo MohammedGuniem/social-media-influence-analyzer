@@ -1,4 +1,4 @@
-from classes.database_connectors.mongo_db_connector import mongo_db_connector
+from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from classes.crawling.RedditCrawlClass import RedditCrawler
 from classes.statistics.RunningTime import Timer
 from dotenv import load_dotenv
@@ -31,7 +31,7 @@ submissions_types.append("Rising")
 # submissions_types.append("Top")
 
 # Database connector
-mongo_db_connector = mongo_db_connector(MongoDB_connection_string)
+mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
 
 # Target Subreddits (subreddit_limit? Most pupolar)
 subreddits = crawler.crawlPopularSubreddits(

@@ -1,9 +1,10 @@
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
 
 class Statistics:
-    def getSummaryStatistics(data_dict):
+    def getSummaryStatistics(self, data_dict):
         df = pd.DataFrame(data_dict)
 
         # Rename '50%' percentile to '50% - median' since it is the same.
@@ -20,3 +21,13 @@ class Statistics:
         summary_statistics = summary_statistics.append(var_statistics)
 
         return summary_statistics
+
+    def plot(self, x, y, xlabel="", ylabel="", legend=""):
+        x = np.array(x)
+        y = np.array(y)
+        plt.scatter(x, y, label="")
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        if legend:
+            plt.legend(loc=legend)
+        plt.show()
