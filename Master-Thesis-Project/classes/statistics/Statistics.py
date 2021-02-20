@@ -4,7 +4,7 @@ import numpy as np
 
 
 class Statistics:
-    def getSummaryStatistics(self, data_dict):
+    def getSummaryStatistics(data_dict):
         df = pd.DataFrame(data_dict)
 
         # Rename '50%' percentile to '50% - median' since it is the same.
@@ -22,7 +22,7 @@ class Statistics:
 
         return summary_statistics
 
-    def plot(self, x, y, xlabel="", ylabel="", legend=""):
+    def plot(x, y, xlabel="", ylabel="", legend=""):
         x = np.array(x)
         y = np.array(y)
         plt.scatter(x, y, label="")

@@ -1,5 +1,5 @@
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
-from classes.statistics.Statistics import Statistics
+from classes.statistics.Statistics import Statistics as statistics_methods
 import os
 
 connection_string = os.environ.get('mongo_connnection_string')
@@ -25,7 +25,6 @@ def analyze_runtimes(operations):
             else:
                 runtimes[database] += [value]
 
-    statistics_methods = Statistics()
     summary_statistics = statistics_methods.getSummaryStatistics(runtimes)
     return summary_statistics
 

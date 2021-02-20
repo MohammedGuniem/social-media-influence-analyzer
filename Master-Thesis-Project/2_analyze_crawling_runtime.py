@@ -1,5 +1,5 @@
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
-from classes.statistics.Statistics import Statistics
+from classes.statistics.Statistics import Statistics as statistics_methods
 import os
 
 connection_string = os.environ.get('mongo_connnection_string')
@@ -7,8 +7,6 @@ connection_string = os.environ.get('mongo_connnection_string')
 mongo_db_connector = MongoDBConnector(connection_string)
 
 crawling_analysis_data = mongo_db_connector.get_crawling_runtimes()
-
-statistics_methods = Statistics()
 
 all_submissions_num = []
 all_submissions_crawling_runtime = []
