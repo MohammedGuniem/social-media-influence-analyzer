@@ -1,7 +1,19 @@
+from classes.database_connectors.MongoDBConnector import MongoDBConnector
+from classes.database_connectors.Neo4jConnector import GraphDBConnector
+
+
 class ActionGraphModel:
-    def __init__(self, mongo_db_connector, graph_db_connector):
-        self.mongo_db_connector = mongo_db_connector
-        self.graph_db_connector = graph_db_connector
+    def __init__(self, mongodb_connection_string, neo4j_connection_string, neo4j_username, neo4j_password, construct_neo4j_graph):
+        # Mongo DB Database Connector
+        self.mongo_db_connector = MongoDBConnector(
+            mongodb_connection_string
+        )
+
+        # Neo4j graph database Connector
+        self.graph_db_connector = GraphDBConnector(
+            neo4j_connection_string, neo4j_username, neo4j_password)
+
+        self.construct_neo4j_graph = construct_neo4j_graph
         self.nodes = {}
         self.edges = {}
 
@@ -24,8 +36,9 @@ class ActionGraphModel:
             props["author_id"] = activity_object["author_id"]
 
         if not node_id in self.nodes:
-            self.graph_db_connector.addNode(
-                node_id, Type, props)
+            if self.construct_neo4j_graph:
+                self.graph_db_connector.addNode(
+                    node_id, Type, props)
             self.nodes[node_id] = Type
 
     def addEdge(self, from_ID, to_ID, score):
@@ -36,29 +49,34 @@ class ActionGraphModel:
         else:
             self.edges[edge_id] = score
 
-        self.graph_db_connector.addEdge(
-            relation_Type=F"Influences",
-            relation_props={"weight": score},
-            from_ID=from_ID,
-            from_Type=self.nodes[from_ID],
-            to_ID=to_ID,
-            to_Type=self.nodes[to_ID],
-        )
+        if self.construct_neo4j_graph:
+            self.graph_db_connector.addEdge(
+                relation_Type=F"Influences",
+                relation_props={"weight": score},
+                from_ID=from_ID,
+                from_Type=self.nodes[from_ID],
+                to_ID=to_ID,
+                to_Type=self.nodes[to_ID],
+            )
 
-    def getCommentChildrenCount(self, comments_array, submission_type):
+    def get_comment_children_count(self, comments_array, submission_type):
+        children_array = []
+        children_of_children_num = []
         for comment in comments_array:
             children = self.mongo_db_connector.getCommentChildren(
                 comment_id=comment['id'], Type=submission_type)
 
-            children_num = len(children)
-            if children_num == 0:
-                return 0
-            else:
-                score = len(children) + self.getCommentChildrenCount(
-                    comments_array=children, submission_type=submission_type)
-            return score
+            children_array += children
+            children_of_children_num.append(len(children))
 
-    def buildModelForSubredditAndType(self, subreddit_display_name, submission_type):
+        if sum(children_of_children_num) == 0:
+            return 0
+        else:
+            score = sum(children_of_children_num) + self.get_comment_children_count(
+                comments_array=children_array, submission_type=submission_type)
+        return score
+
+    def build_model(self, subreddit_display_name, submission_type):
         # Get subreddit information.
         subreddit = self.mongo_db_connector.getSubredditInfo(
             subreddit_display_name)
@@ -88,7 +106,7 @@ class ActionGraphModel:
                 parent_id_prefix = comment['parent_id'][0:2]
                 parent_id = comment['parent_id'][3:]
 
-                comment_score = 1 + self.getCommentChildrenCount(
+                edge_score = 1 + self.get_comment_children_count(
                     [comment], submission_type=submission_type)
 
                 # Comment is top-level
@@ -104,21 +122,9 @@ class ActionGraphModel:
                 # Draw comment
                 self.addNode(activity_object=comment, Type=node_type)
 
-                # Draw influence relation between parent (commenters or submission authors) and child commenters
+                # Draw edge relation between parent (comment or submission) and child comments.
                 self.addEdge(
                     from_ID=from_node_id,
                     to_ID=comment_id,
-                    score=comment_score
-                )
-
-    ##
-    def buildModel(self):
-        subreddits = self.mongo_db_connector.getSubredditsInfo()
-        submissions_types = ["New", "Rising"]
-
-        for submissions_type in submissions_types:
-            for subreddit in subreddits:
-                self.buildModelForSubredditAndType(
-                    subreddit_display_name=subreddit["display_name"],
-                    submission_type=submissions_type
+                    score=edge_score
                 )

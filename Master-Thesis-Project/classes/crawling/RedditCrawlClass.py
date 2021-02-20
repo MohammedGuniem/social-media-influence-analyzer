@@ -1,7 +1,9 @@
-from datetime import datetime
+from classes.statistics.CrawlingRegister import CrawlingRegister
+from classes.statistics.RunningTime import Timer
+from datetime import date
+from pathlib import Path
 import praw
 import json
-from pathlib import Path
 
 
 class RedditCrawler:
@@ -22,27 +24,28 @@ class RedditCrawler:
         self.user_model = self.getModel(
             F'{path}/crawling_models/user.model.json')
 
+        self.register = CrawlingRegister()
+        self.timer = Timer()
+
+        self.register.set_crawling_start(
+            crawling_start_time=self.timer.getCurrentTime()
+        )
+
     def getModel(self, path):
         with open(path, 'r') as model_file:
             self.model = json.load(model_file)
             return self.model
 
-    def getTimeStamp(self):
-        return round(datetime.utcnow().timestamp())
-
     # Method to fetch the top (subreddit_limit?) popular subreddits
     def crawlPopularSubreddits(self, subreddit_limit):
-        method_start = self.getTimeStamp()
+        all_subreddits_crawling_start = self.timer.getCurrentTime()
 
         subreddits = self.redditCrawler.subreddits.popular(
             limit=subreddit_limit)
 
-        subreddits_info = []
-        running_times = []
-
+        all_subreddits = []
         for subreddit in subreddits:
-            subreddit_start_reading = self.getTimeStamp()
-
+            subreddit_crawling_start = self.timer.getCurrentTime()
             subreddit_attributes = dir(subreddit)
             moderators = []
             for moderator in subreddit.moderator():
@@ -64,156 +67,214 @@ class RedditCrawler:
                     extracted_subreddit[local_key] = subreddit.__getattribute__(
                         external_key)
             extracted_subreddit["updated_utc"] = round(
-                datetime.utcnow().timestamp())
-            subreddits_info.append(extracted_subreddit)
+                self.timer.getCurrentTime())
+            all_subreddits.append(extracted_subreddit)
 
-            subreddit_end_reading = self.getTimeStamp()
-            running_times.append({
-                'subreddit_id': subreddit.__getattribute__(
-                    "id"),
-                'subreddit_display_name': subreddit.__getattribute__(
-                    "display_name"),
-                'start_reading_time': subreddit_start_reading,
-                'end_reading_time': subreddit_end_reading,
-                'elapsed_time': subreddit_end_reading - subreddit_start_reading
-            })
-        method_end = self.getTimeStamp()
-        total_running_time = {
-            'start_reading_time': method_start,
-            'end_reading_time': method_end,
-            'elapsed_time': method_end - method_start
-        }
-        execution_time_data = [running_times, total_running_time]
-        return subreddits_info, execution_time_data
+            subreddit_crawling_runtime = self.timer.calculate_runtime(
+                subreddit_crawling_start)
+
+            self.register.set_subreddit_runtime(
+                subreddit_id=subreddit.__getattribute__("id"),
+                runtime=subreddit_crawling_runtime
+            )
+
+        all_subreddits_crawling_runtime = self.timer.calculate_runtime(
+            last_time_checkpoint=all_subreddits_crawling_start
+        )
+
+        self.register.set_subreddits_total_runtime(
+            all_subreddits_crawling_runtime
+        )
+
+        self.register.set_subreddits_num(
+            number_of_crawled_subreddits=len(all_subreddits)
+        )
+
+        return all_subreddits
 
     # Method to crawl submissions from a certain subreddit
-    def crawlSubmissions(self, subreddit_display_name, Type, submission_limit):
-        method_start = self.getTimeStamp()
+    def crawlSubmissions(self, subreddits, submissions_type, submission_limit):
 
-        subreddit = self.redditCrawler.subreddit(subreddit_display_name)
-        if Type == "New":
-            submissions = subreddit.new(limit=submission_limit)
-        elif Type == "Hot":
-            submissions = subreddit.hot(limit=submission_limit)
-        elif Type == "Top":
-            submissions = subreddit.top(limit=submission_limit)
-        elif Type == "Rising":
-            submissions = subreddit.rising(limit=submission_limit)
-        else:
-            print(
-                "You need to specify one of these 4 valid submission types ['New', 'Hot', 'Top', 'Rising']")
-            return "Error"
+        all_submissions_crawling_start = self.timer.getCurrentTime()
+        self.register.add_submissions_type(submissions_type=submissions_type)
 
-        submissions_info = []
-        users_info = []
-        running_times = []
+        all_submissions = []
+        all_users = []
 
-        for submission in submissions:
-            submission_start_reading = self.getTimeStamp()
+        for subreddit in subreddits:
 
-            submission_attributes = dir(submission)
-            extracted_submission = {}
+            extracted_submissions = []
+            extracted_users = []
 
-            if not hasattr(submission, 'author') or not hasattr(submission.author, 'id') or not hasattr(submission.author, 'name'):
-                continue
-            users_info.append(self.crawlUser(
-                redditor_name=submission.author.name))
+            subreddit_display_name = subreddit['display_name']
+            subreddit = self.redditCrawler.subreddit(subreddit_display_name)
+            if submissions_type == "New":
+                submissions = subreddit.new(limit=submission_limit)
+            elif submissions_type == "Hot":
+                submissions = subreddit.hot(limit=submission_limit)
+            elif submissions_type == "Top":
+                submissions = subreddit.top(limit=submission_limit)
+            elif submissions_type == "Rising":
+                submissions = subreddit.rising(limit=submission_limit)
+            else:
+                print(
+                    "You need to specify one of these 4 valid submission types ['New', 'Hot', 'Top', 'Rising']")
+                return "Error"
 
-            for local_key, external_key in self.submission_model.items():
-                external_sub_keys = external_key.split(".")
-                if ("subreddit" in external_sub_keys) and ("id" in external_sub_keys):
-                    extracted_value = subreddit.id
-                elif ("subreddit" in external_sub_keys) and ("display_name" in external_sub_keys):
-                    extracted_value = subreddit_display_name
-                elif (len(external_sub_keys) >= 1) and (external_sub_keys[0] in submission_attributes):
-                    extracted_value = submission.__getattribute__(
-                        external_sub_keys[0])
-                    for key in external_sub_keys[1:]:
-                        if key in dir(extracted_value):
-                            extracted_value = extracted_value.__getattribute__(
-                                key)
-                else:
+            for submission in submissions:
+                submission_crawling_start = self.timer.getCurrentTime()
+
+                submission_attributes = dir(submission)
+                extracted_submission = {}
+
+                if not hasattr(submission, 'author') or not hasattr(submission.author, 'id') or not hasattr(submission.author, 'name'):
                     continue
-                extracted_submission[local_key] = extracted_value
+                extracted_users.append(self.crawlUser(
+                    redditor_name=submission.author.name))
 
-            extracted_submission["updated_utc"] = round(
-                datetime.utcnow().timestamp())
-            submissions_info.append(extracted_submission)
+                for local_key, external_key in self.submission_model.items():
+                    external_sub_keys = external_key.split(".")
+                    if ("subreddit" in external_sub_keys) and ("id" in external_sub_keys):
+                        extracted_value = subreddit.id
+                    elif ("subreddit" in external_sub_keys) and ("display_name" in external_sub_keys):
+                        extracted_value = subreddit_display_name
+                    elif (len(external_sub_keys) >= 1) and (external_sub_keys[0] in submission_attributes):
+                        extracted_value = submission.__getattribute__(
+                            external_sub_keys[0])
+                        for key in external_sub_keys[1:]:
+                            if key in dir(extracted_value):
+                                extracted_value = extracted_value.__getattribute__(
+                                    key)
+                    else:
+                        continue
+                    extracted_submission[local_key] = extracted_value
 
-            submission_end_reading = self.getTimeStamp()
-            running_times.append({
-                'submission_id': submission.__getattribute__(
-                    "id"),
-                'start_reading_time': submission_start_reading,
-                'end_reading_time': submission_end_reading,
-                'elapsed_time': submission_end_reading - submission_start_reading
-            })
-        method_end = self.getTimeStamp()
-        total_running_time = {
-            'start_reading_time': method_start,
-            'end_reading_time': method_end,
-            'elapsed_time': method_end - method_start
-        }
-        execution_time_data = [running_times, total_running_time]
-        return submissions_info, users_info, execution_time_data
+                extracted_submission["updated_utc"] = round(
+                    self.timer.getCurrentTime()
+                )
+                extracted_submissions.append(extracted_submission)
+
+                submission_crawling_runtime = self.timer.calculate_runtime(
+                    submission_crawling_start)
+
+                self.register.set_submission_runtime(
+                    submission_id=submission.__getattribute__("id"),
+                    submissions_type=submissions_type,
+                    runtime=submission_crawling_runtime
+                )
+
+            all_submissions += extracted_submissions
+            all_users += extracted_users
+
+            print(
+                F"Subreddit: {subreddit_display_name}, crawled {len(extracted_submissions)} submissions and {len(extracted_users)} authors.")
+
+        self.register.update_users_num(
+            number_of_crawled_users=len(all_users),
+            submissions_type=submissions_type
+        )
+
+        all_submissions_crawling_runtime = self.timer.calculate_runtime(
+            last_time_checkpoint=all_submissions_crawling_start
+        )
+
+        self.register.set_submissions_total_runtime(
+            runtime=all_submissions_crawling_runtime,
+            submissions_type=submissions_type
+        )
+
+        self.register.set_submissions_num(
+            number_of_crawled_submissions=len(all_submissions),
+            submissions_type=submissions_type
+        )
+
+        print(
+            F"Total: crawled {len(all_submissions)} submissions and {len(all_users)} authors.")
+
+        return all_submissions, all_users
 
     # Method to crawl comments from a certain submission
-    def crawlComments(self, submission_id):
-        method_start = self.getTimeStamp()
+    def crawlComments(self, submissions, submissions_type):
+        all_comments_crawling_start = self.timer.getCurrentTime()
 
-        submission = self.redditCrawler.submission(id=submission_id)
-        comments_info = []
-        users_info = []
-        running_times = []
+        all_comments = []
+        all_users = []
 
-        comments = submission.comments
-        submission.comments.replace_more(limit=3)
-        for comment in submission.comments.list():
-            comment_start_reading = self.getTimeStamp()
+        for submission in submissions:
+            submission = self.redditCrawler.submission(id=submission['id'])
 
-            if not hasattr(comment.author, 'id') or not hasattr(comment.author, 'name'):
-                continue
+            extracted_comments = []
+            extracted_users = []
 
-            comment_attributes = dir(comment)
-            extracted_comment = {}
+            comments = submission.comments
+            submission.comments.replace_more(limit=3)
+            for comment in submission.comments.list():
+                comment_crawling_start = self.timer.getCurrentTime()
 
-            for local_key, external_key in self.comment_model.items():
-                external_sub_keys = external_key.split(".")
-                if (len(external_sub_keys) >= 1) and (external_sub_keys[0] in comment_attributes):
-                    extracted_value = comment.__getattribute__(
-                        external_sub_keys[0])
-                    for key in external_sub_keys[1:]:
-                        if key in dir(extracted_value):
-                            extracted_value = extracted_value.__getattribute__(
-                                key)
-                    extracted_comment["updated_utc"] = round(
-                        datetime.utcnow().timestamp())
-                    extracted_comment[local_key] = extracted_value
-                else:
+                if not hasattr(comment.author, 'id') or not hasattr(comment.author, 'name'):
                     continue
-            comments_info.append(extracted_comment)
-            user_info = self.crawlUser(
-                redditor_name=extracted_comment['author_name'])
-            users_info.append(user_info)
 
-            comment_end_reading = self.getTimeStamp()
-            running_times.append({
-                'comment_id': comment.__getattribute__(
-                    "id"),
-                'start_reading_time': comment_start_reading,
-                'end_reading_time': comment_end_reading,
-                'elapsed_time': comment_end_reading - comment_start_reading
-            })
+                comment_attributes = dir(comment)
+                extracted_comment = {}
 
-        method_end = self.getTimeStamp()
-        total_running_time = {
-            'start_reading_time': method_start,
-            'end_reading_time': method_end,
-            'elapsed_time': method_end - method_start
-        }
-        execution_time_data = [running_times, total_running_time]
+                for local_key, external_key in self.comment_model.items():
+                    external_sub_keys = external_key.split(".")
+                    if (len(external_sub_keys) >= 1) and (external_sub_keys[0] in comment_attributes):
+                        extracted_value = comment.__getattribute__(
+                            external_sub_keys[0])
+                        for key in external_sub_keys[1:]:
+                            if key in dir(extracted_value):
+                                extracted_value = extracted_value.__getattribute__(
+                                    key)
+                        extracted_comment["updated_utc"] = round(
+                            self.timer.getCurrentTime()
+                        )
+                        extracted_comment[local_key] = extracted_value
+                    else:
+                        continue
+                extracted_comments.append(extracted_comment)
+                user_info = self.crawlUser(
+                    redditor_name=extracted_comment['author_name'])
+                extracted_users.append(user_info)
 
-        return comments_info, users_info, execution_time_data
+                comment_crawling_runtime = self.timer.calculate_runtime(
+                    comment_crawling_start
+                )
+
+                self.register.set_comment_runtime(
+                    submissions_type=submissions_type,
+                    comment_id=comment.__getattribute__("id"),
+                    runtime=comment_crawling_runtime
+                )
+
+            all_comments += extracted_comments
+            all_users += extracted_users
+            print(
+                F"submission-ID: {submission.id}, crawled {len(extracted_comments)} comments and {len(extracted_users)} commenters.")
+
+        self.register.update_users_num(
+            number_of_crawled_users=len(all_users),
+            submissions_type=submissions_type
+        )
+
+        all_comments_crawling_runtime = self.timer.calculate_runtime(
+            last_time_checkpoint=all_comments_crawling_start
+        )
+
+        self.register.set_comments_total_runtime(
+            all_comments_crawling_runtime,
+            submissions_type=submissions_type
+        )
+
+        self.register.set_comments_num(
+            number_of_crawled_comments=len(all_comments),
+            submissions_type=submissions_type
+        )
+
+        print(
+            F"Total: crawled {len(all_comments)} comments and {len(all_users)} commenters.")
+
+        return all_comments, all_users
 
     # Method to crawl user meta data
     def crawlUser(self, redditor_name):
@@ -226,7 +287,14 @@ class RedditCrawler:
                     extracted_user[local_key] = redditor.__getattribute__(
                         external_key)
             extracted_user["updated_utc"] = round(
-                datetime.utcnow().timestamp())
+                self.timer.getCurrentTime()
+            )
             return extracted_user
         else:
             return "Redditor has no attribute id and/or name"
+
+    def get_crawling_runtime(self):
+        self.register.set_crawling_end(
+            crawling_end_time=self.timer.getCurrentTime()
+        )
+        return self.register.get_running_times()

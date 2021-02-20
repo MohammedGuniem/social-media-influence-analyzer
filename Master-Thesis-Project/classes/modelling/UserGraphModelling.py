@@ -1,8 +1,19 @@
+from classes.database_connectors.MongoDBConnector import MongoDBConnector
+from classes.database_connectors.Neo4jConnector import GraphDBConnector
+
+
 class UserGraphModel:
-    def __init__(self, mongo_db_connector, graph_db_connector, write_to_database):
-        self.mongo_db_connector = mongo_db_connector
-        self.graph_db_connector = graph_db_connector
-        self.write_to_database = write_to_database
+    def __init__(self, mongodb_connection_string, neo4j_connection_string, neo4j_username, neo4j_password, construct_neo4j_graph):
+        # Mongo DB Database Connector
+        self.mongo_db_connector = MongoDBConnector(
+            mongodb_connection_string
+        )
+
+        # Neo4j graph database Connector
+        self.graph_db_connector = GraphDBConnector(
+            neo4j_connection_string, neo4j_username, neo4j_password)
+
+        self.construct_neo4j_graph = construct_neo4j_graph
         self.nodes = {}
         self.edges = {}
 
@@ -23,7 +34,7 @@ class UserGraphModel:
                 props["moderators_names"].append(moderator['name'])
 
         if not node_id in self.nodes:
-            if self.write_to_database:
+            if self.construct_neo4j_graph:
                 self.graph_db_connector.addNode(node_id, Type, props)
             self.nodes[node_id] = Type
 
@@ -35,7 +46,7 @@ class UserGraphModel:
         else:
             self.edges[edge_id] = score
 
-        if self.write_to_database:
+        if self.construct_neo4j_graph:
             self.graph_db_connector.addEdge(
                 relation_Type=F"Influences",
                 relation_props={"weight": score},
@@ -45,18 +56,22 @@ class UserGraphModel:
                 to_Type=self.nodes[to_ID]
             )
 
-    def getCommentChildrenCount(self, comments_array, submission_type):
+    def get_comment_children_count(self, comments_array, submission_type):
+        children_array = []
+        children_of_children_num = []
         for comment in comments_array:
             children = self.mongo_db_connector.getCommentChildren(
                 comment_id=comment['id'], Type=submission_type)
 
-            children_num = len(children)
-            if children_num == 0:
-                return 0
-            else:
-                score = len(children) + self.getCommentChildrenCount(
-                    comments_array=children, submission_type=submission_type)
-            return score
+            children_array += children
+            children_of_children_num.append(len(children))
+
+        if sum(children_of_children_num) == 0:
+            return 0
+        else:
+            score = sum(children_of_children_num) + self.get_comment_children_count(
+                comments_array=children_array, submission_type=submission_type)
+        return score
 
     def buildModelForSubredditAndType(self, subreddit_display_name, submission_type, connection_count_score, activity_weight_score, upvotes_count_score):
         # Get subreddit information.
@@ -90,7 +105,7 @@ class UserGraphModel:
                 parent_id = comment['parent_id'][3:]
 
                 score = 1 if connection_count_score else 0
-                score += self.getCommentChildrenCount(
+                score += self.get_comment_children_count(
                     comments_array=[comment], submission_type=submission_type) if activity_weight_score else 0
 
                 # Comment is top-level
