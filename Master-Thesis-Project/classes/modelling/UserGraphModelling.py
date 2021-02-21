@@ -10,8 +10,9 @@ class UserGraphModel:
         )
 
         # Neo4j graph database Connector
-        self.graph_db_connector = GraphDBConnector(
-            neo4j_connection_string, neo4j_username, neo4j_password)
+        if construct_neo4j_graph:
+            self.graph_db_connector = GraphDBConnector(
+                neo4j_connection_string, neo4j_username, neo4j_password)
 
         self.construct_neo4j_graph = construct_neo4j_graph
         self.nodes = {}
@@ -142,7 +143,7 @@ class UserGraphModel:
         self.nodes = {}
         self.edges = {}
         subreddits = self.mongo_db_connector.getSubredditsInfo()
-        submissions_types = ["New", "Rising"]
+        submissions_types = ["New"]
 
         for submissions_type in submissions_types:
             for subreddit in subreddits:
@@ -151,4 +152,5 @@ class UserGraphModel:
                     submission_type=submissions_type,
                     connection_count_score=add_connection_count,
                     activity_weight_score=add_activity_weight,
-                    upvotes_count_score=add_upvotes_count)
+                    upvotes_count_score=add_upvotes_count
+                )

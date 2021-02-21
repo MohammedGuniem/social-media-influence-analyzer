@@ -2,7 +2,7 @@ from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
 
 
-class ActionGraphModel:
+class EventGraphModel:
     def __init__(self, mongodb_connection_string, neo4j_connection_string, neo4j_username, neo4j_password, construct_neo4j_graph):
         # Mongo DB Database Connector
         self.mongo_db_connector = MongoDBConnector(
@@ -10,8 +10,9 @@ class ActionGraphModel:
         )
 
         # Neo4j graph database Connector
-        self.graph_db_connector = GraphDBConnector(
-            neo4j_connection_string, neo4j_username, neo4j_password)
+        if construct_neo4j_graph:
+            self.graph_db_connector = GraphDBConnector(
+                neo4j_connection_string, neo4j_username, neo4j_password)
 
         self.construct_neo4j_graph = construct_neo4j_graph
         self.nodes = {}
@@ -76,7 +77,7 @@ class ActionGraphModel:
                 comments_array=children_array, submission_type=submission_type)
         return score
 
-    def build_model(self, subreddit_display_name, submission_type):
+    def build_model_for_subreddit_and_type(self, subreddit_display_name, submission_type, connection_count_score, activity_weight_score, upvotes_count_score):
         # Get subreddit information.
         subreddit = self.mongo_db_connector.getSubredditInfo(
             subreddit_display_name)
@@ -98,26 +99,33 @@ class ActionGraphModel:
                 submission_type
             )
 
-            submission_score = len(comments) + 1
-
             for comment in comments:
                 comment_id = comment['id']
 
                 parent_id_prefix = comment['parent_id'][0:2]
                 parent_id = comment['parent_id'][3:]
 
-                edge_score = 1 + self.get_comment_children_count(
-                    [comment], submission_type=submission_type)
+                edge_score = 0
 
                 # Comment is top-level
                 if parent_id_prefix == "t3":
                     from_node_id = comment["submission_id"][3:]
                     node_type = "Top_comment"
+                    edge_score = 1 if connection_count_score else 0
+                    edge_score += len(comments) if activity_weight_score else 0
+                    edge_score += submission["upvotes"] if upvotes_count_score else 0
 
                 # Comment is a subcomment
                 elif parent_id_prefix == "t1":
                     from_node_id = comment["parent_id"][3:]
                     node_type = "Sub_comment"
+                    edge_score = 1 + self.get_comment_children_count(
+                        [comment], submission_type=submission_type)
+
+                    edge_score = 1 if connection_count_score else 0
+                    edge_score += self.get_comment_children_count(
+                        [comment], submission_type=submission_type) if activity_weight_score else 0
+                    edge_score += comment["upvotes"] if upvotes_count_score else 0
 
                 # Draw comment
                 self.addNode(activity_object=comment, Type=node_type)
@@ -127,4 +135,20 @@ class ActionGraphModel:
                     from_ID=from_node_id,
                     to_ID=comment_id,
                     score=edge_score
+                )
+
+    def build_model(self, add_connection_count=False, add_activity_weight=False, add_upvotes_count=False):
+        self.nodes = {}
+        self.edges = {}
+        subreddits = self.mongo_db_connector.getSubredditsInfo()
+        submissions_types = ["New"]
+
+        for submissions_type in submissions_types:
+            for subreddit in subreddits:
+                self.build_model_for_subreddit_and_type(
+                    subreddit_display_name=subreddit["display_name"],
+                    submission_type=submissions_type,
+                    connection_count_score=add_connection_count,
+                    activity_weight_score=add_activity_weight,
+                    upvotes_count_score=add_upvotes_count
                 )
