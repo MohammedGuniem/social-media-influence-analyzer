@@ -3,10 +3,12 @@ from classes.database_connectors.Neo4jConnector import GraphDBConnector
 
 
 class UserGraphModel:
-    def __init__(self, mongodb_connection_string, neo4j_connection_string, neo4j_username, neo4j_password, construct_neo4j_graph):
+    def __init__(self, mongodb_connection_string, neo4j_connection_string, neo4j_username, neo4j_password, construct_neo4j_graph, collection_name=None):
+
         # Mongo DB Database Connector
         self.mongo_db_connector = MongoDBConnector(
-            mongodb_connection_string
+            mongodb_connection_string,
+            collection_name=collection_name
         )
 
         # Neo4j graph database Connector
@@ -50,6 +52,7 @@ class UserGraphModel:
         else:
             self.edges[edge_id] = scores
 
+        scores = self.edges[edge_id]
         if self.construct_neo4j_graph:
             self.graph_db_connector.addEdge(
                 relation_Type=F"Influences",
@@ -135,7 +138,7 @@ class UserGraphModel:
                         Type=submission_type
                     )
                     from_node_id = parent_comment["author_id"]
-                    upvotes_weight = comment["upvotes"]
+                    upvotes_weight = parent_comment["upvotes"]
 
                 connection_weight = 1
                 event_weight = 1 + self.get_comment_children_count(

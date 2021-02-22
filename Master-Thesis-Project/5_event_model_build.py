@@ -35,3 +35,6 @@ print("using 3 different scoring techniques for event relations")
 print(event_models_statistics)
 
 event_model.mongo_db_connector.logg_reading_runtimes()
+
+print("Drawing histograms for user graph models")
+print("using 3 different scoring techniques for user relations")
