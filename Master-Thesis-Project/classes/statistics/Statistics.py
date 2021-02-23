@@ -31,3 +31,16 @@ class Statistics:
         if legend:
             plt.legend(loc=legend)
         plt.show()
+
+    def subplot_histograms(data):
+        fig, axs = plt.subplots(1, len(data.keys()),
+                                sharey=True, tight_layout=True)
+        plot_number = 0
+        for key, value in data.items():
+            x = np.array(value)
+            possible_answers = len(set(x))
+            axs[plot_number].hist(x, bins=np.arange(
+                min(x), max(x)+2, 1)-0.5, ec="k")
+            axs[plot_number].set_title(key)
+            plot_number += 1
+        plt.show()

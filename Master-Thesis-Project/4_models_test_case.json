@@ -1,7 +1,7 @@
 {
   "id": "Test",
   "expected_output": {
-    "event_model": {
+    "Event": {
       "edges": {
         "S_1_TC_1": {
           "connection": 1,
@@ -130,7 +130,7 @@
         "SC_6": "Sub_comment"
       }
     },
-    "user_model": {
+    "User": {
       "edges": {
         "U_1_U_4": {
           "connection": 2,

@@ -34,4 +34,7 @@ print("Summary statistics cross validation for user graph models")
 print("using 3 different scoring techniques for user relations")
 print(user_models_statistics)
 
+print("Drawing histograms using combinations of 3 different scoring techniques")
+statistics_methods.subplot_histograms(user_model_edge_weights)
+
 user_model.mongo_db_connector.logg_reading_runtimes()
