@@ -1,7 +1,37 @@
 from classes.statistics.Statistics import Statistics as statistics_methods
+from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from classes.modelling.UserGraphModelling import UserGraphModel
 from dotenv import load_dotenv
+import json
 import os
+
+# Reading documents from test .json file.
+with open("4_test_case.json", 'r') as model_file:
+    test = json.load(model_file)
+
+test_id = test["id"]
+
+# Writing documents to mongoDB.
+mongo_db_connector = MongoDBConnector(
+    os.environ.get('mongo_connnection_string'))
+
+mongo_db_connector.writeToDB(
+    database_name="Subreddits_DB",
+    collection_name=test_id,
+    data=test["subreddits"]
+)
+
+mongo_db_connector.writeToDB(
+    database_name=F"{test_id}_Submissions_DB",
+    collection_name=test_id,
+    data=test["submissions"]
+)
+
+mongo_db_connector.writeToDB(
+    database_name=F"{test_id}_Comments_DB",
+    collection_name=test_id,
+    data=test["comments"]
+)
 
 # Loading Enviroment variables and initiating a user graph model instance
 load_dotenv()
@@ -36,4 +66,14 @@ print("Summary statistics cross validation for user graph models")
 print("using 3 different scoring techniques for user relations")
 print(user_models_statistics)
 
-user_model.mongo_db_connector.logg_reading_runtimes()
+# Deleting test documents from mongoDB
+mongo_db_connector.remove_collection(F"{test_id}_Submissions_DB", test_id)
+mongo_db_connector.remove_collection(F"{test_id}_Comments_DB", test_id)
+mongo_db_connector.remove_collection("Subreddits_DB", test_id)
+
+expected_edges = test["expected_output"]["user_model"]["edges"]
+expected_nodes = test["expected_output"]["user_model"]["nodes"]
+if (expected_edges == user_model.edges and expected_nodes == user_model.nodes):
+    print("*** User Model Test is Successful! ***")
+else:
+    print("*** User Model Test is Not Successful! ***")

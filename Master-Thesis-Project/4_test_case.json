@@ -1,0 +1,376 @@
+{
+  "id": "Test",
+  "expected_output": {
+    "event_model": {
+      "edges": {
+        "S_1_TC_1": {
+          "connection": 1,
+          "event": 4,
+          "upvotes": 10,
+          "connection_and_event": 5,
+          "connection_and_upvotes": 11,
+          "event_and_upvotes": 14,
+          "all": 15
+        },
+        "TC_1_SC_1": {
+          "connection": 1,
+          "event": 1,
+          "upvotes": 7,
+          "connection_and_event": 2,
+          "connection_and_upvotes": 8,
+          "event_and_upvotes": 8,
+          "all": 9
+        },
+        "TC_1_SC_2": {
+          "connection": 1,
+          "event": 2,
+          "upvotes": 7,
+          "connection_and_event": 3,
+          "connection_and_upvotes": 8,
+          "event_and_upvotes": 9,
+          "all": 10
+        },
+        "SC_2_SC_3": {
+          "connection": 1,
+          "event": 1,
+          "upvotes": 3,
+          "connection_and_event": 2,
+          "connection_and_upvotes": 4,
+          "event_and_upvotes": 4,
+          "all": 5
+        },
+        "S_2_TC_2": {
+          "connection": 1,
+          "event": 1,
+          "upvotes": 3,
+          "connection_and_event": 2,
+          "connection_and_upvotes": 4,
+          "event_and_upvotes": 4,
+          "all": 5
+        },
+        "S_2_TC_3": {
+          "connection": 1,
+          "event": 2,
+          "upvotes": 3,
+          "connection_and_event": 3,
+          "connection_and_upvotes": 4,
+          "event_and_upvotes": 5,
+          "all": 6
+        },
+        "TC_3_SC_4": {
+          "connection": 1,
+          "event": 1,
+          "upvotes": 5,
+          "connection_and_event": 2,
+          "connection_and_upvotes": 6,
+          "event_and_upvotes": 6,
+          "all": 7
+        },
+        "S_3_TC_4": {
+          "connection": 1,
+          "event": 1,
+          "upvotes": 10,
+          "connection_and_event": 2,
+          "connection_and_upvotes": 11,
+          "event_and_upvotes": 11,
+          "all": 12
+        },
+        "S_3_TC_5": {
+          "connection": 1,
+          "event": 3,
+          "upvotes": 10,
+          "connection_and_event": 4,
+          "connection_and_upvotes": 11,
+          "event_and_upvotes": 13,
+          "all": 14
+        },
+        "S_3_TC_6": {
+          "connection": 1,
+          "event": 1,
+          "upvotes": 10,
+          "connection_and_event": 2,
+          "connection_and_upvotes": 11,
+          "event_and_upvotes": 11,
+          "all": 12
+        },
+        "TC_5_SC_5": {
+          "connection": 1,
+          "event": 1,
+          "upvotes": 5,
+          "connection_and_event": 2,
+          "connection_and_upvotes": 6,
+          "event_and_upvotes": 6,
+          "all": 7
+        },
+        "TC_5_SC_6": {
+          "connection": 1,
+          "event": 1,
+          "upvotes": 5,
+          "connection_and_event": 2,
+          "connection_and_upvotes": 6,
+          "event_and_upvotes": 6,
+          "all": 7
+        }
+      },
+      "nodes": {
+        "S_1": "Submission",
+        "TC_1": "Top_comment",
+        "SC_1": "Sub_comment",
+        "SC_2": "Sub_comment",
+        "SC_3": "Sub_comment",
+        "S_2": "Submission",
+        "TC_2": "Top_comment",
+        "TC_3": "Top_comment",
+        "SC_4": "Sub_comment",
+        "S_3": "Submission",
+        "TC_4": "Top_comment",
+        "TC_5": "Top_comment",
+        "TC_6": "Top_comment",
+        "SC_5": "Sub_comment",
+        "SC_6": "Sub_comment"
+      }
+    },
+    "user_model": {
+      "edges": {
+        "U_1_U_4": {
+          "connection": 2,
+          "event": 5,
+          "upvotes": 13,
+          "connection_and_event": 7,
+          "connection_and_upvotes": 15,
+          "event_and_upvotes": 18,
+          "all": 20
+        },
+        "U_4_U_1": {
+          "connection": 2,
+          "event": 3,
+          "upvotes": 14,
+          "connection_and_event": 5,
+          "connection_and_upvotes": 16,
+          "event_and_upvotes": 17,
+          "all": 19
+        },
+        "U_2_U_5": {
+          "connection": 1,
+          "event": 1,
+          "upvotes": 3,
+          "connection_and_event": 2,
+          "connection_and_upvotes": 4,
+          "event_and_upvotes": 4,
+          "all": 5
+        },
+        "U_2_U_6": {
+          "connection": 1,
+          "event": 2,
+          "upvotes": 3,
+          "connection_and_event": 3,
+          "connection_and_upvotes": 4,
+          "event_and_upvotes": 5,
+          "all": 6
+        },
+        "U_6_U_2": {
+          "connection": 1,
+          "event": 1,
+          "upvotes": 5,
+          "connection_and_event": 2,
+          "connection_and_upvotes": 6,
+          "event_and_upvotes": 6,
+          "all": 7
+        },
+        "U_3_U_6": {
+          "connection": 2,
+          "event": 2,
+          "upvotes": 20,
+          "connection_and_event": 4,
+          "connection_and_upvotes": 22,
+          "event_and_upvotes": 22,
+          "all": 24
+        },
+        "U_3_U_7": {
+          "connection": 1,
+          "event": 3,
+          "upvotes": 10,
+          "connection_and_event": 4,
+          "connection_and_upvotes": 11,
+          "event_and_upvotes": 13,
+          "all": 14
+        },
+        "U_7_U_3": {
+          "connection": 2,
+          "event": 2,
+          "upvotes": 10,
+          "connection_and_event": 4,
+          "connection_and_upvotes": 12,
+          "event_and_upvotes": 12,
+          "all": 14
+        }
+      },
+      "nodes": {
+        "U_1": "Redditor",
+        "U_4": "Redditor",
+        "U_2": "Redditor",
+        "U_5": "Redditor",
+        "U_6": "Redditor",
+        "U_3": "Redditor",
+        "U_7": "Redditor"
+      }
+    }
+  },
+  "subreddits": [
+    {
+      "id": "Test",
+      "display_name": "Test"
+    }
+  ],
+  "submissions": [
+    {
+      "id": "S_1",
+      "author_id": "U_1",
+      "author_name": "User A",
+      "num_comments": 4,
+      "subreddit_id": "Test",
+      "title": "What's up?",
+      "upvotes": 10
+    },
+    {
+      "id": "S_2",
+      "author_id": "U_2",
+      "author_name": "User B",
+      "num_comments": 3,
+      "subreddit_id": "Test",
+      "title": "What a lovely day!",
+      "upvotes": 3
+    },
+    {
+      "id": "S_3",
+      "author_id": "U_3",
+      "author_name": "User C",
+      "num_comments": 5,
+      "subreddit_id": "Test",
+      "title": "Who likes icecream?",
+      "upvotes": 10
+    }
+  ],
+  "comments": [
+    {
+      "id": "TC_1",
+      "author_id": "U_4",
+      "author_name": "User D",
+      "comment_body": "not much",
+      "parent_id": "t3_S_1",
+      "submission_id": "t3_S_1",
+      "subreddit_id": "Test",
+      "upvotes": 7
+    },
+    {
+      "id": "SC_1",
+      "author_id": "U_1",
+      "author_name": "User A",
+      "comment_body": "ok",
+      "parent_id": "t1_TC_1",
+      "submission_id": "t3_S_1",
+      "subreddit_id": "Test",
+      "upvotes": 2
+    },
+    {
+      "id": "SC_2",
+      "author_id": "U_1",
+      "author_name": "User A",
+      "comment_body": "You want to play tennis?",
+      "parent_id": "t1_TC_1",
+      "submission_id": "t3_S_1",
+      "subreddit_id": "Test",
+      "upvotes": 3
+    },
+    {
+      "id": "SC_3",
+      "author_id": "U_4",
+      "author_name": "User D",
+      "comment_body": "Sure",
+      "parent_id": "t1_SC_2",
+      "submission_id": "t3_S_1",
+      "subreddit_id": "Test",
+      "upvotes": 8
+    },
+    {
+      "id": "TC_2",
+      "author_id": "U_5",
+      "author_name": "User E",
+      "comment_body": "amazing",
+      "parent_id": "t3_S_2",
+      "submission_id": "t3_S_2",
+      "subreddit_id": "Test",
+      "upvotes": 9
+    },
+    {
+      "id": "TC_3",
+      "author_id": "U_6",
+      "author_name": "User F",
+      "comment_body": "You want to go running?",
+      "parent_id": "t3_S_2",
+      "submission_id": "t3_S_2",
+      "subreddit_id": "Test",
+      "upvotes": 5
+    },
+    {
+      "id": "SC_4",
+      "author_id": "U_2",
+      "author_name": "User B",
+      "comment_body": "No, thanks",
+      "parent_id": "t1_TC_3",
+      "submission_id": "t3_S_2",
+      "subreddit_id": "Test",
+      "upvotes": 8
+    },
+    {
+      "id": "TC_4",
+      "author_id": "U_6",
+      "author_name": "User F",
+      "comment_body": "Not me",
+      "parent_id": "t3_S_3",
+      "submission_id": "t3_S_3",
+      "subreddit_id": "Test",
+      "upvotes": 7
+    },
+    {
+      "id": "TC_5",
+      "author_id": "U_7",
+      "author_name": "User G",
+      "comment_body": "me too",
+      "parent_id": "t3_S_3",
+      "submission_id": "t3_S_3",
+      "subreddit_id": "Test",
+      "upvotes": 5
+    },
+    {
+      "id": "TC_6",
+      "author_id": "U_6",
+      "author_name": "User F",
+      "comment_body": "I like cake",
+      "parent_id": "t3_S_3",
+      "submission_id": "t3_S_3",
+      "subreddit_id": "Test",
+      "upvotes": 10
+    },
+    {
+      "id": "SC_5",
+      "author_id": "U_3",
+      "author_name": "User C",
+      "comment_body": "that what i thought",
+      "parent_id": "t1_TC_5",
+      "submission_id": "t3_S_3",
+      "subreddit_id": "Test",
+      "upvotes": 3
+    },
+    {
+      "id": "SC_6",
+      "author_id": "U_3",
+      "author_name": "User C",
+      "comment_body": "you are a cool person",
+      "parent_id": "t1_TC_5",
+      "submission_id": "t3_S_3",
+      "subreddit_id": "Test",
+      "upvotes": 10
+    }
+  ]
+}

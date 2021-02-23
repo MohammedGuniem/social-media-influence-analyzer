@@ -69,6 +69,11 @@ class MongoDBConnector:
         self.reading_runtimes[database_name] = runtime
         return docs
 
+    """ Removal and cleaning methods """
+
+    def remove_collection(self, database_name, collection_name):
+        self.client[database_name].drop_collection(collection_name)
+
     """ Crawling, writing and reading runtimes loggers """
 
     def logg_crawling_runtimes(self, crawling_runtime):
