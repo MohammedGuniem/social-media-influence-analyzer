@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 import json
 import os
 
+load_dotenv()
+
 # Reading documents from test .json file.
 with open("4_models_test_case.json", 'r') as model_file:
     test = json.load(model_file)

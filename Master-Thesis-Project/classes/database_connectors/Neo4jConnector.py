@@ -26,6 +26,10 @@ class GraphDBConnector:
             session.write_transaction(
                 self._create_or_update_edge, relation_Type, relation_props, from_ID, from_Type, to_ID, to_Type)
 
+    def clear_database(self):
+        with self.driver.session() as session:
+            session.write_transaction(self._clear_database)
+
     def __del__(self):
         self.driver.close()
 
@@ -72,6 +76,15 @@ class GraphDBConnector:
         query += relation_props
         query += "\nON MATCH SET\n"
         query += relation_props
+
+        # Sending query to DB
+        result = tx.run(query)
+
+    @staticmethod
+    def _clear_database(tx):
+
+        # Constructing query
+        query = "MATCH (n) DETACH DELETE n"
 
         # Sending query to DB
         result = tx.run(query)

@@ -14,6 +14,7 @@ class EventGraphModel:
         if construct_neo4j_graph:
             self.graph_db_connector = GraphDBConnector(
                 neo4j_connection_string, neo4j_username, neo4j_password)
+            self.graph_db_connector.clear_database()
 
         self.construct_neo4j_graph = construct_neo4j_graph
         self.nodes = {}
@@ -33,7 +34,7 @@ class EventGraphModel:
 
         elif Type in ["Submission", "Top_comment", "Sub_comment"]:
             node_id = activity_object["id"]
-            props["name"] = activity_object["id"]
+            props["name"] = F"{activity_object['author_name']} ({activity_object['id']})"
             props["author_name"] = activity_object["author_name"]
             props["author_id"] = activity_object["author_id"]
 
@@ -57,7 +58,7 @@ class EventGraphModel:
         scores = self.edges[edge_id]
         if self.construct_neo4j_graph:
             self.graph_db_connector.addEdge(
-                relation_Type=F"Influences",
+                relation_Type="Got",
                 relation_props=scores,
                 from_ID=from_ID,
                 from_Type=self.nodes[from_ID],

@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import math
 
 
 class Statistics:
@@ -33,14 +34,25 @@ class Statistics:
         plt.show()
 
     def subplot_histograms(data):
-        fig, axs = plt.subplots(1, len(data.keys()),
+        number_of_histograms = len(data.keys())
+        number_of_rows = 4
+        number_of_columns = math.ceil(number_of_histograms/number_of_rows)
+
+        fig, axs = plt.subplots(number_of_rows, number_of_columns,
                                 sharey=True, tight_layout=True)
-        plot_number = 0
+        row_number = 0
+        column_number = 0
         for key, value in data.items():
             x = np.array(value)
             possible_answers = len(set(x))
-            axs[plot_number].hist(x, bins=np.arange(
+            axs[row_number, column_number].hist(x, bins=np.arange(
                 min(x), max(x)+2, 1)-0.5, ec="k")
-            axs[plot_number].set_title(key)
-            plot_number += 1
+            axs[row_number, column_number].set_title(key)
+
+            if column_number == (number_of_columns-1):
+                column_number = 0
+                row_number += 1
+            else:
+                column_number += 1
+
         plt.show()
