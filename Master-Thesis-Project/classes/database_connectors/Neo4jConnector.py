@@ -6,8 +6,12 @@ class GraphDBConnector:
     def __init__(self, uri, user, password):
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
 
+    def set_database(self, database_name):
+        self.database = database_name
+        self.create_or_replace_database(database_name)
+
     def addNode(self, ID, Type, props):
-        with self.driver.session() as session:
+        with self.driver.session(database=self.database) as session:
 
             # Preparing props for ON CREATE and On MATCH for update
             props = self.prepare_props(pointer="n", props=props)
@@ -16,7 +20,7 @@ class GraphDBConnector:
                 self._create_or_update_node, ID, Type, props)
 
     def addEdge(self, relation_Type, relation_props, from_ID, from_Type, to_ID, to_Type):
-        with self.driver.session() as session:
+        with self.driver.session(database=self.database) as session:
 
             # Preparing props for ON CREATE and On MATCH for update
 
@@ -26,9 +30,10 @@ class GraphDBConnector:
             session.write_transaction(
                 self._create_or_update_edge, relation_Type, relation_props, from_ID, from_Type, to_ID, to_Type)
 
-    def clear_database(self):
+    def create_or_replace_database(self, database_name):
         with self.driver.session() as session:
-            session.write_transaction(self._clear_database)
+            session.write_transaction(
+                self._create_or_replace_database, database_name)
 
     def __del__(self):
         self.driver.close()
@@ -81,10 +86,10 @@ class GraphDBConnector:
         result = tx.run(query)
 
     @staticmethod
-    def _clear_database(tx):
+    def _create_or_replace_database(tx, database_name):
 
         # Constructing query
-        query = "MATCH (n) DETACH DELETE n"
+        query = F"CREATE OR REPLACE DATABASE {database_name}"
 
         # Sending query to DB
         result = tx.run(query)

@@ -1,8 +1,10 @@
 from classes.statistics.Statistics import Statistics as statistics_methods
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
+from classes.database_connectors.Neo4jConnector import GraphDBConnector
 from classes.modelling.EventGraphModelling import EventGraphModel
 from classes.modelling.UserGraphModelling import UserGraphModel
 from dotenv import load_dotenv
+from datetime import date
 import json
 import os
 
@@ -16,7 +18,9 @@ test_id = test["id"]
 
 # Writing documents to mongoDB.
 mongo_db_connector = MongoDBConnector(
-    os.environ.get('mongo_connnection_string'))
+    os.environ.get('mongo_connnection_string'),
+    collection_name=test_id
+)
 
 for docs in ["Subreddits", "Submissions", "Comments"]:
     mongo_db_connector.writeToDB(
@@ -25,27 +29,30 @@ for docs in ["Subreddits", "Submissions", "Comments"]:
         data=test[docs.lower()]
     )
 
+# Making a neo4j graph connector
+neo4j_db_connector = GraphDBConnector(
+    uri=os.environ.get('neo4j_connection_string'),
+    user=os.environ.get('neo4j_username'),
+    password=os.environ.get('neo4j_password'),
+)
+
 for model_name in test["expected_output"].keys():
     if model_name == "Event":
         model = EventGraphModel(
-            mongodb_connection_string=os.environ.get(
-                'mongo_connnection_string'),
-            collection_name="Test",
-            neo4j_connection_string=os.environ.get('neo4j_connection_string'),
-            neo4j_username=os.environ.get('neo4j_username'),
-            neo4j_password=os.environ.get('neo4j_password'),
-            construct_neo4j_graph=False
+            mongo_db_connector=mongo_db_connector,
+            neo4j_db_connector=neo4j_db_connector,
+            construct_neo4j_graph=True
         )
     elif model_name == "User":
         model = UserGraphModel(
-            mongodb_connection_string=os.environ.get(
-                'mongo_connnection_string'),
-            collection_name="Test",
-            neo4j_connection_string=os.environ.get('neo4j_connection_string'),
-            neo4j_username=os.environ.get('neo4j_username'),
-            neo4j_password=os.environ.get('neo4j_password'),
-            construct_neo4j_graph=False
+            mongo_db_connector=mongo_db_connector,
+            neo4j_db_connector=neo4j_db_connector,
+            construct_neo4j_graph=True
         )
+
+    if model.construct_neo4j_graph:
+        database_name = F"{test_id}{model_name}{str(date.today()).replace('-','')}"
+        model.neo4j_db_connector.set_database(database_name)
 
     print(F"{model_name} Model >> Data feed from: {model.mongo_db_connector.collection_name}")
 

@@ -1,20 +1,8 @@
-from classes.database_connectors.MongoDBConnector import MongoDBConnector
-from classes.database_connectors.Neo4jConnector import GraphDBConnector
-
-
 class UserGraphModel:
-    def __init__(self, mongodb_connection_string, neo4j_connection_string, neo4j_username, neo4j_password, construct_neo4j_graph, collection_name=None):
-
-        # Mongo DB Database Connector
-        self.mongo_db_connector = MongoDBConnector(
-            mongodb_connection_string,
-            collection_name=collection_name
-        )
-
-        # Neo4j graph database Connector
+    def __init__(self, mongo_db_connector, neo4j_db_connector, construct_neo4j_graph):
+        self.mongo_db_connector = mongo_db_connector
         if construct_neo4j_graph:
-            self.graph_db_connector = GraphDBConnector(
-                neo4j_connection_string, neo4j_username, neo4j_password)
+            self.neo4j_db_connector = neo4j_db_connector
 
         self.construct_neo4j_graph = construct_neo4j_graph
         self.nodes = {}
@@ -38,7 +26,7 @@ class UserGraphModel:
 
         if not node_id in self.nodes:
             if self.construct_neo4j_graph:
-                self.graph_db_connector.addNode(node_id, Type, props)
+                self.neo4j_db_connector.addNode(node_id, Type, props)
             self.nodes[node_id] = Type
 
     def addEdge(self, from_ID, to_ID, scores):
@@ -54,7 +42,7 @@ class UserGraphModel:
 
         scores = self.edges[edge_id]
         if self.construct_neo4j_graph:
-            self.graph_db_connector.addEdge(
+            self.neo4j_db_connector.addEdge(
                 relation_Type=F"Influences",
                 relation_props=scores,
                 from_ID=from_ID,
