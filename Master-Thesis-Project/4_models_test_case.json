@@ -1,114 +1,114 @@
 {
   "id": "Test",
   "expected_output": {
-    "Event": {
+    "activities": {
       "edges": {
-        "S_1_TC_1": {
+        "S_1_Got_TC_1": {
           "connection": 1,
-          "event": 4,
+          "activity": 4,
           "upvotes": 10,
-          "connection_and_event": 5,
+          "connection_and_activity": 5,
           "connection_and_upvotes": 11,
-          "event_and_upvotes": 14,
+          "activity_and_upvotes": 14,
           "all": 15
         },
-        "TC_1_SC_1": {
+        "TC_1_Got_SC_1": {
           "connection": 1,
-          "event": 1,
+          "activity": 1,
           "upvotes": 7,
-          "connection_and_event": 2,
+          "connection_and_activity": 2,
           "connection_and_upvotes": 8,
-          "event_and_upvotes": 8,
+          "activity_and_upvotes": 8,
           "all": 9
         },
-        "TC_1_SC_2": {
+        "TC_1_Got_SC_2": {
           "connection": 1,
-          "event": 2,
+          "activity": 2,
           "upvotes": 7,
-          "connection_and_event": 3,
+          "connection_and_activity": 3,
           "connection_and_upvotes": 8,
-          "event_and_upvotes": 9,
+          "activity_and_upvotes": 9,
           "all": 10
         },
-        "SC_2_SC_3": {
+        "SC_2_Got_SC_3": {
           "connection": 1,
-          "event": 1,
+          "activity": 1,
           "upvotes": 3,
-          "connection_and_event": 2,
+          "connection_and_activity": 2,
           "connection_and_upvotes": 4,
-          "event_and_upvotes": 4,
+          "activity_and_upvotes": 4,
           "all": 5
         },
-        "S_2_TC_2": {
+        "S_2_Got_TC_2": {
           "connection": 1,
-          "event": 1,
+          "activity": 1,
           "upvotes": 3,
-          "connection_and_event": 2,
+          "connection_and_activity": 2,
           "connection_and_upvotes": 4,
-          "event_and_upvotes": 4,
+          "activity_and_upvotes": 4,
           "all": 5
         },
-        "S_2_TC_3": {
+        "S_2_Got_TC_3": {
           "connection": 1,
-          "event": 2,
+          "activity": 2,
           "upvotes": 3,
-          "connection_and_event": 3,
+          "connection_and_activity": 3,
           "connection_and_upvotes": 4,
-          "event_and_upvotes": 5,
+          "activity_and_upvotes": 5,
           "all": 6
         },
-        "TC_3_SC_4": {
+        "TC_3_Got_SC_4": {
           "connection": 1,
-          "event": 1,
+          "activity": 1,
           "upvotes": 5,
-          "connection_and_event": 2,
+          "connection_and_activity": 2,
           "connection_and_upvotes": 6,
-          "event_and_upvotes": 6,
+          "activity_and_upvotes": 6,
           "all": 7
         },
-        "S_3_TC_4": {
+        "S_3_Got_TC_4": {
           "connection": 1,
-          "event": 1,
+          "activity": 1,
           "upvotes": 10,
-          "connection_and_event": 2,
+          "connection_and_activity": 2,
           "connection_and_upvotes": 11,
-          "event_and_upvotes": 11,
+          "activity_and_upvotes": 11,
           "all": 12
         },
-        "S_3_TC_5": {
+        "S_3_Got_TC_5": {
           "connection": 1,
-          "event": 3,
+          "activity": 3,
           "upvotes": 10,
-          "connection_and_event": 4,
+          "connection_and_activity": 4,
           "connection_and_upvotes": 11,
-          "event_and_upvotes": 13,
+          "activity_and_upvotes": 13,
           "all": 14
         },
-        "S_3_TC_6": {
+        "S_3_Got_TC_6": {
           "connection": 1,
-          "event": 1,
+          "activity": 1,
           "upvotes": 10,
-          "connection_and_event": 2,
+          "connection_and_activity": 2,
           "connection_and_upvotes": 11,
-          "event_and_upvotes": 11,
+          "activity_and_upvotes": 11,
           "all": 12
         },
-        "TC_5_SC_5": {
+        "TC_5_Got_SC_5": {
           "connection": 1,
-          "event": 1,
+          "activity": 1,
           "upvotes": 5,
-          "connection_and_event": 2,
+          "connection_and_activity": 2,
           "connection_and_upvotes": 6,
-          "event_and_upvotes": 6,
+          "activity_and_upvotes": 6,
           "all": 7
         },
-        "TC_5_SC_6": {
+        "TC_5_Got_SC_6": {
           "connection": 1,
-          "event": 1,
+          "activity": 1,
           "upvotes": 5,
-          "connection_and_event": 2,
+          "connection_and_activity": 2,
           "connection_and_upvotes": 6,
-          "event_and_upvotes": 6,
+          "activity_and_upvotes": 6,
           "all": 7
         }
       },
@@ -130,78 +130,78 @@
         "SC_6": "Sub_comment"
       }
     },
-    "User": {
+    "users": {
       "edges": {
-        "U_1_U_4": {
+        "U_1_Influences_U_4": {
           "connection": 2,
-          "event": 5,
+          "activity": 5,
           "upvotes": 13,
-          "connection_and_event": 7,
+          "connection_and_activity": 7,
           "connection_and_upvotes": 15,
-          "event_and_upvotes": 18,
+          "activity_and_upvotes": 18,
           "all": 20
         },
-        "U_4_U_1": {
+        "U_4_Influences_U_1": {
           "connection": 2,
-          "event": 3,
+          "activity": 3,
           "upvotes": 14,
-          "connection_and_event": 5,
+          "connection_and_activity": 5,
           "connection_and_upvotes": 16,
-          "event_and_upvotes": 17,
+          "activity_and_upvotes": 17,
           "all": 19
         },
-        "U_2_U_5": {
+        "U_2_Influences_U_5": {
           "connection": 1,
-          "event": 1,
+          "activity": 1,
           "upvotes": 3,
-          "connection_and_event": 2,
+          "connection_and_activity": 2,
           "connection_and_upvotes": 4,
-          "event_and_upvotes": 4,
+          "activity_and_upvotes": 4,
           "all": 5
         },
-        "U_2_U_6": {
+        "U_2_Influences_U_6": {
           "connection": 1,
-          "event": 2,
+          "activity": 2,
           "upvotes": 3,
-          "connection_and_event": 3,
+          "connection_and_activity": 3,
           "connection_and_upvotes": 4,
-          "event_and_upvotes": 5,
+          "activity_and_upvotes": 5,
           "all": 6
         },
-        "U_6_U_2": {
+        "U_6_Influences_U_2": {
           "connection": 1,
-          "event": 1,
+          "activity": 1,
           "upvotes": 5,
-          "connection_and_event": 2,
+          "connection_and_activity": 2,
           "connection_and_upvotes": 6,
-          "event_and_upvotes": 6,
+          "activity_and_upvotes": 6,
           "all": 7
         },
-        "U_3_U_6": {
+        "U_3_Influences_U_6": {
           "connection": 2,
-          "event": 2,
+          "activity": 2,
           "upvotes": 20,
-          "connection_and_event": 4,
+          "connection_and_activity": 4,
           "connection_and_upvotes": 22,
-          "event_and_upvotes": 22,
+          "activity_and_upvotes": 22,
           "all": 24
         },
-        "U_3_U_7": {
+        "U_3_Influences_U_7": {
           "connection": 1,
-          "event": 3,
+          "activity": 3,
           "upvotes": 10,
-          "connection_and_event": 4,
+          "connection_and_activity": 4,
           "connection_and_upvotes": 11,
-          "event_and_upvotes": 13,
+          "activity_and_upvotes": 13,
           "all": 14
         },
-        "U_7_U_3": {
+        "U_7_Influences_U_3": {
           "connection": 2,
-          "event": 2,
+          "activity": 2,
           "upvotes": 10,
-          "connection_and_event": 4,
+          "connection_and_activity": 4,
           "connection_and_upvotes": 12,
-          "event_and_upvotes": 12,
+          "activity_and_upvotes": 12,
           "all": 14
         }
       },

@@ -1,7 +1,7 @@
 from classes.statistics.Statistics import Statistics as statistics_methods
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
-from classes.modelling.EventGraphModelling import EventGraphModel
+from classes.modelling.ActivityGraphModelling import ActivityGraphModel
 from classes.modelling.UserGraphModelling import UserGraphModel
 from dotenv import load_dotenv
 from datetime import date
@@ -37,31 +37,34 @@ neo4j_db_connector = GraphDBConnector(
 )
 
 for model_name in test["expected_output"].keys():
-    if model_name == "Event":
-        model = EventGraphModel(
+    if model_name == "activities":
+        model = ActivityGraphModel(
             mongo_db_connector=mongo_db_connector,
-            neo4j_db_connector=neo4j_db_connector,
-            construct_neo4j_graph=True
+            neo4j_db_connector=neo4j_db_connector
         )
-    elif model_name == "User":
+    elif model_name == "users":
         model = UserGraphModel(
             mongo_db_connector=mongo_db_connector,
-            neo4j_db_connector=neo4j_db_connector,
-            construct_neo4j_graph=True
+            neo4j_db_connector=neo4j_db_connector
         )
-
-    if model.construct_neo4j_graph:
-        database_name = F"{test_id}{model_name}{str(date.today()).replace('-','')}"
-        model.neo4j_db_connector.set_database(database_name)
+    else:
+        import sys
+        sys.exit(0)
 
     print(F"{model_name} Model >> Data feed from: {model.mongo_db_connector.collection_name}")
 
     print(F"{model_name} Model >> Building model with all possible scoring combinations...")
     model.build_model_for_subreddit_and_type(
         subreddit_display_name=test_id, submission_type=test_id)
-    all_edge_weights = model.edges.values()
+
+    database_name = F"{test_id}{model_name}{str(date.today()).replace('-','')}"
+    model.save(database_name)
 
     print(F"{model_name} Model >> Calculating Summary Statistics for each and every edge scoring combination...")
+    all_edge_weights = []
+    for edge in model.edges.values():
+        all_edge_weights.append(edge['props'])
+
     model_edge_weights = {}
     for edge_weights in all_edge_weights:
         for k, v in edge_weights.items():
@@ -81,11 +84,30 @@ for model_name in test["expected_output"].keys():
     expected_output = test["expected_output"][model_name]
     expected_edges = expected_output["edges"]
     expected_nodes = expected_output["nodes"]
-    if (expected_edges == model.edges and expected_nodes == model.nodes):
+
+    successful_test = True
+    for edge_id, edge in model.edges.items():
+        if edge["props"] != expected_edges[edge_id]:
+            successful_test = False
+            print("----- Expected edge ----->")
+            print(edge["props"])
+            print("----- Got edge ----->")
+            print(expected_edges[edge_id])
+            break
+
+    for node_id, node in model.nodes.items():
+        if node["type"] != expected_nodes[node_id]:
+            successful_test = False
+            print("----- Expected edge ----->")
+            print(edge["props"])
+            print("----- Got edge ----->")
+            print(expected_edges[edge_id])
+            break
+
+    if (successful_test):
         print(F"\n*** {model_name} Model Test is Successful! ***\n")
     else:
         print(F"\n*** {model_name} Model Test is Not Successful! ***\n")
-
 
 # Deleting test documents from mongoDB
 mongo_db_connector.remove_collection(F"{test_id}_Submissions_DB", test_id)
