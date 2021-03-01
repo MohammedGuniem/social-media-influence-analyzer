@@ -1,13 +1,9 @@
 {
-    "id": "id",
-    "title": "title",
-    "name": "name",
-    "author_id": "author.id",
-    "author_name": "author.name",    
-    "num_comments": "num_comments",
-    "upvotes": "score",
-    "upvote_ratio": "upvote_ratio",
-    "subreddit_id": "subreddit.id",
-    "url": "url",
-    "created_utc": "created_utc"
+  "id": "id",
+  "author_id": "author.id",
+  "author_name": "author.name",
+  "num_comments": "num_comments",
+  "subreddit_id": "subreddit.id",
+  "title": "title",
+  "upvotes": "score"
 }

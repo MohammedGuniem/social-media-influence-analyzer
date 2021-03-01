@@ -10,8 +10,12 @@ mongo_db_connector = MongoDBConnector(connection_string)
 def analyze_runtimes(operations):
     if operations == "write":
         analysis_data = mongo_db_connector.get_writing_runtimes()
+        if len(analysis_data) == 0:
+            return "Not enough data about read operations"
     elif operations == "read":
         analysis_data = mongo_db_connector.get_reading_runtimes()
+        if len(analysis_data) == 0:
+            return "Not enough data about read operations"
     else:
         return "You need to specify either read or write as operations type"
 

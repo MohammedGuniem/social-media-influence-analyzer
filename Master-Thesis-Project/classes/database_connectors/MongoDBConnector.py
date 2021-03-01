@@ -20,12 +20,8 @@ class MongoDBConnector:
     def getMostRecentValidCollection(self):
         collections = [
             set(self.client["Subreddits_DB"].collection_names()),
-            set(self.client["New_Submissions_DB"].collection_names()),
-            set(self.client["New_Comments_DB"].collection_names()),
-            set(self.client["New_Users_DB"].collection_names()),
             set(self.client["Rising_Submissions_DB"].collection_names()),
             set(self.client["Rising_Comments_DB"].collection_names()),
-            set(self.client["Rising_Users_DB"].collection_names())
         ]
         valid_collections = collections[0]
         for collection_set in collections:
@@ -168,3 +164,20 @@ class MongoDBConnector:
             query={"parent_id": F"t1_{comment_id}"}
         )
         return data
+
+    def get_children_count(self, comments_array, submission_type):
+        children_array = []
+        children_of_children_num = []
+        for comment in comments_array:
+            children = self.getCommentChildren(
+                comment_id=comment['id'], Type=submission_type)
+
+            children_array += children
+            children_of_children_num.append(len(children))
+
+        if sum(children_of_children_num) == 0:
+            return 0
+        else:
+            score = sum(children_of_children_num) + self.get_children_count(
+                comments_array=children_array, submission_type=submission_type)
+        return score

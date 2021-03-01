@@ -39,15 +39,15 @@ for data in crawling_analysis_data:
 statistics_methods.plot(
     x=all_submissions_num,
     y=all_submissions_crawling_runtime,
-    xlabel="crawling runtime (s)",
-    ylabel="number of crawled submissions",
+    xlabel="number of crawled submissions",
+    ylabel="crawling runtime (s)",
 )
 
 statistics_methods.plot(
     x=all_comments_num,
     y=all_comments_crawling_runtime,
-    xlabel="crawling runtime (s)",
-    ylabel="number of crawled comments",
+    xlabel="number of crawled comments",
+    ylabel="crawling runtime (s)",
 )
 
 """ Viewing basic statistics about indivdual crawling runtimes for submissions and comments """

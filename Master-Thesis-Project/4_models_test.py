@@ -1,8 +1,8 @@
 from classes.statistics.Statistics import Statistics as statistics_methods
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
-from classes.modelling.ActivityGraphModelling import ActivityGraphModel
-from classes.modelling.UserGraphModelling import UserGraphModel
+from classes.modelling.ActivityGraphModelling import ActivityGraph
+from classes.modelling.UserGraphModelling import UserGraph
 from dotenv import load_dotenv
 from datetime import date
 import json
@@ -38,12 +38,12 @@ neo4j_db_connector = GraphDBConnector(
 
 for model_name in test["expected_output"].keys():
     if model_name == "activities":
-        model = ActivityGraphModel(
+        model = ActivityGraph(
             mongo_db_connector=mongo_db_connector,
             neo4j_db_connector=neo4j_db_connector
         )
     elif model_name == "users":
-        model = UserGraphModel(
+        model = UserGraph(
             mongo_db_connector=mongo_db_connector,
             neo4j_db_connector=neo4j_db_connector
         )
@@ -54,8 +54,7 @@ for model_name in test["expected_output"].keys():
     print(F"{model_name} Model >> Data feed from: {model.mongo_db_connector.collection_name}")
 
     print(F"{model_name} Model >> Building model with all possible scoring combinations...")
-    model.build_model_for_subreddit_and_type(
-        subreddit_display_name=test_id, submission_type=test_id)
+    model.build_model(subreddit_display_name=test_id, submission_type=test_id)
 
     database_name = F"{test_id}{model_name}{str(date.today()).replace('-','')}"
     model.save(database_name)

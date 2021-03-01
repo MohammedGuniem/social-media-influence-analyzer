@@ -33,7 +33,6 @@ class CrawlingRegister:
         self.subreddit_events[submissions_type] = {
             "submissions_num": 0,
             "comments_num": 0,
-            "users_num": 0,
             "submissions_total_runtime": 0,
             "comments_total_runtime": 0,
             "submissions_runtimes": {},
@@ -45,9 +44,6 @@ class CrawlingRegister:
 
     def set_comments_num(self, number_of_crawled_comments, submissions_type):
         self.subreddit_events[submissions_type]["comments_num"] = number_of_crawled_comments
-
-    def update_users_num(self, number_of_crawled_users, submissions_type):
-        self.subreddit_events[submissions_type]["users_num"] += number_of_crawled_users
 
     def set_submissions_total_runtime(self, runtime, submissions_type):
         self.subreddit_events[submissions_type]["submissions_total_runtime"] = runtime

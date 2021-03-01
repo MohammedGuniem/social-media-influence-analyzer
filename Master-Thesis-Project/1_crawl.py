@@ -25,7 +25,7 @@ submission_limit = 3
 
 # submissions_type of submissions to crawl
 submissions_types = []
-submissions_types.append("New")
+# submissions_types.append("New")
 submissions_types.append("Rising")
 # submissions_types.append("Hot")
 # submissions_types.append("Top")
@@ -48,16 +48,13 @@ mongo_db_connector.writeToDB(
     data=subreddits
 )
 
-users = []
-
 for submissions_type in submissions_types:
     print("----------------------------------------------")
     print(F"Crawling {submissions_type} Submissions...")
     print("----------------------------------------------")
 
-    submissions, authors = crawler.crawlSubmissions(
+    submissions = crawler.crawlSubmissions(
         subreddits, submissions_type, submission_limit)
-    users += authors
 
     mongo_db_connector.writeToDB(
         database_name=F"{submissions_type}_Submissions_DB",
@@ -65,22 +62,15 @@ for submissions_type in submissions_types:
         data=submissions
     )
 
-    comments, commenters = crawler.crawlComments(
+    comments = crawler.crawlComments(
         submissions=submissions,
         submissions_type=submissions_type
     )
-    users += commenters
 
     mongo_db_connector.writeToDB(
         database_name=F"{submissions_type}_Comments_DB",
         collection_name=str(date.today()),
         data=comments
-    )
-
-    mongo_db_connector.writeToDB(
-        database_name=F"{submissions_type}_Users_DB",
-        collection_name=str(date.today()),
-        data=users
     )
 
 crawling_runtime = crawler.get_crawling_runtime()

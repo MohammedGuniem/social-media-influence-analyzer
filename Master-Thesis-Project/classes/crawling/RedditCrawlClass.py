@@ -21,8 +21,6 @@ class RedditCrawler:
             F'{path}/crawling_models/submission.model.json')
         self.comment_model = self.getModel(
             F'{path}/crawling_models/comment.model.json')
-        self.user_model = self.getModel(
-            F'{path}/crawling_models/user.model.json')
 
         self.register = CrawlingRegister()
         self.timer = Timer()
@@ -99,12 +97,10 @@ class RedditCrawler:
         self.register.add_submissions_type(submissions_type=submissions_type)
 
         all_submissions = []
-        all_users = []
 
         for subreddit in subreddits:
 
             extracted_submissions = []
-            extracted_users = []
 
             subreddit_display_name = subreddit['display_name']
             subreddit = self.redditCrawler.subreddit(subreddit_display_name)
@@ -129,8 +125,6 @@ class RedditCrawler:
 
                 if not hasattr(submission, 'author') or not hasattr(submission.author, 'id') or not hasattr(submission.author, 'name'):
                     continue
-                extracted_users.append(self.crawlUser(
-                    redditor_name=submission.author.name))
 
                 for local_key, external_key in self.submission_model.items():
                     external_sub_keys = external_key.split(".")
@@ -164,15 +158,9 @@ class RedditCrawler:
                 )
 
             all_submissions += extracted_submissions
-            all_users += extracted_users
 
             print(
-                F"Subreddit: {subreddit_display_name}, crawled {len(extracted_submissions)} submissions and {len(extracted_users)} authors.")
-
-        self.register.update_users_num(
-            number_of_crawled_users=len(all_users),
-            submissions_type=submissions_type
-        )
+                F"Subreddit: {subreddit_display_name}, crawled {len(extracted_submissions)} submissions.")
 
         all_submissions_crawling_runtime = self.timer.calculate_runtime(
             last_time_checkpoint=all_submissions_crawling_start
@@ -189,22 +177,20 @@ class RedditCrawler:
         )
 
         print(
-            F"Total: crawled {len(all_submissions)} submissions and {len(all_users)} authors.")
+            F"Total: crawled {len(all_submissions)} submissions.")
 
-        return all_submissions, all_users
+        return all_submissions
 
     # Method to crawl comments from a certain submission
     def crawlComments(self, submissions, submissions_type):
         all_comments_crawling_start = self.timer.getCurrentTime()
 
         all_comments = []
-        all_users = []
 
         for submission in submissions:
             submission = self.redditCrawler.submission(id=submission['id'])
 
             extracted_comments = []
-            extracted_users = []
 
             comments = submission.comments
             submission.comments.replace_more(limit=3)
@@ -233,9 +219,6 @@ class RedditCrawler:
                     else:
                         continue
                 extracted_comments.append(extracted_comment)
-                user_info = self.crawlUser(
-                    redditor_name=extracted_comment['author_name'])
-                extracted_users.append(user_info)
 
                 comment_crawling_runtime = self.timer.calculate_runtime(
                     comment_crawling_start
@@ -248,14 +231,8 @@ class RedditCrawler:
                 )
 
             all_comments += extracted_comments
-            all_users += extracted_users
             print(
-                F"submission-ID: {submission.id}, crawled {len(extracted_comments)} comments and {len(extracted_users)} commenters.")
-
-        self.register.update_users_num(
-            number_of_crawled_users=len(all_users),
-            submissions_type=submissions_type
-        )
+                F"submission-ID: {submission.id}, crawled {len(extracted_comments)} comments.")
 
         all_comments_crawling_runtime = self.timer.calculate_runtime(
             last_time_checkpoint=all_comments_crawling_start
@@ -272,26 +249,9 @@ class RedditCrawler:
         )
 
         print(
-            F"Total: crawled {len(all_comments)} comments and {len(all_users)} commenters.")
+            F"Total: crawled {len(all_comments)} comments.")
 
-        return all_comments, all_users
-
-    # Method to crawl user meta data
-    def crawlUser(self, redditor_name):
-        redditor = self.redditCrawler.redditor(name=redditor_name)
-        if hasattr(redditor, 'id') and hasattr(redditor, 'name') and not hasattr(redditor, 'is_suspended'):
-            extracted_user = {}
-            redditor_attributes = dir(redditor)
-            for local_key, external_key in self.user_model.items():
-                if external_key in redditor_attributes:
-                    extracted_user[local_key] = redditor.__getattribute__(
-                        external_key)
-            extracted_user["updated_utc"] = round(
-                self.timer.getCurrentTime()
-            )
-            return extracted_user
-        else:
-            return "Redditor has no attribute id and/or name"
+        return all_comments
 
     def get_crawling_runtime(self):
         self.register.set_crawling_end(
