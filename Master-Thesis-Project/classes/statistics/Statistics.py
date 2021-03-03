@@ -33,6 +33,16 @@ class Statistics:
             plt.legend(loc=legend)
         plt.show()
 
+    def line_plot(x, y, xlabel="", ylabel="", legend=""):
+        x = np.array(x)
+        y = np.array(y)
+        plt.plot(x, y)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.xlim(min(x), max(x))
+        plt.ylim(min(y), max(y))
+        plt.show()
+
     def subplot_histograms(data):
         number_of_histograms = len(data.keys())
         number_of_rows = 4

@@ -46,11 +46,13 @@ def encode(text):
     text_array = text.lower().split(" ")
     encoded_array = []
     for word in text_array:
-        encoded_word = 0
+        encoded_word = ""
         for letter in word:
             if letter in mapping.keys():
-                encoded_word += mapping[letter]
-        encoded_array.append(encoded_word)
+                encoded_word += str(mapping[letter])
+        if encoded_word == "":
+            encoded_word = "0"
+        encoded_array.append(float(encoded_word))
     return encoded_array
 
 
@@ -83,7 +85,7 @@ training_data = []
 for topic, subreddits in topic_subreddits_mapping.items():
     for subreddit in subreddits:
         submissions = crawler.crawlSubmissions(
-            subreddits=[{"display_name": subreddit}], submissions_type="New", submission_limit=75)
+            subreddits=[{"display_name": subreddit}], submissions_type="New", submission_limit=100)
         for submission in submissions:
             record = {
                 'title': submission['title'],
@@ -97,7 +99,7 @@ for topic, subreddits in topic_subreddits_mapping.items():
 mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
 
 # Deleting test documents from mongoDB
-mongo_db_connector.remove_collection("Topic_detection", str(date.today()))
+mongo_db_connector.remove_collection("Topic_Detection", str(date.today()))
 
-mongo_db_connector.writeToDB(database_name="Topic_detection", collection_name=str(
+mongo_db_connector.writeToDB(database_name="Topic_Detection", collection_name=str(
     date.today()), data=training_data)
