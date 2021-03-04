@@ -40,6 +40,11 @@ for record in data:
             categories_words[category] = []
         categories_words[category].append(encoded_word)
 
+for k, v in categories_words.items():
+    print(k, ": ", v[0:3])
+
+sys.exit()
+
 
 def find_common_words(lists):
     common = []
