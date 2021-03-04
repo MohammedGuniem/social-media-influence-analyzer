@@ -21,20 +21,42 @@ mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
 data = mongo_db_connector.readFromDB(database_name="Topic_Detection", query={
 }, single=False, collection_name="2021-03-03")
 
-size_limit = 10
+categories_words = {}
+for record in data:
+    for encoded_word in record['encoded_title']:
+        category = record['encoded_topic']
+        if category not in categories_words:
+            categories_words[category] = []
+        categories_words[category].append(encoded_word)
+
+
+def find_common_words(lists):
+    common = []
+    for i in range(0, len(lists), 1):
+        rest = []
+        for l in lists[i+1:len(lists)]:
+            rest += l
+        current_common = list(set(lists[i]) & set(rest))
+        common += current_common
+    return list(set(common))
+
+
+common = find_common_words(list(categories_words.values()))
+
+for category, words in list(categories_words.items()):
+    unique_list = []
+    for word in words:
+        if word not in common:
+            unique_list.append(word)
+    categories_words[category] = unique_list
 
 X = []
 y = []
-for record in data:
-    if len(record['encoded_title']) > size_limit:
-        X.append(record['encoded_title'][0:size_limit])
-    elif len(record['encoded_title']) < size_limit:
-        r = record['encoded_title'] + \
-            ((size_limit - len(record['encoded_title'])) * [0.0])
-        X.append(r)
-    else:
-        X.append(record['encoded_title'])
-    y.append(record['encoded_topic'])
+
+for category, words in categories_words.items():
+    for word in words:
+        X.append([word])
+        y.append(category)
 
 X = np.array(X).astype(np.float32)
 X = np.nan_to_num(X.astype(np.float32))

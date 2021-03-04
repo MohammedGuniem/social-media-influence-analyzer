@@ -48,6 +48,13 @@ for category, words in list(categories_words.items()):
             unique_list.append(word)
     categories_words[category] = unique_list
 
+min_length = len(list(categories_words.values())[0])
+for category, words in categories_words.items():
+    if len(words) < min_length:
+        min_length = len(words)
+
+print(min_length)
+
 X = []
 y = []
 
@@ -58,3 +65,15 @@ for category, words in categories_words.items():
 
 X = np.array(X)
 y = np.array(y)
+
+# train and evaluate
+scores = []
+kf = KFold(n_splits=5, shuffle=True, random_state=10)
+for train_index, test_index in kf.split(X):
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+    model = MLPClassifier(max_iter=1000)
+    model.fit(X_train, y_train)
+    scores.append(model.score(X_test, y_test))
+score = np.mean(scores)
+print(F"accuracy: {score}")

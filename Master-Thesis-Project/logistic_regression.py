@@ -18,7 +18,7 @@ MongoDB_connection_string = os.environ.get('mongo_connnection_string')
 mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
 
 data = mongo_db_connector.readFromDB(database_name="Topic_Detection", query={
-}, single=False, collection_name=str(date.today()))
+}, single=False, collection_name="2021-03-03")
 
 size_limit = 10
 X = []

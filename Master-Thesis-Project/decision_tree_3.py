@@ -1,4 +1,17 @@
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+from classes.crawling.RedditCrawlClass import RedditCrawler
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import KFold
+from dotenv import load_dotenv
+from datetime import date
+import pandas as pd
+import numpy as np
+import string
+import sys
+import os
+
+from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from classes.crawling.RedditCrawlClass import RedditCrawler
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier
@@ -52,9 +65,31 @@ X = []
 y = []
 
 for category, words in categories_words.items():
-    for word in words[0:min_length]:
+    for word in words:
         X.append([word])
         y.append(category)
 
-X = np.array(X)
+X = np.array(X).astype(np.float32)
+X = np.nan_to_num(X.astype(np.float32))
 y = np.array(y)
+
+# train and evaluate
+kf = KFold(n_splits=5, shuffle=True, random_state=10)
+for criterion in ['gini', 'entropy']:
+    print("Decision Tree - {}".format(criterion))
+    accuracy = []
+    precision = []
+    recall = []
+    for train_index, test_index in kf.split(X):
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+        dt = DecisionTreeClassifier(criterion=criterion)
+        dt.fit(X_train, y_train)
+        y_pred = dt.predict(X_test)
+        accuracy.append(accuracy_score(y_test, y_pred))
+        precision.append(precision_score(y_test, y_pred, average='weighted'))
+        recall.append(recall_score(y_test, y_pred, average='weighted'))
+    print("accuracy:", np.mean(accuracy))
+    print("precision:", np.mean(precision))
+    print("recall:", np.mean(recall), '\n')
+    print()

@@ -20,19 +20,15 @@ mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
 data = mongo_db_connector.readFromDB(database_name="Topic_Detection", query={
 }, single=False, collection_name="2021-03-03")
 
-size_limit = 10
 X = []
 y = []
 for record in data:
-    if len(record['encoded_title']) > size_limit:
-        X.append(record['encoded_title'][0:size_limit])
-    elif len(record['encoded_title']) < size_limit:
-        r = record['encoded_title'] + \
-            ((size_limit - len(record['encoded_title'])) * [0.0])
-        X.append(r)
-    else:
-        X.append(record['encoded_title'])
-    y.append(record['encoded_topic'])
+    for encoded_word in record['encoded_title']:
+        X.append([encoded_word])
+        y.append(record['encoded_topic'])
+
+X = np.array(X)
+y = np.array(y)
 
 X = np.array(X).astype(np.float32)
 X = np.nan_to_num(X.astype(np.float32))
