@@ -6,22 +6,6 @@ from datetime import date
 import string
 import os
 
-# prepare
-
-
-def get_letters_mapping():
-    mapping = {}
-    alphabet = list(string.printable)
-    for letter in alphabet:
-        mapping[letter] = ord(letter)
-    return mapping
-
-
-def encode(text):
-    mybytes = text.encode('utf-8')
-    myint = int.from_bytes(mybytes, 'little')
-    return myint
-
 
 def find_common_words(lists):
     common = []
@@ -52,22 +36,21 @@ topic_subreddits_mapping = {
     "sport": ["football", "basketball", "sports"]
 }
 
-words = []
-categories = []
+data = {}
 for category, subreddits in topic_subreddits_mapping.items():
-    category_words = []
+    data[category] = []
     for subreddit in subreddits:
         submissions = crawler.crawlSubmissions(
-            subreddits=[{"display_name": subreddit}], submissions_type="New", submission_limit=1)
+            subreddits=[{"display_name": subreddit}], submissions_type="New", submission_limit=3)
         for submission in submissions:
             split_words = (submission['title']).split(" ")
-            category_words += split_words
+            for word in split_words:
+                data[category].append([word])
 
-    words.append(category_words)
-    categories.append(category)
+print(
+    F"\n#of words after before removing duplicates {sum(len(r) for r in data.values())}")
 
-print(F"\n#of words after before duplicates {sum(len(r) for r in words)}")
-
+"""
 # detecting duplicate words between categories
 common = find_common_words(words)
 print(F"#of duplicate words {len(common)}")
@@ -78,27 +61,14 @@ for category_words in words:
         if word in common:
             category_words.remove(word)
 print(F"#of words after removing duplicates {sum(len(r) for r in words)}")
-
-data = {
-    "words": [],
-    "encoded_words": [],
-    "topic": [],
-    "encoded_topic": []
-}
-
-for index in range(0, len(words), 1):
-    category = categories[index]
-    for word in words[index]:
-        data["words"].append(word)
-        data["encoded_words"].append(encode(word))
-        data["topic"].append(category)
-        data["encoded_topic"].append(encode(category))
+"""
 
 # Database connector
 mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
 
 # Deleting test documents from mongoDB
-mongo_db_connector.remove_collection("Topic_Detection_New", str(date.today()))
+mongo_db_connector.remove_collection(
+    "Train_Topic_Detection", str(date.today()))
 
-mongo_db_connector.writeToDB(database_name="Topic_Detection_New", collection_name=str(
+mongo_db_connector.writeToDB(database_name="Train_Topic_Detection", collection_name=str(
     date.today()), data=[data])

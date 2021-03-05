@@ -1,2 +1,4 @@
 # insert or update multiple docs at once
 https://stackoverflow.com/questions/62220625/insert-many-documents-into-empty-collection-update-if-document-with-same-key-al
+
+https://stackoverflow.com/questions/43162506/undefinedmetricwarning-f-score-is-ill-defined-and-being-set-to-0-0-in-labels-wi
