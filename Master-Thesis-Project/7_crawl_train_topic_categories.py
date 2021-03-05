@@ -31,9 +31,9 @@ crawler = RedditCrawler(
     client_id, client_secret, user_agent, username, password)
 
 topic_subreddits_mapping = {
-    "comedy": ["comedy", "funny", "comedyheaven"],
-    "politics": ["politics", "PoliticsPeopleTwitter", "elections"],
-    "sport": ["football", "basketball", "sports"]
+    "comedy": ["comedy"],  # , "funny", "comedyheaven"],
+    "politics": ["politics"],  # , "PoliticsPeopleTwitter", "elections"],
+    "sport": ["football"]  # , "basketball", "sports"]
 }
 
 data = {}
@@ -41,7 +41,7 @@ for category, subreddits in topic_subreddits_mapping.items():
     data[category] = []
     for subreddit in subreddits:
         submissions = crawler.crawlSubmissions(
-            subreddits=[{"display_name": subreddit}], submissions_type="New", submission_limit=3)
+            subreddits=[{"display_name": subreddit}], submissions_type="New", submission_limit=50)
         for submission in submissions:
             split_words = (submission['title']).split(" ")
             for word in split_words:

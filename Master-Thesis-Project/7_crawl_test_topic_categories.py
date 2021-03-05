@@ -30,10 +30,17 @@ MongoDB_connection_string = os.environ.get('mongo_connnection_string')
 crawler = RedditCrawler(
     client_id, client_secret, user_agent, username, password)
 
+"""
 topic_subreddits_mapping = {
     "comedy": ["comedy", "funny", "comedyheaven"],
     "politics": ["politics", "PoliticsPeopleTwitter", "elections"],
     "sport": ["football", "basketball", "sports"]
+}
+"""
+topic_subreddits_mapping = {
+    "comedy": ["funny"],
+    "politics": ["PoliticsPeopleTwitter"],
+    "sport": ["basketball"]
 }
 
 data = {}

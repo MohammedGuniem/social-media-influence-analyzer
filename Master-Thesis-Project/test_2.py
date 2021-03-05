@@ -1,4 +1,5 @@
 
+import statistics
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
@@ -40,6 +41,8 @@ print(encoded)
 decoded_labels = label_enc.inverse_transform(encoded)
 print(decoded_labels)
 
+m = statistics.mode(np.array([0, 0, 0, 0]))
+print(m)
 """
 from sklearn.preprocessing import OneHotEncoder
 enc = OneHotEncoder(handle_unknown='ignore')
