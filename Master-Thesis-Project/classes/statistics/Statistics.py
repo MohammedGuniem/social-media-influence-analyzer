@@ -39,8 +39,8 @@ class Statistics:
         plt.plot(x, y)
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
-        plt.xlim(min(x), max(x))
-        plt.ylim(min(y), max(y))
+        plt.xlim(min(x)-0.01, max(x)+0.01)
+        plt.ylim(min(y)-0.01, max(y)+0.01)
         plt.show()
 
     def subplot_histograms(data):

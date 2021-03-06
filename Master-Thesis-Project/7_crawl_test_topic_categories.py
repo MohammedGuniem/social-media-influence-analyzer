@@ -6,18 +6,6 @@ from datetime import date
 import string
 import os
 
-
-def find_common_words(lists):
-    common = []
-    for i in range(0, len(lists), 1):
-        rest = []
-        for l in lists[i+1:len(lists)]:
-            rest += l
-        current_common = list(set(lists[i]) & set(rest))
-        common += current_common
-    return list(set(common))
-
-
 load_dotenv()
 
 client_id = os.environ.get('reddit_client_id')
@@ -30,17 +18,21 @@ MongoDB_connection_string = os.environ.get('mongo_connnection_string')
 crawler = RedditCrawler(
     client_id, client_secret, user_agent, username, password)
 
-"""
+
+def clean_text(input_text):
+    alphabet = list(string.ascii_lowercase)
+    numbers = [str(num) for num in range(0, 10, 1)]
+    output_text = ""
+    for char in input_text.lower():
+        if (char == " ") or (char in alphabet) or (char in numbers):
+            output_text += char
+    return output_text
+
+
 topic_subreddits_mapping = {
-    "comedy": ["comedy", "funny", "comedyheaven"],
-    "politics": ["politics", "PoliticsPeopleTwitter", "elections"],
-    "sport": ["football", "basketball", "sports"]
-}
-"""
-topic_subreddits_mapping = {
-    "comedy": ["funny"],
-    "politics": ["PoliticsPeopleTwitter"],
-    "sport": ["basketball"]
+    "comedy": ["comedy"],
+    "politics": ["politics"],
+    "sport": ["sports"]
 }
 
 data = {}
@@ -48,9 +40,9 @@ for category, subreddits in topic_subreddits_mapping.items():
     data[category] = []
     for subreddit in subreddits:
         submissions = crawler.crawlSubmissions(
-            subreddits=[{"display_name": subreddit}], submissions_type="New", submission_limit=50)
+            subreddits=[{"display_name": subreddit}], submissions_type="New", submission_limit=20)
         for submission in submissions:
-            data[category].append(submission['title'])
+            data[category].append(clean_text(submission['title']))
 
 print(F"\n#of titles {sum(len(r) for r in data.values())}")
 
@@ -59,7 +51,7 @@ mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
 
 # Deleting test documents from mongoDB
 mongo_db_connector.remove_collection(
-    "Test_Topic_Detection", str(date.today()))
+    "Machine_Learning", "Test_Topic_Detection")
 
-mongo_db_connector.writeToDB(database_name="Test_Topic_Detection", collection_name=str(
-    date.today()), data=[data])
+mongo_db_connector.writeToDB(database_name="Machine_Learning",
+                             collection_name="Test_Topic_Detection", data=[data])
