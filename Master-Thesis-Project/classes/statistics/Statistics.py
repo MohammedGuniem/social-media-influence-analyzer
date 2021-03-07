@@ -43,6 +43,22 @@ class Statistics:
         plt.ylim(min(y)-0.01, max(y)+0.01)
         plt.show()
 
+    def multi_line_plot(x, Y, optimal_x, optimal_y, optimal_label, plot_labels, xlabel="", ylabel="", xlim=[], ylim=[]):
+        for plot_index in range(0, len(Y), 1):
+            plt.plot(x, Y[plot_index],
+                     label=plot_labels[plot_index])
+        plt.plot(optimal_x, optimal_y,
+                 label=optimal_label)
+
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        if len(xlim) == 2:
+            plt.xlim(xlim[0], xlim[1])
+        if len(ylim) == 2:
+            plt.ylim(ylim[0], ylim[1])
+        plt.legend()
+        plt.show()
+
     def subplot_histograms(data):
         number_of_histograms = len(data.keys())
         number_of_rows = 4

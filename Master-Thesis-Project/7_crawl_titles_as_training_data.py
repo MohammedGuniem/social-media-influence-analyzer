@@ -30,9 +30,9 @@ def clean_text(input_text):
 
 
 topic_subreddits_mapping = {
-    "comedy": ["comedy"],
-    "politics": ["politics"],
-    "sport": ["sports"]
+    "comedy": ["comedy", "funny", "comedyheaven"],
+    "politics": ["politics", "PoliticsPeopleTwitter", "elections"],
+    "sport": ["sports", "football", "basketball"]
 }
 
 data = {}
@@ -40,7 +40,7 @@ for category, subreddits in topic_subreddits_mapping.items():
     data[category] = []
     for subreddit in subreddits:
         submissions = crawler.crawlSubmissions(
-            subreddits=[{"display_name": subreddit}], submissions_type="New", submission_limit=20)
+            subreddits=[{"display_name": subreddit}], submissions_type="New", submission_limit=100)
         for submission in submissions:
             data[category].append(clean_text(submission['title']))
 

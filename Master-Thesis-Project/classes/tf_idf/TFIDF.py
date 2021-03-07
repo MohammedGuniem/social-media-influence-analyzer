@@ -2,9 +2,9 @@ import math
 
 
 class TFIDF:
-    def __init__(self):
-        self.TF = {}
-        self.IDF = {}
+    def __init__(self, X):
+        self.TF = self.tf(X)
+        self.IDF = self.idf(X)
 
     def tf(self, X):
         TFs = {}
@@ -39,17 +39,36 @@ class TFIDF:
 
         return IDFs
 
-    def build(self, X):
-        self.TF = self.tf(X)
-        self.IDF = self.idf(X)
+    def classify_word(self, word):
+        output = {}
+        for k, _ in self.TF.items():
+            if word not in self.TF[k]:
+                self.TF[k][word] = 0
+            if word not in self.IDF:
+                self.IDF[word] = 0
+            output[k] = self.TF[k][word] * self.IDF[word]
+        return output
 
-    def predict(self, x):
-        temp = {}
-        for word in x.split(" "):
-            for k, _ in self.TF.items():
-                if word not in self.TF[k]:
-                    self.TF[k][word] = 0
-                if word not in self.IDF:
-                    self.IDF[word] = 0
-                temp[k] = self.TF[k][word] * self.IDF[word]
-        return temp
+    def classify_doc(self, doc):
+        output = {}
+        max_output = 0
+        max_class = "other"
+        for word in doc.split(" "):
+            word_class = self.classify_word(word)
+            for k, v in word_class.items():
+                if k in output:
+                    output[k] += v
+                else:
+                    output[k] = v
+                if output[k] > max_output:
+                    max_output = output[k]
+                    max_class = k
+        return max_class, max_output
+
+    def classify(self, docs):
+        classified = []
+        for doc in docs:
+            max_class, max_output = self.classify_doc(doc)
+            classified.append(max_class)
+
+        return classified
