@@ -19,14 +19,17 @@ class ActivityGraph(Graph):
         }
         self.nodes[node_id] = node
 
-    def add_edge(self, from_node_id, relation_type, to_node_id, scores):
+    def add_edge(self, from_node_id, relation_type, to_node_id, scores, influence_areas):
         edge_id = F"{from_node_id}_{relation_type}_{to_node_id}"
         edge = {
             'id': edge_id,
             'type': relation_type,
             'from_node_id': from_node_id,
             'to_node_id': to_node_id,
-            'props': scores
+            'props': {
+                "influence_scores": scores,
+                "influence_areas": influence_areas
+            }
         }
         self.edges[edge_id] = edge
 
@@ -71,8 +74,6 @@ class ActivityGraph(Graph):
                         comment_id=comment["parent_id"][3:],
                         Type=submission_type
                     )
-                    if not parent_comment:
-                        continue
                     from_node_id = parent_comment["id"]
                     upvotes_weight = parent_comment["upvotes"]
 
@@ -93,5 +94,6 @@ class ActivityGraph(Graph):
                     from_node_id=from_node_id,
                     relation_type="Got",
                     to_node_id=comment_id,
-                    scores=edge_scores
+                    scores=edge_scores,
+                    influence_areas=["comedy", "sports", "politics"]
                 )

@@ -1,7 +1,12 @@
+from classes.tf_idf.TFIDF import TFIDF
+
+
 class Graph:
     def __init__(self, mongo_db_connector, neo4j_db_connector):
         self.mongo_db_connector = mongo_db_connector
         self.neo4j_db_connector = neo4j_db_connector
+        self.influence_area_classifier = TFIDF()
+        self.tf_idf.train(training_data)
         self.nodes = {}
         self.edges = {}
 

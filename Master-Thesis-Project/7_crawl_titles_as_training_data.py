@@ -18,33 +18,24 @@ MongoDB_connection_string = os.environ.get('mongo_connnection_string')
 crawler = RedditCrawler(
     client_id, client_secret, user_agent, username, password)
 
-
-def clean_text(input_text):
-    alphabet = list(string.ascii_lowercase)
-    numbers = [str(num) for num in range(0, 10, 1)]
-    output_text = ""
-    for char in input_text.lower():
-        if (char == " ") or (char in alphabet) or (char in numbers):
-            output_text += char
-    return output_text
-
-
 topic_subreddits_mapping = {
     "comedy": ["comedy", "funny", "comedyheaven"],
     "politics": ["politics", "PoliticsPeopleTwitter", "elections"],
     "sport": ["sports", "football", "basketball"]
 }
 
-data = {}
+data = {"training_data": []}
 for category, subreddits in topic_subreddits_mapping.items():
-    data[category] = []
     for subreddit in subreddits:
         submissions = crawler.crawlSubmissions(
             subreddits=[{"display_name": subreddit}], submissions_type="New", submission_limit=100)
         for submission in submissions:
-            data[category].append(clean_text(submission['title']))
+            data["training_data"].append({
+                "title": submission['title'],
+                "label": category
+            })
 
-print(F"\n#of titles {sum(len(r) for r in data.values())}")
+print(F"\n#of titles {len(data)}")
 
 # Database connector
 mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
