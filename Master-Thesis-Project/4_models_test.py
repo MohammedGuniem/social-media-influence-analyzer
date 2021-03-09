@@ -14,6 +14,10 @@ load_dotenv()
 with open("4_models_test_case.json", 'r') as model_file:
     test = json.load(model_file)
 
+subreddits_display_names = []
+for subreddit in test["subreddits"]:
+    subreddits_display_names.append(subreddit['display_name'])
+
 test_id = test["id"]
 
 # Writing documents to mongoDB.
@@ -37,12 +41,12 @@ neo4j_db_connector = GraphDBConnector(
 )
 
 for model_name in test["expected_output"].keys():
-    if model_name == "activities":
+    if model_name == "activitygraph":
         model = ActivityGraph(
             mongo_db_connector=mongo_db_connector,
             neo4j_db_connector=neo4j_db_connector
         )
-    elif model_name == "users":
+    elif model_name == "usergraph":
         model = UserGraph(
             mongo_db_connector=mongo_db_connector,
             neo4j_db_connector=neo4j_db_connector
@@ -54,7 +58,9 @@ for model_name in test["expected_output"].keys():
     print(F"{model_name} Model >> Data feed from: {model.mongo_db_connector.collection_name}")
 
     print(F"{model_name} Model >> Building model with all possible scoring combinations...")
-    model.build_model(subreddit_display_name=test_id, submission_type=test_id)
+    for display_name in subreddits_display_names:
+        model.build_model(subreddit_display_name=display_name,
+                          submission_type=test_id)
 
     database_name = F"{test_id}{model_name}{str(date.today()).replace('-','')}"
     model.save(database_name)
@@ -62,7 +68,7 @@ for model_name in test["expected_output"].keys():
     print(F"{model_name} Model >> Calculating Summary Statistics for each and every edge scoring combination...")
     all_edge_weights = []
     for edge in model.edges.values():
-        all_edge_weights.append(edge['props'])
+        all_edge_weights.append(edge['props']['influence_scores'])
 
     model_edge_weights = {}
     for edge_weights in all_edge_weights:
@@ -86,12 +92,12 @@ for model_name in test["expected_output"].keys():
 
     successful_test = True
     for edge_id, edge in model.edges.items():
-        if edge["props"] != expected_edges[edge_id]:
+        if edge["props"]['influence_scores'] != expected_edges[edge_id]:
             successful_test = False
             print("----- Expected edge ----->")
-            print(edge["props"])
-            print("----- Got edge ----->")
             print(expected_edges[edge_id])
+            print("----- Got edge ----->")
+            print(edge["props"])
             break
 
     for node_id, node in model.nodes.items():

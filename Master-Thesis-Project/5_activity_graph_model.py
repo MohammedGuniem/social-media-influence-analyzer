@@ -32,7 +32,7 @@ print(
 print("Activity Graph Model >> Building model with all possible scoring combinations...")
 model.build_graph(submissions_types=["Rising"])
 
-database_name = F"activity{str(date.today()).replace('-','')}"
+database_name = F"activitygraph{str(date.today()).replace('-','')}"
 model.save(database_name)
 
 print("Activity Graph Model >> Calculating Summary Statistics for each and every edge scoring combination...")

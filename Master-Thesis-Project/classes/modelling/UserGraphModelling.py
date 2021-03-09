@@ -18,23 +18,30 @@ class UserGraph(Graph):
         }
         self.nodes[node_id] = node
 
-    def add_edge(self, from_node_id, relation_type, to_node_id, scores):
+    def add_edge(self, from_node_id, relation_type, to_node_id, scores, influence_area, subreddit_display_name):
         edge_props = {}
+        influence_areas = [influence_area]
+        subreddit_display_names = [subreddit_display_name]
+        updated_scores = scores
         edge_id = F"{from_node_id}_{relation_type}_{to_node_id}"
         if edge_id in self.edges:
             updated_scores = self.update_score(
-                current_scores=self.edges[edge_id]['props'],
+                current_scores=self.edges[edge_id]['props']['influence_scores'],
                 add_scores=scores
             )
-        else:
-            updated_scores = scores
+            influence_areas += self.edges[edge_id]['props']['influence_areas']
+            subreddit_display_names += self.edges[edge_id]['props']['subreddits']
 
         edge = {
             'id': edge_id,
             'type': relation_type,
             'from_node_id': from_node_id,
             'to_node_id': to_node_id,
-            'props': updated_scores
+            'props': {
+                "influence_scores": updated_scores,
+                "influence_areas": list(set(influence_areas)),
+                "subreddits": list(set(subreddit_display_names))
+            }
         }
         self.edges[edge_id] = edge
 
@@ -54,6 +61,9 @@ class UserGraph(Graph):
             subreddit_id, submission_type)
 
         for submission in submissions:
+            influence_area = self.text_classifier.classify_title(
+                submission['title'])
+
             # add submission authors as nodes
             self.add_node(activity_object=submission, node_type="Redditor")
 
@@ -102,4 +112,6 @@ class UserGraph(Graph):
                     relation_type="Influences",
                     to_node_id=comment_author_id,
                     scores=edge_scores,
+                    influence_area=influence_area,
+                    subreddit_display_name=subreddit_display_name
                 )

@@ -1,7 +1,7 @@
 {
   "id": "Test",
   "expected_output": {
-    "activities": {
+    "activitygraph": {
       "edges": {
         "S_1_Got_TC_1": {
           "connection": 1,
@@ -110,6 +110,15 @@
           "connection_and_upvotes": 6,
           "activity_and_upvotes": 6,
           "all": 7
+        },
+        "S_4_Got_TC_7": {
+          "connection": 1,
+          "activity": 1,
+          "upvotes": 7,
+          "connection_and_activity": 2,
+          "connection_and_upvotes": 8,
+          "activity_and_upvotes": 8,
+          "all": 9
         }
       },
       "nodes": {
@@ -127,10 +136,12 @@
         "TC_5": "Top_comment",
         "TC_6": "Top_comment",
         "SC_5": "Sub_comment",
-        "SC_6": "Sub_comment"
+        "SC_6": "Sub_comment",
+        "S_4": "Submission",
+        "TC_7": "Top_comment"
       }
     },
-    "users": {
+    "usergraph": {
       "edges": {
         "U_1_Influences_U_4": {
           "connection": 2,
@@ -178,13 +189,13 @@
           "all": 7
         },
         "U_3_Influences_U_6": {
-          "connection": 2,
-          "activity": 2,
-          "upvotes": 20,
-          "connection_and_activity": 4,
-          "connection_and_upvotes": 22,
-          "activity_and_upvotes": 22,
-          "all": 24
+          "connection": 3,
+          "activity": 3,
+          "upvotes": 27,
+          "connection_and_activity": 6,
+          "connection_and_upvotes": 30,
+          "activity_and_upvotes": 30,
+          "all": 33
         },
         "U_3_Influences_U_7": {
           "connection": 1,
@@ -220,6 +231,10 @@
     {
       "id": "Test",
       "display_name": "Test"
+    },
+    {
+      "id": "Test_2",
+      "display_name": "Test_2"
     }
   ],
   "submissions": [
@@ -249,6 +264,15 @@
       "subreddit_id": "Test",
       "title": "Who likes icecream?",
       "upvotes": 10
+    },
+    {
+      "id": "S_4",
+      "author_id": "U_3",
+      "author_name": "User C",
+      "num_comments": 1,
+      "subreddit_id": "Test_2",
+      "title": "What a lovely day!",
+      "upvotes": 7
     }
   ],
   "comments": [
@@ -371,6 +395,16 @@
       "submission_id": "t3_S_3",
       "subreddit_id": "Test",
       "upvotes": 10
+    },
+    {
+      "id": "TC_7",
+      "author_id": "U_6",
+      "author_name": "User F",
+      "comment_body": "Yes it is",
+      "parent_id": "t3_S_4",
+      "submission_id": "t3_S_4",
+      "subreddit_id": "Test_2",
+      "upvotes": 2
     }
   ]
 }

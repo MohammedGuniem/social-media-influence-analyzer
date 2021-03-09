@@ -5,7 +5,13 @@ class ActivityGraph(Graph):
     def __init__(self, mongo_db_connector, neo4j_db_connector):
         super().__init__(mongo_db_connector, neo4j_db_connector)
 
-    def add_node(self, activity_object, node_type):
+    def add_node(self, activity_object, node_type, subreddit_display_name):
+        activity_body = ""
+        if "submission" in node_type.lower():
+            activity_body = activity_object['title']
+        elif "comment" in node_type.lower():
+            activity_body = activity_object['comment_body']
+
         node_id = activity_object['id']
         node = {
             'id': node_id,
@@ -14,12 +20,14 @@ class ActivityGraph(Graph):
                 'network_id': node_id,
                 'name': F"{activity_object['author_name']} ({activity_object['id']})",
                 'author_name': activity_object['author_name'],
-                'author_id': activity_object["author_id"]
+                'author_id': activity_object["author_id"],
+                'body': activity_body,
+                "subreddit": subreddit_display_name
             }
         }
         self.nodes[node_id] = node
 
-    def add_edge(self, from_node_id, relation_type, to_node_id, scores, influence_areas):
+    def add_edge(self, from_node_id, relation_type, to_node_id, scores, influence_area):
         edge_id = F"{from_node_id}_{relation_type}_{to_node_id}"
         edge = {
             'id': edge_id,
@@ -28,7 +36,7 @@ class ActivityGraph(Graph):
             'to_node_id': to_node_id,
             'props': {
                 "influence_scores": scores,
-                "influence_areas": influence_areas
+                "influence_area": influence_area
             }
         }
         self.edges[edge_id] = edge
@@ -45,9 +53,12 @@ class ActivityGraph(Graph):
 
         for submission in submissions:
             submission_id = submission["id"]
+            influence_area = self.text_classifier.classify_title(
+                submission['title'])
 
             # add submissions as nodes
-            self.add_node(activity_object=submission, node_type="Submission")
+            self.add_node(activity_object=submission, node_type="Submission",
+                          subreddit_display_name=subreddit_display_name)
 
             # Get all comments on submissions from this subreddit
             comments = self.mongo_db_connector.getCommentsOnSubmission(
@@ -87,7 +98,7 @@ class ActivityGraph(Graph):
 
                 # add comments as nodes
                 to_node = self.add_node(
-                    activity_object=comment, node_type=node_type)
+                    activity_object=comment, node_type=node_type, subreddit_display_name=subreddit_display_name)
 
                 # Draw edge relation between parent (comment or submission) and child comments.
                 self.add_edge(
@@ -95,5 +106,5 @@ class ActivityGraph(Graph):
                     relation_type="Got",
                     to_node_id=comment_id,
                     scores=edge_scores,
-                    influence_areas=["comedy", "sports", "politics"]
+                    influence_area=influence_area
                 )

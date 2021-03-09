@@ -32,13 +32,13 @@ print(
 print("User Graph Model >> Building model with all possible scoring combinations...")
 model.build_graph(submissions_types=["Rising"])
 
-database_name = F"users{str(date.today()).replace('-','')}"
+database_name = F"usergraph{str(date.today()).replace('-','')}"
 model.save(database_name)
 
 print("User Graph Model >> Calculating Summary Statistics for each and every edge scoring combination...")
 all_edge_weights = []
 for edge in model.edges.values():
-    all_edge_weights.append(edge['props'])
+    all_edge_weights.append(edge['props']['influence_scores'])
 
 model_edge_weights = {}
 for edge_weights in all_edge_weights:

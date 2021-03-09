@@ -19,9 +19,11 @@ crawler = RedditCrawler(
     client_id, client_secret, user_agent, username, password)
 
 topic_subreddits_mapping = {
-    "comedy": ["comedy", "funny", "comedyheaven"],
-    "politics": ["politics", "PoliticsPeopleTwitter", "elections"],
-    "sport": ["sports", "football", "basketball"]
+    "politic": ["politics", "PoliticsPeopleTwitter", "elections"],
+    "economy": ["Economics", "economy", "business"],
+    "sport": ["sports", "olympics", "worldcup"],
+    "entertainment": ["movies", "comedy", "culture"],
+    "technology": ["technology", "science", "Futurology"]
 }
 
 data = {"training_data": []}
@@ -42,7 +44,7 @@ mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
 
 # Deleting test documents from mongoDB
 mongo_db_connector.remove_collection(
-    "Machine_Learning", "Test_Topic_Detection")
+    "Text_Classification_Training_Data", str(date.today()))
 
-mongo_db_connector.writeToDB(database_name="Machine_Learning",
-                             collection_name="Test_Topic_Detection", data=[data])
+mongo_db_connector.writeToDB(database_name="Text_Classification_Training_Data",
+                             collection_name=str(date.today()), data=[data])

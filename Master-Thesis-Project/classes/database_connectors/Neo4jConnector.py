@@ -24,7 +24,6 @@ class GraphDBConnector:
         with self.driver.session(database=self.database) as session:
 
             # Preparing props for ON CREATE and On MATCH for update
-
             edge_props = self.prepare_props(
                 pointer="r", props=edge_props)
 
@@ -44,11 +43,11 @@ class GraphDBConnector:
         for key, prop in props.items():
             props_query += pointer+"."+key.lower()
             if isinstance(prop, list):
-                props_query += " = "+str(prop)+",\n"
+                props_query += ' = '+str(prop).replace("'", '"')+',\n'
             elif isinstance(prop, dict):
-                props_query += " = '"+json.dumps(prop)+"',\n"
+                props_query += ' = "'+json.dumps(prop).replace('"', "'")+'",\n'
             else:
-                props_query += " = '"+str(prop)+"',\n"
+                props_query += ' = "'+str(prop).replace('"', "'")+'",\n'
         props_query = props_query[:-2]
         return props_query
 

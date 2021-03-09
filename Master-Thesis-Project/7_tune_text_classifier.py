@@ -20,8 +20,8 @@ load_dotenv()
 MongoDB_connection_string = os.environ.get('mongo_connnection_string')
 mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
 
-data = mongo_db_connector.readFromDB(database_name="Machine_Learning", query={
-}, single=True, collection_name="Test_Topic_Detection")
+data = mongo_db_connector.readFromDB(database_name="Text_Classification_Training_Data", query={
+}, single=True, collection_name="2021-03-09")
 del data["_id"]
 
 data = data["training_data"]
@@ -34,7 +34,7 @@ labels = (data["label"]).to_numpy()
 text_clf = Pipeline([
     ('vect', CountVectorizer()),
     ('tfidf', TfidfTransformer()),
-    ('clf', SGDClassifier()),
+    ('clf', SGDClassifier(random_state=99)),
 ])
 
 """
@@ -44,8 +44,8 @@ text_clf = Pipeline([
         max_iter=5, tol=None)),
 """
 
-training_percentage = 0.9
-testing_percentage = 0.1
+training_percentage = 0.8
+testing_percentage = 0.2
 X_train, X_test = list(features[:int(training_percentage*len(features))]
                        ), list(features[:int(testing_percentage*len(features))])
 y_train, y_test = list(labels[:int(training_percentage*len(features))]
