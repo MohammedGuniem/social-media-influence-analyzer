@@ -18,7 +18,7 @@ Return n,r,m
 MATCH (n {name: 'User G'} ),
       (m {name: 'User F'}),
       p = shortestPath((n)-[r:Influences*]->(m))
-RETURN r, p
+RETURN p
 
 Or
 
