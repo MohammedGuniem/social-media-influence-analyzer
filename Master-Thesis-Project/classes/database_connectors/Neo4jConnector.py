@@ -4,8 +4,11 @@ import json
 
 class GraphDBConnector:
 
-    def __init__(self, uri, user, password):
+    def __init__(self, uri, user, password, database_name=""):
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
+        self.database = database_name
+
+    """ Writing methods """
 
     def set_database(self, database_name):
         self.database = database_name
@@ -95,3 +98,54 @@ class GraphDBConnector:
 
         # Sending query to DB
         result = tx.run(query)
+
+    """ Reading methods """
+
+    def get_graph(self):
+        with self.driver.session(database=self.database) as session:
+            result = session.read_transaction(
+                self._find_and_return_graph)
+            return result
+
+    @staticmethod
+    def _find_and_return_graph(tx):
+        query = (
+            "MATCH (n)-[r]->(m)"
+            "RETURN n,r,m"
+        )
+        result = tx.run(query)
+        nodes, links = [], []
+        for pair in result:
+
+            source_id = ""
+            target_id = ""
+            for node_pointer in ['n', 'm']:
+                neo4j_node = dict(pair[node_pointer])
+
+                node = {}
+                node['id'] = neo4j_node['network_id']
+                node['props'] = {'name': neo4j_node['name'],
+                                 'author_id': neo4j_node['author_id']}
+                if node not in nodes:
+                    nodes.append(node)
+
+                if node_pointer == 'n':
+                    source_id = node['id']
+                elif node_pointer == 'm':
+                    target_id = node['id']
+
+            neo4j_relation = pair['r']
+
+            relation = {
+                'source': source_id,
+                'target': target_id,
+                'props': {
+                    'influence_areas': neo4j_relation['influence_areas'],
+                    'influence_scores': dict(eval(neo4j_relation['influence_scores'])),
+                    'subreddits': neo4j_relation['subreddits'],
+                }
+            }
+
+            links.append(relation)
+
+        return {"nodes": nodes, "links": links}
