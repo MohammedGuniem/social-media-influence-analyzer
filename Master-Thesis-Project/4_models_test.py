@@ -40,7 +40,7 @@ neo4j_db_connector = GraphDBConnector(
     password=os.environ.get('neo4j_password'),
 )
 
-for model_name in test["expected_output"].keys():
+for model_name in ["activitygraph", "usergraph"]:
     if model_name == "activitygraph":
         model = ActivityGraph(
             mongo_db_connector=mongo_db_connector,
@@ -65,10 +65,20 @@ for model_name in test["expected_output"].keys():
     database_name = F"{test_id}{model_name}{str(date.today()).replace('-','')}"
     model.save(database_name)
 
+    def extract_score(edge_props):
+        return {'connection_influence_score': edge_props['connection_influence_score'],
+                'activity_influence_score': edge_props['activity_influence_score'],
+                'upvotes_influence_score': edge_props['upvotes_influence_score'],
+                'connection_and_activity_influence_score': edge_props['connection_and_activity_influence_score'],
+                'connection_and_upvotes_influence_score': edge_props['connection_and_upvotes_influence_score'],
+                'activity_and_upvotes_influence_score': edge_props['activity_and_upvotes_influence_score'],
+                'all_influence_score': edge_props['all_influence_score']}
+
     print(F"{model_name} Model >> Calculating Summary Statistics for each and every edge scoring combination...")
     all_edge_weights = []
     for edge in model.edges.values():
-        all_edge_weights.append(edge['props']['influence_scores'])
+        scores = extract_score(edge['props'])
+        all_edge_weights.append(scores)
 
     model_edge_weights = {}
     for edge_weights in all_edge_weights:
@@ -85,34 +95,6 @@ for model_name in test["expected_output"].keys():
 
     print(F"{model_name} Model >> Drawing histograms using combinations of 3 different scoring techniques")
     statistics_methods.subplot_histograms(model_edge_weights)
-
-    expected_output = test["expected_output"][model_name]
-    expected_edges = expected_output["edges"]
-    expected_nodes = expected_output["nodes"]
-
-    successful_test = True
-    for edge_id, edge in model.edges.items():
-        if edge["props"]['influence_scores'] != expected_edges[edge_id]:
-            successful_test = False
-            print("----- Expected edge ----->")
-            print(expected_edges[edge_id])
-            print("----- Got edge ----->")
-            print(edge["props"])
-            break
-
-    for node_id, node in model.nodes.items():
-        if node["type"] != expected_nodes[node_id]:
-            successful_test = False
-            print("----- Expected edge ----->")
-            print(edge["props"])
-            print("----- Got edge ----->")
-            print(expected_edges[edge_id])
-            break
-
-    if (successful_test):
-        print(F"\n*** {model_name} Model Test is Successful! ***\n")
-    else:
-        print(F"\n*** {model_name} Model Test is Not Successful! ***\n")
 
 # Deleting test documents from mongoDB
 mongo_db_connector.remove_collection(F"{test_id}_Submissions_DB", test_id)

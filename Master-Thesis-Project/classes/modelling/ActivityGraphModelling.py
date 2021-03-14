@@ -35,10 +35,12 @@ class ActivityGraph(Graph):
             'from_node_id': from_node_id,
             'to_node_id': to_node_id,
             'props': {
-                "influence_scores": scores,
                 "influence_area": influence_area
             }
         }
+        for score, value in scores.items():
+            edge['props'][score] = value
+
         self.edges[edge_id] = edge
 
     def build_model(self, subreddit_display_name, submission_type):

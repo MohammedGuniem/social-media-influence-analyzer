@@ -26,7 +26,8 @@ class UserGraph(Graph):
         edge_id = F"{from_node_id}_{relation_type}_{to_node_id}"
         if edge_id in self.edges:
             updated_scores = self.update_score(
-                current_scores=self.edges[edge_id]['props']['influence_scores'],
+                current_scores=self.extract_score(
+                    self.edges[edge_id]['props']),
                 add_scores=scores
             )
             influence_areas += self.edges[edge_id]['props']['influence_areas']
@@ -38,11 +39,13 @@ class UserGraph(Graph):
             'from_node_id': from_node_id,
             'to_node_id': to_node_id,
             'props': {
-                "influence_scores": updated_scores,
                 "influence_areas": list(set(influence_areas)),
                 "subreddits": list(set(subreddit_display_names))
             }
         }
+        for score, value in updated_scores.items():
+            edge['props'][score] = value
+
         self.edges[edge_id] = edge
 
     def update_score(self, current_scores, add_scores):

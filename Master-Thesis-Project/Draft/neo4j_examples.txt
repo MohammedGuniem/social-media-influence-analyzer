@@ -1,19 +1,25 @@
 # Get all graph nodes and links
-Match (n)-[r]->(m)
-Return n,r,m
+MATCH (n) 
+MATCH (m) 
+MATCH p=(n)-[:Influences*..]->(m) 
+WITH *, relationships(p) AS relations 
+RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data 
 
 # Filter for influence area(s)
-Match (n)-[r]->(m)
-where 'sport' in r.influence_areas or 'entertainment' in r.influence_areas
-Return n,r,m
-
-Match (n)-[r]->(m)
-where 'sport' in r.influence_areas and 'entertainment' in r.influence_areas
-Return n,r,m
+MATCH (n) 
+MATCH (m) 
+MATCH p=(n)-[r]->(m) 
+WHERE 'sport' IN r.influence_areas
+WITH *, relationships(p) AS relations 
+RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data
 
 # Filter for influence scores
-... needs some changes on how you write
-
+MATCH (n) 
+MATCH (m) 
+MATCH p=(n)-[r]->(m) 
+WHERE 0 <= toInteger(r.all_influence_score) <= 10
+WITH *, relationships(p) AS relations 
+RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data 
 
 # All paths between to nodes by name
 MATCH (n {name: 'User G'})
@@ -28,3 +34,6 @@ MATCH (m {name: 'User B'})
 MATCH p=shortestPath((n) - [:Influences* ..] -> (m))
 WITH *, relationships(p) AS relations 
 RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data
+
+# graph density, centrality, and all other measures
+?

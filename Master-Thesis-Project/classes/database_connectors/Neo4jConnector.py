@@ -103,72 +103,77 @@ class GraphDBConnector:
 
     def get_graph(self):
         with self.driver.session(database=self.database) as session:
+            query = (
+                "MATCH (n) "
+                "MATCH (m) "
+                "MATCH p=(n)-[:Influences*..]->(m) "
+                "WITH *, relationships(p) AS relations "
+                "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
+            )
             result = session.read_transaction(
-                self._find_and_return_graph)
+                self._read_graph, query)
             return result
 
     def get_path(self, from_name, to_name, shortestPath):
         with self.driver.session(database=self.database) as session:
+            if shortestPath:
+                path = "MATCH p=shortestPath((n)-[:Influences* ..]->(m)) "
+            else:
+                path = "MATCH p=(n)-[:Influences* ..]->(m) "
+            query = (
+                "MATCH (n {name: '"+from_name + "'}) "
+                "MATCH (m {name: '"+to_name + "'}) "
+                F"{path}"
+                "WITH *, relationships(p) AS relations "
+                "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
+            )
+
             result = session.read_transaction(
-                self._find_path, from_name, to_name, shortestPath)
+                self._read_graph, query)
+            return result
+
+    def filter_by_score(self, score_type, lower_score, upper_score):
+        with self.driver.session(database=self.database) as session:
+            lower, upper = "", ""
+            if isinstance(lower_score, int):
+                lower = F"{lower_score} <="
+            if isinstance(upper_score, int):
+                upper = F"<= {upper_score}"
+            query = (
+                "MATCH (n) "
+                "MATCH (m) "
+                "MATCH p=(n)-[r]->(m) "
+                F"WHERE {lower} toInteger(r.{score_type}) {upper} "
+                "WITH *, relationships(p) AS relations "
+                "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
+            )
+            result = session.read_transaction(
+                self._read_graph, query)
+            return result
+
+    def filter_by_influence_area(self, areas_array, operation):
+        with self.driver.session(database=self.database) as session:
+            if len(areas_array) > 0:
+                filters = []
+                for area in areas_array:
+                    filters.append(F" '{area}' IN r.influence_areas ")
+                filter_syntax = F' {operation} '.join(filters)
+            else:
+                return
+
+            query = ("MATCH(n) "
+                     "MATCH (m) "
+                     "MATCH p=(n)-[r]->(m) "
+                     F"WHERE {filter_syntax} "
+                     "WITH *, relationships(p) AS relations "
+                     "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
+                     )
+            result = session.read_transaction(
+                self._read_graph, query)
             return result
 
     @staticmethod
-    def _find_and_return_graph(tx):
-        query = (
-            "MATCH (n)-[r]->(m)"
-            "RETURN n,r,m"
-        )
-        result = tx.run(query)
-        nodes, links = [], []
-        for pair in result:
-            source_id = ""
-            target_id = ""
-            for node_pointer in ['n', 'm']:
-                neo4j_node = dict(pair[node_pointer])
-
-                node = {}
-                node['id'] = neo4j_node['network_id']
-                node['props'] = {'name': neo4j_node['name'],
-                                 'author_id': neo4j_node['author_id']}
-                if node not in nodes:
-                    nodes.append(node)
-
-                if node_pointer == 'n':
-                    source_id = node['id']
-                elif node_pointer == 'm':
-                    target_id = node['id']
-
-            neo4j_relation = pair['r']
-
-            relation = {
-                'source': source_id,
-                'target': target_id,
-                'props': {
-                    'influence_areas': neo4j_relation['influence_areas'],
-                    'influence_scores': dict(eval(neo4j_relation['influence_scores'])),
-                    'subreddits': neo4j_relation['subreddits'],
-                }
-            }
-
-            links.append(relation)
-
-        return {"nodes": nodes, "links": links}
-
-    @staticmethod
-    def _find_path(tx, from_name, to_name, shortestPath=False):
-        if shortestPath:
-            path = "MATCH p=shortestPath((n)-[:Influences* ..]->(m))"
-        else:
-            path = "MATCH p=(n)-[:Influences* ..]->(m)"
-        query = (
-            "MATCH (n {name: '"+from_name + "'}) "
-            "MATCH (m {name: '"+to_name + "'}) "
-            F"{path}"
-            "WITH *, relationships(p) AS relations "
-            "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
-        )
-
+    def _read_graph(tx, query):
         result = tx.run(query)
         nodes, links = [], []
 
@@ -191,8 +196,14 @@ class GraphDBConnector:
                     'target': end_node['network_id'],
                     'props': {
                         'influence_areas': relation_node['influence_areas'],
-                        'influence_scores': dict(eval(relation_node['influence_scores'])),
                         'subreddits': relation_node['subreddits'],
+                        'connection_influence_score': relation_node['connection_influence_score'],
+                        'activity_influence_score': relation_node['activity_influence_score'],
+                        'upvotes_influence_score': relation_node['upvotes_influence_score'],
+                        'connection_and_activity_influence_score':  relation_node['connection_and_activity_influence_score'],
+                        'connection_and_upvotes_influence_score': relation_node['connection_and_upvotes_influence_score'],
+                        'activity_and_upvotes_influence_score': relation_node['activity_and_upvotes_influence_score'],
+                        'all_influence_score': relation_node['all_influence_score']
                     }
                 }
                 if relation not in links:

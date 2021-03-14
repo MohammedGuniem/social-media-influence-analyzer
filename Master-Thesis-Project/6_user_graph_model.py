@@ -38,7 +38,8 @@ model.save(database_name)
 print("User Graph Model >> Calculating Summary Statistics for each and every edge scoring combination...")
 all_edge_weights = []
 for edge in model.edges.values():
-    all_edge_weights.append(edge['props']['influence_scores'])
+    scores = model.extract_score(edge['props'])
+    all_edge_weights.append(scores)
 
 model_edge_weights = {}
 for edge_weights in all_edge_weights:

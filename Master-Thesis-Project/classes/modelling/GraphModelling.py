@@ -9,15 +9,24 @@ class Graph:
         self.nodes = {}
         self.edges = {}
 
+    def extract_score(self, edge_props):
+        return {'connection_influence_score': edge_props['connection_influence_score'],
+                'activity_influence_score': edge_props['activity_influence_score'],
+                'upvotes_influence_score': edge_props['upvotes_influence_score'],
+                'connection_and_activity_influence_score': edge_props['connection_and_activity_influence_score'],
+                'connection_and_upvotes_influence_score': edge_props['connection_and_upvotes_influence_score'],
+                'activity_and_upvotes_influence_score': edge_props['activity_and_upvotes_influence_score'],
+                'all_influence_score': edge_props['all_influence_score']}
+
     def get_edge_scores(self, connection_weight, activity_weight, upvotes_weight):
         edge_scores = {
-            "connection": connection_weight,
-            "activity": activity_weight,
-            "upvotes": upvotes_weight,
-            "connection_and_activity":  connection_weight + activity_weight,
-            "connection_and_upvotes": connection_weight + upvotes_weight,
-            "activity_and_upvotes": activity_weight + upvotes_weight,
-            "all": connection_weight + activity_weight + upvotes_weight
+            "connection_influence_score": connection_weight,
+            "activity_influence_score": activity_weight,
+            "upvotes_influence_score": upvotes_weight,
+            "connection_and_activity_influence_score":  connection_weight + activity_weight,
+            "connection_and_upvotes_influence_score": connection_weight + upvotes_weight,
+            "activity_and_upvotes_influence_score": activity_weight + upvotes_weight,
+            "all_influence_score": connection_weight + activity_weight + upvotes_weight
         }
         return edge_scores
 
