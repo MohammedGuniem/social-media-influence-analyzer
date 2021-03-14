@@ -14,6 +14,8 @@ neo4j_db_connector = GraphDBConnector(
     database_name="testusergraph20210309"
 )
 
+"""
+print("------------------All graph--------------------")
 graph = neo4j_db_connector.get_graph()
 print("------------------nodes--------------------")
 nodes = graph['nodes']
@@ -51,3 +53,38 @@ print()
 print(links[element_nr]['props']['influence_scores'])
 print(links[element_nr]['props']['influence_scores']
       ['connection_and_activity'])
+
+"""
+
+print("------------------a path--------------------")
+path = neo4j_db_connector.get_path(
+    from_name="User G", to_name="User F", shortestPath=False)
+
+print("------------------nodes--------------------")
+nodes = path['nodes']
+print(F"#nodes: {len(nodes)}")
+for node in nodes:
+    # {'id': 'U_3', 'props': {'name': 'User C', 'author_id': 'U_3'}}
+    print(node['id'] + " " + node['props']['name'])
+
+print("------------------links--------------------")
+links = path['links']
+print(F"#links: {len(links)}")
+for link in links:
+    """
+    {'source': 'U_3', 'target': 'U_6',
+         'props': {
+            'influence_areas': ['entertainment', 'sport'], 
+            'influence_scores': {  'connection': 3, 
+                                    'activity': 3, 
+                                    'upvotes': 27, 
+                                    'connection_and_activity': 6, 
+                                    'connection_and_upvotes': 30, 
+                                    'activity_and_upvotes': 30, 
+                                    'all': 33
+                                },
+            'subreddits': ['Test', 'Test_2']
+            }
+        }
+    """
+    print(F"{link['source']} --> {link['target']}")

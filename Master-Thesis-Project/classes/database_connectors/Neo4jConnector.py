@@ -107,6 +107,12 @@ class GraphDBConnector:
                 self._find_and_return_graph)
             return result
 
+    def get_path(self, from_name, to_name, shortestPath):
+        with self.driver.session(database=self.database) as session:
+            result = session.read_transaction(
+                self._find_path, from_name, to_name, shortestPath)
+            return result
+
     @staticmethod
     def _find_and_return_graph(tx):
         query = (
@@ -116,7 +122,6 @@ class GraphDBConnector:
         result = tx.run(query)
         nodes, links = [], []
         for pair in result:
-
             source_id = ""
             target_id = ""
             for node_pointer in ['n', 'm']:
@@ -147,5 +152,50 @@ class GraphDBConnector:
             }
 
             links.append(relation)
+
+        return {"nodes": nodes, "links": links}
+
+    @staticmethod
+    def _find_path(tx, from_name, to_name, shortestPath=False):
+        if shortestPath:
+            path = "MATCH p=shortestPath((n)-[:Influences* ..]->(m))"
+        else:
+            path = "MATCH p=(n)-[:Influences* ..]->(m)"
+        query = (
+            "MATCH (n {name: '"+from_name + "'}) "
+            "MATCH (m {name: '"+to_name + "'}) "
+            F"{path}"
+            "WITH *, relationships(p) AS relations "
+            "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
+        )
+
+        result = tx.run(query)
+        nodes, links = [], []
+
+        for path_array in result:
+            data = path_array['data']
+            for relation in data:
+                start_node = dict(relation[0])
+                relation_node = dict(relation[1])
+                end_node = dict(relation[2])
+                for this_node in [start_node, end_node]:
+                    node = {}
+                    node['id'] = this_node['network_id']
+                    node['props'] = {'name': this_node['name'],
+                                     'author_id': this_node['author_id']}
+                    if node not in nodes:
+                        nodes.append(node)
+
+                relation = {
+                    'source': start_node['network_id'],
+                    'target': end_node['network_id'],
+                    'props': {
+                        'influence_areas': relation_node['influence_areas'],
+                        'influence_scores': dict(eval(relation_node['influence_scores'])),
+                        'subreddits': relation_node['subreddits'],
+                    }
+                }
+                if relation not in links:
+                    links.append(relation)
 
         return {"nodes": nodes, "links": links}

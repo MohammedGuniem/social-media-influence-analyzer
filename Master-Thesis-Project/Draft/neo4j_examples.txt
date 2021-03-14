@@ -14,17 +14,17 @@ Return n,r,m
 # Filter for influence scores
 ... needs some changes on how you write
 
-# Filter for finding shortest path
-MATCH (n {name: 'User G'} ),
-      (m {name: 'User F'}),
-      p = shortestPath((n)-[r:Influences*]->(m))
-RETURN p
 
-Or
+# All paths between to nodes by name
+MATCH (n {name: 'User G'})
+MATCH (m {name: 'User F'})
+MATCH p=(n)-[:Influences*..]->(m)
+WITH *, relationships(p) AS relations
+RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data
 
-MATCH p=(start:Redditor)-[r:Influences*1..10]->(end:Redditor)
-WHERE start.name = 'User G' AND end.name = 'User F'
-RETURN start, p, end
-ORDER BY length(p) ASC
-LIMIT 1
-
+# Shortest path between to nodes by name
+MATCH (n {name: 'User G'})
+MATCH (m {name: 'User B'})
+MATCH p=shortestPath((n) - [:Influences* ..] -> (m))
+WITH *, relationships(p) AS relations 
+RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data
