@@ -49,6 +49,8 @@ class GraphDBConnector:
                 props_query += ' = '+str(prop).replace("'", '"')+',\n'
             elif isinstance(prop, dict):
                 props_query += ' = "'+json.dumps(prop).replace('"', "'")+'",\n'
+            elif isinstance(prop, int):
+                props_query += ' = '+str(prop).replace('"', "'")+',\n'
             else:
                 props_query += ' = "'+str(prop).replace('"', "'")+'",\n'
         props_query = props_query[:-2]
@@ -172,6 +174,43 @@ class GraphDBConnector:
                 self._read_graph, query)
             return result
 
+    def get_degree_centrality(self):
+        with self.driver.session(database=self.database) as session:
+            query = ("MATCH()-[r] -> () "
+                     "CALL gds.alpha.degree.stream({ "
+                     "nodeProjection: 'Redditor', "
+                     "relationshipProjection: { "
+                     "  Influences: { "
+                     "    type: 'Influences', "
+                     "    properties: 'all_influence_score' "
+                     "  } "
+                     "}, "
+                     "  relationshipWeightProperty: 'all_influence_score' "
+                     "}) "
+                     "YIELD nodeId, score "
+                     "RETURN gds.util.asNode(nodeId).name AS name, score/sum(r.all_influence_score) as centrality "
+                     "ORDER BY centrality DESC "
+                     )
+            result = session.read_transaction(
+                self._calculate_centrality, query)
+            return result
+
+    def get_betweenness_centrality(self):
+        with self.driver.session(database=self.database) as session:
+            query = ("MATCH p=shortestPath((n)-[:Influences* ..]->(m)) "
+                     "WHERE n.name <> m.name "
+                     "CALL gds.betweenness.stream({ "
+                     "  nodeProjection: 'Redditor', "
+                     "  relationshipProjection: 'Influences' "
+                     "}) "
+                     "YIELD nodeId, score "
+                     "RETURN gds.util.asNode(nodeId).name AS name, round(score/count(p), 3) as centrality "
+                     "ORDER BY centrality DESC "
+                     )
+            result = session.read_transaction(
+                self._calculate_centrality, query)
+            return result
+
     @staticmethod
     def _read_graph(tx, query):
         result = tx.run(query)
@@ -210,3 +249,13 @@ class GraphDBConnector:
                     links.append(relation)
 
         return {"nodes": nodes, "links": links}
+
+    @staticmethod
+    def _calculate_centrality(tx, query):
+        result = tx.run(query)
+        ordered_users = []
+        ordered_user_centrality = []
+        for record in result:
+            ordered_users.append(record['name'])
+            ordered_user_centrality.append(record['centrality'])
+        return ordered_users, ordered_user_centrality

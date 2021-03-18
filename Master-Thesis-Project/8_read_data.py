@@ -11,7 +11,7 @@ neo4j_db_connector = GraphDBConnector(
     uri=os.environ.get('neo4j_connection_string'),
     user=os.environ.get('neo4j_username'),
     password=os.environ.get('neo4j_password'),
-    database_name="testusergraph20210314"
+    database_name="testusergraph20210318"
 )
 
 print("------------------All graph--------------------")
