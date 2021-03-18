@@ -1,3 +1,4 @@
+import statistics
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
 from dotenv import load_dotenv
 from datetime import date
@@ -16,12 +17,51 @@ neo4j_db_connector = GraphDBConnector(
 
 print()
 print("Degree Centrality, normalized, weighted and directed")
-dc_ordered_users, dc_ordered_user_centrality = neo4j_db_connector.get_degree_centrality()
-print(dc_ordered_users)
-print(dc_ordered_user_centrality)
+degree_ordered_users, degree_ordered_user_centrality = neo4j_db_connector.get_degree_centrality()
+print(degree_ordered_users)
+print(degree_ordered_user_centrality)
 
 print()
-print("Degree Centrality, normalized, unweighted and directed")
-bc_ordered_users, bc_ordered_user_centrality = neo4j_db_connector.get_betweenness_centrality()
-print(bc_ordered_users)
-print(bc_ordered_user_centrality)
+print("Betweenness Centrality, normalized, unweighted and directed")
+betweennes_ordered_users, betweennes_ordered_user_centrality = neo4j_db_connector.get_betweenness_centrality()
+print(betweennes_ordered_users)
+print(betweennes_ordered_user_centrality)
+
+print()
+print("AUTH HITS Centrality, normalized, unweighted and directed")
+auth_hits_ordered_users, auth_hits_ordered_user_centrality = neo4j_db_connector.get_hits_centrality(
+    order_by="AUTH")
+print(auth_hits_ordered_users)
+print(auth_hits_ordered_user_centrality)
+
+print()
+print("HUB HITS Centrality, normalized, unweighted and directed")
+hub_hits_ordered_users, hub_hits_ordered_user_centrality = neo4j_db_connector.get_hits_centrality(
+    order_by="HUB")
+print(hub_hits_ordered_users)
+print(hub_hits_ordered_user_centrality)
+
+print()
+
+
+def merge_centrality_scores(*ordered_users):
+    users = {}
+    for user_array in ordered_users:
+        top_score = len(user_array)
+        for user in user_array:
+            if user not in users:
+                users[user] = [top_score - user_array.index(user)]
+            else:
+                users[user].append(top_score - user_array.index(user))
+    merged_scores = {}
+    for user, scores in users.items():
+        merged_scores[user] = round(statistics.median(scores))
+    return merged_scores
+
+
+merged_centrality_scores = merge_centrality_scores(degree_ordered_users, betweennes_ordered_users,
+                                                   auth_hits_ordered_users, hub_hits_ordered_users)
+
+
+for user, score in sorted(merged_centrality_scores.items(), key=lambda item: item[1], reverse=True):
+    print(F"{user} - {score}")

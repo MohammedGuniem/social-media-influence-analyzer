@@ -211,6 +211,21 @@ class GraphDBConnector:
                 self._calculate_centrality, query)
             return result
 
+    def get_hits_centrality(self, order_by):
+        with self.driver.session(database=self.database) as session:
+            query = ("CALL gds.alpha.hits.stream({ "
+                     "hitsIterations: 30, "
+                     "nodeProjection: 'Redditor',  "
+                     "relationshipProjection: 'Influences' "
+                     "}) "
+                     "YIELD nodeId, values "
+                     "RETURN gds.util.asNode(nodeId).name AS name, {auth: values.auth, hub: values.hub} AS centrality "
+                     F"ORDER BY values.{order_by.lower()} DESC "
+                     )
+            result = session.read_transaction(
+                self._calculate_centrality, query)
+            return result
+
     @staticmethod
     def _read_graph(tx, query):
         result = tx.run(query)
