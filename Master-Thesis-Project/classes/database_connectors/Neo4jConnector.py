@@ -103,8 +103,8 @@ class GraphDBConnector:
 
     """ Reading methods """
 
-    def get_graph(self):
-        with self.driver.session(database=self.database) as session:
+    def get_graph(self, database):
+        with self.driver.session(database=database) as session:
             query = (
                 "MATCH (n) "
                 "MATCH (m) "
@@ -116,8 +116,8 @@ class GraphDBConnector:
                 self._read_graph, query)
             return result
 
-    def get_path(self, from_name, to_name, shortestPath):
-        with self.driver.session(database=self.database) as session:
+    def get_path(self, from_name, to_name, shortestPath, database):
+        with self.driver.session(database=database) as session:
             if shortestPath:
                 path = "MATCH p=shortestPath((n)-[:Influences* ..]->(m)) "
             else:
@@ -134,8 +134,8 @@ class GraphDBConnector:
                 self._read_graph, query)
             return result
 
-    def filter_by_score(self, score_type, lower_score, upper_score):
-        with self.driver.session(database=self.database) as session:
+    def filter_by_score(self, score_type, lower_score, upper_score, database):
+        with self.driver.session(database=database) as session:
             lower, upper = "", ""
             if isinstance(lower_score, int):
                 lower = F"{lower_score} <="
@@ -153,8 +153,8 @@ class GraphDBConnector:
                 self._read_graph, query)
             return result
 
-    def filter_by_influence_area(self, areas_array, operation):
-        with self.driver.session(database=self.database) as session:
+    def filter_by_influence_area(self, areas_array, operation, database):
+        with self.driver.session(database=database) as session:
             if len(areas_array) > 0:
                 filters = []
                 for area in areas_array:
@@ -174,8 +174,8 @@ class GraphDBConnector:
                 self._read_graph, query)
             return result
 
-    def get_degree_centrality(self):
-        with self.driver.session(database=self.database) as session:
+    def get_degree_centrality(self, database):
+        with self.driver.session(database=database) as session:
             query = ("MATCH()-[r] -> () "
                      "CALL gds.alpha.degree.stream({ "
                      "nodeProjection: 'Redditor', "
@@ -195,8 +195,8 @@ class GraphDBConnector:
                 self._calculate_centrality, query)
             return result
 
-    def get_betweenness_centrality(self):
-        with self.driver.session(database=self.database) as session:
+    def get_betweenness_centrality(self, database):
+        with self.driver.session(database=database) as session:
             query = ("MATCH p=shortestPath((n)-[:Influences* ..]->(m)) "
                      "WHERE n.name <> m.name "
                      "CALL gds.betweenness.stream({ "
@@ -211,20 +211,29 @@ class GraphDBConnector:
                 self._calculate_centrality, query)
             return result
 
-    def get_hits_centrality(self, order_by):
-        with self.driver.session(database=self.database) as session:
-            query = ("CALL gds.alpha.hits.stream({ "
-                     "hitsIterations: 30, "
-                     "nodeProjection: 'Redditor',  "
-                     "relationshipProjection: 'Influences' "
-                     "}) "
-                     "YIELD nodeId, values "
-                     "RETURN gds.util.asNode(nodeId).name AS name, {auth: values.auth, hub: values.hub} AS centrality "
-                     F"ORDER BY values.{order_by.lower()} DESC "
-                     )
-            result = session.read_transaction(
-                self._calculate_centrality, query)
-            return result
+    def get_hits_centrality(self, order_by, database):
+        with self.driver.session(database=database) as session:
+            hitsIterations = 5
+            ordered_users, ordered_user_centrality = [], []
+            while True:
+                query = ("CALL gds.alpha.hits.stream({ "
+                         F"hitsIterations: {hitsIterations}, "
+                         "nodeProjection: 'Redditor',  "
+                         "relationshipProjection: 'Influences' "
+                         "}) "
+                         "YIELD nodeId, values "
+                         "RETURN gds.util.asNode(nodeId).name AS name, {auth: values.auth, hub: values.hub} AS centrality "
+                         F"ORDER BY values.{order_by.lower()} DESC "
+                         )
+                this_ordered_users, this_ordered_user_centrality = session.read_transaction(
+                    self._calculate_centrality, query)
+
+                if this_ordered_users == ordered_users:
+                    break
+                else:
+                    ordered_users, ordered_user_centrality = this_ordered_users, this_ordered_user_centrality
+                    hitsIterations += 5
+            return this_ordered_users, this_ordered_user_centrality, hitsIterations
 
     @staticmethod
     def _read_graph(tx, query):

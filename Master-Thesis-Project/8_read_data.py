@@ -1,7 +1,5 @@
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
 from dotenv import load_dotenv
-from datetime import date
-import json
 import os
 
 load_dotenv()
@@ -14,8 +12,10 @@ neo4j_db_connector = GraphDBConnector(
     database_name="testusergraph20210318"
 )
 
+database_name = "testusergraph20210318"
+
 print("------------------All graph--------------------")
-graph = neo4j_db_connector.get_graph()
+graph = neo4j_db_connector.get_graph(database=database_name)
 print("------------------nodes--------------------")
 nodes = graph['nodes']
 print(F"#nodes: {len(nodes)}")
@@ -32,7 +32,7 @@ for link in graph['links']:
 print()
 print("---------a path from User G to User F--------------------")
 path = neo4j_db_connector.get_path(
-    from_name="User G", to_name="User F", shortestPath=True)
+    from_name="User G", to_name="User F", shortestPath=True, database=database_name)
 
 print("------------------nodes--------------------")
 nodes = path['nodes']
@@ -50,7 +50,8 @@ for link in links:
 
 print()
 print("---------filter by total score between 1 and 10--------------------")
-filter_graph = neo4j_db_connector.filter_by_score("all_influence_score", 0, 10)
+filter_graph = neo4j_db_connector.filter_by_score(
+    "all_influence_score", 0, 10, database=database_name)
 
 print("------------------nodes--------------------")
 nodes = filter_graph['nodes']
@@ -69,7 +70,7 @@ for link in links:
 print()
 print("---------filter by influence area sport and entertainment--------------------")
 filter_graph = neo4j_db_connector.filter_by_influence_area(
-    ['sport', 'entertainment'], operation="AND")
+    ['sport', 'entertainment'], operation="AND", database=database_name)
 
 print("------------------nodes--------------------")
 nodes = filter_graph['nodes']
