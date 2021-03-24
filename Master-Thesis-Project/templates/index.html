@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+<head>
+    <style>
+        #graphcanvas {
+            width: 95vw;
+            height: 95vh;
+            border: 5px dotted #4287f5;
+        }
+    </style>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+</head>
+<body>
+    <div id="graphcanvas"></div>
+    <script>
+        
+        graph = {
+            nodes: [
+                    {
+                        label: "User A",
+                        id: "U_1",
+                        color: { background: "rgba(240, 52, 52, 0.169)", border: "#4287f5" },
+                        borderWidth: 1
+                    },
+                    {
+                        label: "User B",
+                        id: "U_2",
+                        color: { background: "rgba(240, 52, 52, 0.093)", border: "#4287f5" },
+                        borderWidth: 1
+                    },
+                    {
+                        label: "User C",
+                        id: "U_3",
+                        color: { background: "rgba(240, 52, 52, 0.398)", border: "#4287f5" },
+                        borderWidth: 1
+                    },
+                    {
+                        label: "User D",
+                        id: "U_4",
+                        color: { background: "rgba(240, 52, 52, 0.161)", border: "#4287f5" },
+                        borderWidth: 1
+                    },
+                    {
+                        label: "User E",
+                        id: "U_5",
+                        color: { background: "rgba(240, 52, 52, 0.000)", border: "#4287f5" },
+                        borderWidth: 1
+                    },
+                    {
+                        label: "User F",
+                        id: "U_6",
+                        color: { background: "rgba(240, 52, 52, 0.059)", border: "#4287f5" },
+                        borderWidth: 1
+                    },
+                    {
+                        label: "User G",
+                        id: "U_7",
+                        color: { background: "rgba(240, 52, 52, 0.119)", border: "#4287f5" },
+                        borderWidth: 1 
+                    },
+                ],
+            links: [
+                    {
+                        from: "U_1",
+                        to: "U_4",
+                        type: "Influences", 
+                        arrows: "to",
+                        value: 20,
+                        label: "20",
+                        color: "#4287f5",
+                        arrowStrikethrough: false
+                    },
+                    {
+                        from: "U_4",
+                        to: "U_1",
+                        type: "Influences", 
+                        arrows: "to",
+                        value: 19,
+                        label: "19",
+                        color: "#4287f5",
+                        arrowStrikethrough: false
+                    },
+                    {
+                        from: "U_2",
+                        to: "U_5",
+                        type: "Influences", 
+                        arrows: "to",
+                        value: 5,
+                        label: "5",
+                        color: "#4287f5",
+                        arrowStrikethrough: false
+                    },
+                    {
+                        from: "U_2",
+                        to: "U_6",
+                        type: "Influences", 
+                        arrows: "to",
+                        value: 6,
+                        label: "6",
+                        color: "#4287f5",
+                        arrowStrikethrough: false
+                    },
+                    {
+                        from: "U_6",
+                        to: "U_2",
+                        type: "Influences", 
+                        arrows: "to",
+                        value: 7,
+                        label: "7",
+                        color: "#4287f5",
+                        arrowStrikethrough: false
+                    },
+                    {
+                        from: "U_3",
+                        to: "U_6",
+                        type: "Influences", 
+                        arrows: "to",
+                        value: 33,
+                        label: "33",
+                        color: "#4287f5",
+                        arrowStrikethrough: false
+                    },
+                    {
+                        from: "U_3",
+                        to: "U_7",
+                        type: "Influences", 
+                        arrows: "to",
+                        value: 14,
+                        label: "14",
+                        color: "#4287f5",
+                        arrowStrikethrough: false
+                    },
+                    {
+                        from: "U_7",
+                        to: "U_3",
+                        type: "Influences", 
+                        arrows: "to",
+                        value: 14,
+                        label: "14",
+                        color: "#4287f5",
+                        arrowStrikethrough: false
+                    }
+            ]
+        }
+
+        // create a network
+        var container = document.getElementById("graphcanvas");
+        var data = {
+            nodes: graph.nodes,
+            edges: graph.links,
+        };
+        var options = {
+            nodes: {
+                shape: "dot",
+                scaling: {
+                    customScalingFunction: function (min, max, total, value) {
+                    return value / total;
+                    },
+                    min: 5,
+                    max: 33,
+                },
+            },
+            physics: {
+                forceAtlas2Based: {
+                    gravitationalConstant: -26,
+                    centralGravity: 0.005,
+                    springLength: 230,
+                    springConstant: 0.18,
+                    avoidOverlap: 1.5
+                },
+                maxVelocity: 146,
+                solver: 'forceAtlas2Based',
+                timestep: 0.35,
+                stabilization: {
+                    enabled: true,
+                    iterations: 1000,
+                    updateInterval: 25
+                }
+            }
+        };
+        var network = new vis.Network(container, data, options);
+
+        /*
+        network.on("stabilizationIterationsDone", function () {
+            network.setOptions( { physics: false } );
+        });
+        */
+    </script>
+</body>
+</html>
