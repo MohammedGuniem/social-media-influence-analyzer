@@ -10,156 +10,32 @@
         }
     </style>
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 </head>
 <body>
     <div id="graphcanvas"></div>
     <script>
+        var graph = JSON.parse('{{ data|tojson|safe }}');
         
-        graph = {
-            nodes: [
-                    {
-                        label: "User A",
-                        id: "U_1",
-                        color: { background: "rgba(240, 52, 52, 0.169)", border: "#4287f5" },
-                        borderWidth: 1
-                    },
-                    {
-                        label: "User B",
-                        id: "U_2",
-                        color: { background: "rgba(240, 52, 52, 0.093)", border: "#4287f5" },
-                        borderWidth: 1
-                    },
-                    {
-                        label: "User C",
-                        id: "U_3",
-                        color: { background: "rgba(240, 52, 52, 0.398)", border: "#4287f5" },
-                        borderWidth: 1
-                    },
-                    {
-                        label: "User D",
-                        id: "U_4",
-                        color: { background: "rgba(240, 52, 52, 0.161)", border: "#4287f5" },
-                        borderWidth: 1
-                    },
-                    {
-                        label: "User E",
-                        id: "U_5",
-                        color: { background: "rgba(240, 52, 52, 0.000)", border: "#4287f5" },
-                        borderWidth: 1
-                    },
-                    {
-                        label: "User F",
-                        id: "U_6",
-                        color: { background: "rgba(240, 52, 52, 0.059)", border: "#4287f5" },
-                        borderWidth: 1
-                    },
-                    {
-                        label: "User G",
-                        id: "U_7",
-                        color: { background: "rgba(240, 52, 52, 0.119)", border: "#4287f5" },
-                        borderWidth: 1 
-                    },
-                ],
-            links: [
-                    {
-                        from: "U_1",
-                        to: "U_4",
-                        type: "Influences", 
-                        arrows: "to",
-                        value: 20,
-                        label: "20",
-                        color: "#4287f5",
-                        arrowStrikethrough: false
-                    },
-                    {
-                        from: "U_4",
-                        to: "U_1",
-                        type: "Influences", 
-                        arrows: "to",
-                        value: 19,
-                        label: "19",
-                        color: "#4287f5",
-                        arrowStrikethrough: false
-                    },
-                    {
-                        from: "U_2",
-                        to: "U_5",
-                        type: "Influences", 
-                        arrows: "to",
-                        value: 5,
-                        label: "5",
-                        color: "#4287f5",
-                        arrowStrikethrough: false
-                    },
-                    {
-                        from: "U_2",
-                        to: "U_6",
-                        type: "Influences", 
-                        arrows: "to",
-                        value: 6,
-                        label: "6",
-                        color: "#4287f5",
-                        arrowStrikethrough: false
-                    },
-                    {
-                        from: "U_6",
-                        to: "U_2",
-                        type: "Influences", 
-                        arrows: "to",
-                        value: 7,
-                        label: "7",
-                        color: "#4287f5",
-                        arrowStrikethrough: false
-                    },
-                    {
-                        from: "U_3",
-                        to: "U_6",
-                        type: "Influences", 
-                        arrows: "to",
-                        value: 33,
-                        label: "33",
-                        color: "#4287f5",
-                        arrowStrikethrough: false
-                    },
-                    {
-                        from: "U_3",
-                        to: "U_7",
-                        type: "Influences", 
-                        arrows: "to",
-                        value: 14,
-                        label: "14",
-                        color: "#4287f5",
-                        arrowStrikethrough: false
-                    },
-                    {
-                        from: "U_7",
-                        to: "U_3",
-                        type: "Influences", 
-                        arrows: "to",
-                        value: 14,
-                        label: "14",
-                        color: "#4287f5",
-                        arrowStrikethrough: false
-                    }
-            ]
-        }
-
-        // create a network
         var container = document.getElementById("graphcanvas");
-        var data = {
-            nodes: graph.nodes,
-            edges: graph.links,
-        };
+
         var options = {
             nodes: {
                 shape: "dot",
-                scaling: {
-                    customScalingFunction: function (min, max, total, value) {
-                    return value / total;
+                color: {
+                    highlight: {
+                        border: '#2B7CE9',
+                        background: '#D2E5FF'
                     },
-                    min: 5,
-                    max: 33,
-                },
+                    border: "#f03434"
+                 },
+                borderWidth: 1
+            },
+            edges: {
+                color: "#4287f5",
+                arrowStrikethrough: false,
+                arrows: "to"
             },
             physics: {
                 forceAtlas2Based: {
@@ -179,13 +55,8 @@
                 }
             }
         };
-        var network = new vis.Network(container, data, options);
-
-        /*
-        network.on("stabilizationIterationsDone", function () {
-            network.setOptions( { physics: false } );
-        });
-        */
+            
+        var network = new vis.Network(container, graph, options);
     </script>
 </body>
 </html>

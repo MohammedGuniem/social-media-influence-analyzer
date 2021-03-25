@@ -9,10 +9,10 @@ neo4j_db_connector = GraphDBConnector(
     uri=os.environ.get('neo4j_connection_string'),
     user=os.environ.get('neo4j_username'),
     password=os.environ.get('neo4j_password'),
-    database_name="testusergraph20210318"
+    database_name="testusergraph20210323"
 )
 
-database_name = "testusergraph20210318"
+database_name = "testusergraph20210323"
 
 print("------------------All graph--------------------")
 graph = neo4j_db_connector.get_graph(database=database_name)
@@ -32,7 +32,7 @@ for link in graph['links']:
 print()
 print("---------a path from User G to User F--------------------")
 path = neo4j_db_connector.get_path(
-    from_name="User G", to_name="User F", shortestPath=True, database=database_name)
+    from_name="User G", to_name="User F", database=database_name)
 
 print("------------------nodes--------------------")
 nodes = path['nodes']

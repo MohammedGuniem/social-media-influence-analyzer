@@ -116,16 +116,12 @@ class GraphDBConnector:
                 self._read_graph, query)
             return result
 
-    def get_path(self, from_name, to_name, shortestPath, database):
+    def get_path(self, from_name, to_name, database):
         with self.driver.session(database=database) as session:
-            if shortestPath:
-                path = "MATCH p=shortestPath((n)-[:Influences* ..]->(m)) "
-            else:
-                path = "MATCH p=(n)-[:Influences* ..]->(m) "
             query = (
                 "MATCH (n {name: '"+from_name + "'}) "
                 "MATCH (m {name: '"+to_name + "'}) "
-                F"{path}"
+                "MATCH p=(n)-[:Influences* ..]->(m) "
                 "WITH *, relationships(p) AS relations "
                 "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
             )
@@ -174,7 +170,7 @@ class GraphDBConnector:
                 self._read_graph, query)
             return result
 
-    def get_degree_centrality(self, database):
+    def get_degree_centrality(self, database, score_type):
         with self.driver.session(database=database) as session:
             query = ("MATCH()-[r] -> () "
                      "CALL gds.alpha.degree.stream({ "
@@ -182,10 +178,10 @@ class GraphDBConnector:
                      "relationshipProjection: { "
                      "  Influences: { "
                      "    type: 'Influences', "
-                     "    properties: 'all_influence_score' "
+                     F"    properties: '{score_type}' "
                      "  } "
                      "}, "
-                     "  relationshipWeightProperty: 'all_influence_score' "
+                     F"  relationshipWeightProperty: '{score_type}' "
                      "}) "
                      "YIELD nodeId, score "
                      "RETURN gds.util.asNode(nodeId).name AS name, score/sum(r.all_influence_score) as centrality "
@@ -211,10 +207,10 @@ class GraphDBConnector:
                 self._calculate_centrality, query)
             return result
 
-    def get_hits_centrality(self, order_by, database):
+    def get_hits_centrality(self, database):
         with self.driver.session(database=database) as session:
             hitsIterations = 5
-            ordered_users, ordered_user_centrality = [], []
+            user_centrality = {}
             while True:
                 query = ("CALL gds.alpha.hits.stream({ "
                          F"hitsIterations: {hitsIterations}, "
@@ -223,17 +219,16 @@ class GraphDBConnector:
                          "}) "
                          "YIELD nodeId, values "
                          "RETURN gds.util.asNode(nodeId).name AS name, {auth: values.auth, hub: values.hub} AS centrality "
-                         F"ORDER BY values.{order_by.lower()} DESC "
                          )
-                this_ordered_users, this_ordered_user_centrality = session.read_transaction(
+                centrality = session.read_transaction(
                     self._calculate_centrality, query)
 
-                if this_ordered_users == ordered_users:
+                if centrality.keys() == user_centrality.keys():
                     break
                 else:
-                    ordered_users, ordered_user_centrality = this_ordered_users, this_ordered_user_centrality
+                    user_centrality = centrality
                     hitsIterations += 5
-            return this_ordered_users, this_ordered_user_centrality, hitsIterations
+            return centrality, hitsIterations
 
     @staticmethod
     def _read_graph(tx, query):
@@ -277,9 +272,7 @@ class GraphDBConnector:
     @staticmethod
     def _calculate_centrality(tx, query):
         result = tx.run(query)
-        ordered_users = []
-        ordered_user_centrality = []
+        centrality = {}
         for record in result:
-            ordered_users.append(record['name'])
-            ordered_user_centrality.append(record['centrality'])
-        return ordered_users, ordered_user_centrality
+            centrality[record['name']] = record['centrality']
+        return centrality
