@@ -4,16 +4,50 @@
 <head>
     <style>
         #graphcanvas {
-            width: 95vw;
-            height: 95vh;
-            border: 5px dotted #4287f5;
+            width: 99vw;
+            height: 90vh;
         }
+
     </style>
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
+
 </head>
 <body>
+    <br>
+    <div class="container-fluid">
+        <form>
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" data-date-format="YYYY-MMMM-DD">
+            
+            <label for="score_type">Score Type</label>
+            <select name="score_type" id="score_type">
+                <option value="all_influence_score">Total</option>
+                <option value="activity_influence_score">Activity</option>
+                <option value="connection_influence_score">Interaction</option>
+                <option value="upvotes_influence_score">Upvotes</option>
+                <option value="activity_and_upvotes_influence_score">Activity & Upvotes</option>
+                <option value="connection_and_activity_influence_score">Interaction & Activity</option>
+                <option value="connection_and_upvotes_influence_score">Interaction & Upvotes</option>
+            </select>
+
+            <label for="centrality">Centrality Measure</label>
+            <select name="centrality" id="centrality">
+                <option value="degree" selected>Degree</option>
+                <option value="betweenness">Betweenness</option>
+                <option value="hits-hub">HITS hub</option>
+                <option value="hits-auth">HITS Auth</option>
+            </select>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <br>
     <div id="graphcanvas"></div>
     <script>
         var graph = JSON.parse('{{ data|tojson|safe }}');
@@ -53,6 +87,14 @@
                     iterations: 1000,
                     updateInterval: 25
                 }
+            },
+            autoResize: true,
+            height: '100%',
+            width: '100%',
+            interaction: {
+                navigationButtons: true,
+                keyboard: true,
+                zoomSpeed: 0.3
             }
         };
             

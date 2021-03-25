@@ -1,6 +1,7 @@
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
-from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request
+from dotenv import load_dotenv
+from datetime import date
 import json
 import os
 
@@ -57,15 +58,15 @@ def constructJSGraph(neo4j_graph, database_name, centrality, score_type):
     return js_graph
 
 
-# Example - GUI: http://localhost:5000/?database_name=testusergraph20210323&score_type=all_influence_score&centrality=degree
-# Example - JSON: http://localhost:5000/?database_name=testusergraph20210323&score_type=all_influence_score&centrality=degree&format=json
+# Example - GUI: http://localhost:5000/?date=20210323&score_type=all_influence_score&centrality=degree
+# Example - JSON: http://localhost:5000/?date=20210323&score_type=all_influence_score&centrality=degree&format=json
 @app.route('/')
 def index():
     data_format = request.args.get('format')
-    database_name = request.args.get('database_name') if request.args.get(
-        'database_name') else "testusergraph20210323"
-    centrality = request.args.get('centrality')
-    score_type = request.args.get('score_type')
+    day = str(request.args.get('date', str(date.today()))).replace('-', '')
+    database_name = F"usergraph{day}"
+    centrality = request.args.get('centrality', 'degree')
+    score_type = request.args.get('score_type', "all_influence_score")
 
     neo4j_graph = neo4j_db_connector.get_graph(database_name)
     if data_format == 'json':
@@ -78,7 +79,7 @@ def index():
 
 # Example - GUI: http://localhost:5000/path?database_name=testusergraph20210323&score_type=all_influence_score&source_name=User%20F&target_name=User%20E&centrality=degree
 # Example - JSON: http://localhost:5000/path?database_name=testusergraph20210323&score_type=all_influence_score&source_name=User%20F&target_name=User%20E&centrality=degree&format=json
-@app.route('/path')
+@ app.route('/path')
 def path():
     data_format = request.args.get('format')
     database_name = request.args.get('database_name') if request.args.get(
