@@ -15,7 +15,7 @@ neo4j_db_connector = GraphDBConnector(
     uri=os.environ.get('neo4j_connection_string'),
     user=os.environ.get('neo4j_username'),
     password=os.environ.get('neo4j_password'),
-    database_name="testusergraph20210323"
+    database_name="testusergraph20210326"
 )
 
 
@@ -51,17 +51,23 @@ def constructJSGraph(neo4j_graph, database_name, centrality, score_type):
         js_graph["edges"].append({
             "from": edge['source'],
             "to": edge['target'],
+            "color": "rgba(50, 121, 168)",
             "value": edge['props'][score_type],
-            "label": str(edge['props'][score_type])
+            "label": F"{str(edge['props'][score_type])}\\n{', '.join(edge['props']['influence_areas'])}"
         })
 
     return js_graph
 
 
-# Example - GUI: http://localhost:5000/?date=20210323&score_type=all_influence_score&centrality=degree
-# Example - JSON: http://localhost:5000/?date=20210323&score_type=all_influence_score&centrality=degree&format=json
 @app.route('/')
 def index():
+    return render_template("index.html")
+
+
+# Example - GUI: http://localhost:5000/graph?date=20210326&score_type=all_influence_score&centrality=degree
+# Example - JSON: http://localhost:5000/graph?date=20210326&score_type=all_influence_score&centrality=degree&format=json
+@app.route('/graph')
+def graph():
     data_format = request.args.get('format')
     day = str(request.args.get('date', str(date.today()))).replace('-', '')
     database_name = F"usergraph{day}"
@@ -74,20 +80,20 @@ def index():
     else:
         js_graph = constructJSGraph(
             neo4j_graph, database_name, centrality, score_type)
-    return render_template("index.html", data=js_graph)
+    return render_template("graph.html", data=js_graph)
 
 
-# Example - GUI: http://localhost:5000/path?database_name=testusergraph20210323&score_type=all_influence_score&source_name=User%20F&target_name=User%20E&centrality=degree
-# Example - JSON: http://localhost:5000/path?database_name=testusergraph20210323&score_type=all_influence_score&source_name=User%20F&target_name=User%20E&centrality=degree&format=json
+# Example - GUI: http://localhost:5000/path?date=20210326&score_type=all_influence_score&source_name=What_the_hellll&target_name=Golden_Renegade&centrality=degree
+# Example - JSON: http://localhost:5000/path?date=20210326&score_type=all_influence_score&source_name=What_the_hellll&target_name=Golden_Renegade&centrality=degree&format=json
 @ app.route('/path')
 def path():
     data_format = request.args.get('format')
-    database_name = request.args.get('database_name') if request.args.get(
-        'database_name') else "testusergraph20210323"
-    centrality = request.args.get('centrality')
-    source_name = request.args.get('source_name')
-    target_name = request.args.get('target_name')
-    score_type = request.args.get('score_type')
+    day = str(request.args.get('date', str(date.today()))).replace('-', '')
+    database_name = F"usergraph{day}"
+    centrality = request.args.get('centrality', 'degree')
+    score_type = request.args.get('score_type', "all_influence_score")
+    source_name = request.args.get('source_name', '')
+    target_name = request.args.get('target_name', '')
 
     neo4j_graph = neo4j_db_connector.get_path(
         source_name, target_name, database_name)
@@ -96,20 +102,20 @@ def path():
     else:
         js_graph = constructJSGraph(
             neo4j_graph, database_name, centrality, score_type)
-    return render_template("index.html", data=js_graph)
+    return render_template("graph.html", data=js_graph)
 
 
-# Example - GUI: http://localhost:5000/filter_by_score?database_name=testusergraph20210323&score_type=all_influence_score&min_score=0&centrality=degree&max_score=10
-# Example - JSON: http://localhost:5000/filter_by_score?database_name=testusergraph20210323&score_type=all_influence_score&min_score=0&max_score=10&centrality=degree&format=json
-@ app.route('/filter_by_score', methods=['GET'])
-def filter_by_score():
+# Example - GUI: http://localhost:5000/score?date=20210326&score_type=all_influence_score&min_score=0&centrality=degree&max_score=10
+# Example - JSON: http://localhost:5000/score?date=20210326&score_type=all_influence_score&min_score=0&max_score=10&centrality=degree&format=json
+@ app.route('/score', methods=['GET'])
+def score():
     data_format = request.args.get('format')
-    database_name = request.args.get('database_name') if request.args.get(
-        'database_name') else "testusergraph20210323"
-    score_type = request.args.get('score_type')
-    min_score = int(request.args.get('min_score'))
-    max_score = int(request.args.get('max_score'))
-    centrality = request.args.get('centrality')
+    day = str(request.args.get('date', str(date.today()))).replace('-', '')
+    database_name = F"usergraph{day}"
+    centrality = request.args.get('centrality', 'degree')
+    score_type = request.args.get('score_type', 'all_influence_score')
+    min_score = int(request.args.get('min_score', 0))
+    max_score = int(request.args.get('max_score', 0))
 
     neo4j_graph = neo4j_db_connector.filter_by_score(
         score_type, min_score, max_score, database_name)
@@ -119,52 +125,58 @@ def filter_by_score():
     else:
         js_graph = constructJSGraph(
             neo4j_graph, database_name, centrality, score_type)
-    return render_template("index.html", data=js_graph)
+    return render_template("graph.html", data=js_graph)
 
 
-# Example - GUI: http://localhost:5000/filter_by_influence_area?database_name=testusergraph20210323&score_type=all_influence_score&influence_areas=sport%20entertainment&operation=AND&centrality=degree
-# Example - JSON: http://localhost:5000/filter_by_influence_area?database_name=testusergraph20210323&score_type=all_influence_score&influence_areas=sport%20entertainment&operation=AND&centrality=degree&format=json
-@ app.route('/filter_by_influence_area', methods=['GET'])
-def filter_by_influence_area():
+# Example - GUI: http://localhost:5000/field?date=20210326&score_type=all_influence_score&fields=sport&fields=entertainment&operation=OR&centrality=degree
+# Example - JSON: http://localhost:5000/field?date=20210326&score_type=all_influence_score&fields=sport&fields=entertainment&operation=OR&centrality=degree&format=json
+@ app.route('/field', methods=['GET'])
+def field():
     data_format = request.args.get('format')
-    database_name = request.args.get('database_name') if request.args.get(
-        'database_name') else "testusergraph20210323"
-    influence_areas = request.args.get('influence_areas').split(" ")
-    operation = request.args.get('operation')
-    centrality = request.args.get('centrality')
-    score_type = request.args.get('score_type')
+    day = str(request.args.get('date', str(date.today()))).replace('-', '')
+    database_name = F"usergraph{day}"
+    centrality = request.args.get('centrality', 'degree')
+    score_type = request.args.get('score_type', 'all_influence_score')
+    fields = request.args.to_dict(flat=False)['fields']
+    operation = request.args.get('operation', 'OR')
 
     neo4j_graph = neo4j_db_connector.filter_by_influence_area(
-        influence_areas, operation, database_name)
+        fields, operation, database_name)
 
     if data_format == 'json':
         return jsonify(neo4j_graph)
     else:
         js_graph = constructJSGraph(
             neo4j_graph, database_name, centrality, score_type)
-    return render_template("index.html", data=js_graph)
+    return render_template("graph.html", data=js_graph)
 
 
-# Example: http://localhost:5000/degree_centrality/testusergraph20210323?score_type=all_influence_score
-@ app.route('/degree_centrality/<database_name>', methods=['GET'])
-def degree_centrality(database_name):
+# Example: http://localhost:5000/degree_centrality?date=20210326&score_type=all_influence_score
+@ app.route('/degree_centrality', methods=['GET'])
+def degree_centrality():
     score_type = request.args.get('score_type')
+    day = str(request.args.get('date', str(date.today()))).replace('-', '')
+    database_name = F"usergraph{day}"
     degree_centrality = neo4j_db_connector.get_degree_centrality(
         database_name, score_type)
     return jsonify(degree_centrality)
 
 
-# Example: http://localhost:5000/betweenness_centrality/testusergraph20210323
-@ app.route('/betweenness_centrality/<database_name>', methods=['GET'])
-def betweenness_centrality(database_name):
+# Example: http://localhost:5000/betweenness_centrality?date=20210326
+@ app.route('/betweenness_centrality', methods=['GET'])
+def betweenness_centrality():
+    day = str(request.args.get('date', str(date.today()))).replace('-', '')
+    database_name = F"usergraph{day}"
     betweennes_centrality = neo4j_db_connector.get_betweenness_centrality(
         database_name)
     return jsonify(betweennes_centrality)
 
 
-# Example: http://localhost:5000/hits_centrality/testusergraph20210323
-@ app.route('/hits_centrality/<database_name>', methods=['GET'])
-def hits_centrality(database_name):
+# Example: http://localhost:5000/hits_centrality?date=20210326
+@ app.route('/hits_centrality', methods=['GET'])
+def hits_centrality():
+    day = str(request.args.get('date', str(date.today()))).replace('-', '')
+    database_name = F"usergraph{day}"
     hits_centrality, hitsIterations = neo4j_db_connector.get_hits_centrality(
         database_name)
     return jsonify({'centralities': hits_centrality, 'hitsIterations': hitsIterations})
