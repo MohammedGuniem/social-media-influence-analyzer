@@ -1,111 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <title>UiS - SMIA</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-</head>
-<body>
+  <head>
+    <title>UiS - SMIA</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Social Media Influence Analyzer</h2>
+      <p>This solution enables you to detect influence fields and identify Influencers in a social media network</p>
+      <form id="request_form" action="/graph" target="_blank">
+        <ul class="nav nav-tabs">
+          <li class="active">
+            <a onclick="$('#request_form').attr('action', 'graph')" data-toggle="tab" href="#graph">Graph</a>
+          </li>
+          <li>
+            <a onclick="$('#request_form').attr('action', 'path')" data-toggle="tab" href="#path">Path</a>
+          </li>
+          <li>
+            <a onclick="$('#request_form').attr('action', 'score')" data-toggle="tab" href="#score">Score</a>
+          </li>
+          <li>
+            <a onclick="$('#request_form').attr('action', 'field')" data-toggle="tab" href="#field">Field</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div id="graph" class="tab-pane fade in active">
+            <h3>Full Graph View</h3>
+          </div>
 
-<div class="container">
-  <h2>Social Media Influence Analyzer</h2>
-  <p>This solution enables you to detect influence fields and identify Influencers in a social media network</p>
+          <div id="path" class="tab-pane fade">
+            <h3>Influence Path(s) between two users</h3>
+            <div class="form-group">
+              <label for="source_name">From:</label>
+              <input type="text" class="form-control" id="source_name" placeholder="Source Username" name="source_name">
+            </div>
+            <div class="form-group">
+              <label for="target_name">To:</label>
+              <input type="text" class="form-control" id="target_name" placeholder="Target Username" name="target_name">
+            </div>
+          </div>
 
-  <ul class="nav nav-tabs">
-    <li class="active"><a data-toggle="tab" href="#graph">Graph</a></li>
-    <li><a data-toggle="tab" href="#path">Path</a></li>
-    <li><a data-toggle="tab" href="#score">Score</a></li>
-    <li><a data-toggle="tab" href="#field">Field</a></li>
-  </ul>
-
-  <div class="tab-content">
-    <div id="graph" class="tab-pane fade in active">
-      <h3>Full Graph View</h3>
-      <form action="/graph" target="_blank">
-        <div class="form-group">
-          <label for="date">Date:</label>
-          <input type="date" class="form-control" id="date" name="date" value="2021-03-26" data-date-format="YYYY-MM-DD">
-        </div>
-        <div class="form-group">
-          <label for="score_type">Score Type</label>
-          <select name="score_type" class="form-control" id="score_type">
-              <option value="all_influence_score">Total</option>
-              <option value="activity_influence_score">Activity</option>
-              <option value="connection_influence_score">Interaction</option>
-              <option value="upvotes_influence_score">Upvotes</option>
-              <option value="activity_and_upvotes_influence_score">Activity & Upvotes</option>
-              <option value="connection_and_activity_influence_score">Interaction & Activity</option>
-              <option value="connection_and_upvotes_influence_score">Interaction & Upvotes</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="centrality">Centrality Measure</label>
-          <select name="centrality" class="form-control" id="centrality">
-              <option value="degree" selected>Degree</option>
-              <option value="betweenness">Betweenness</option>
-              <option value="hits-hub">HITS hub</option>
-              <option value="hits-auth">HITS Auth</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <button type="submit" class="form-control btn btn-success">Submit</button>
-        </div>
-      </form>
-    </div>
-    <div id="path" class="tab-pane fade">
-      <h3>Influence Path(s) between two users</h3>
-      <form action="/path" target="_blank">
-        <div class="form-group">
-          <label for="source_name">From:</label>
-          <input type="text" class="form-control" id="source_name" placeholder="Source Username" name="source_name">
-        </div>
-        <div class="form-group">
-          <label for="target_name">To:</label>
-          <input type="text" class="form-control" id="target_name" placeholder="Target Username" name="target_name">
-        </div>
-        <div class="form-group">
-          <label for="date">Date:</label>
-          <input type="date" class="form-control" id="date" name="date" value="2021-03-26" data-date-format="YYYY-MM-DD">
-        </div>
-        <div class="form-group">
-          <label for="score_type">Score Type</label>
-          <select name="score_type" class="form-control" id="score_type">
-              <option value="all_influence_score">Total</option>
-              <option value="activity_influence_score">Activity</option>
-              <option value="connection_influence_score">Interaction</option>
-              <option value="upvotes_influence_score">Upvotes</option>
-              <option value="activity_and_upvotes_influence_score">Activity & Upvotes</option>
-              <option value="connection_and_activity_influence_score">Interaction & Activity</option>
-              <option value="connection_and_upvotes_influence_score">Interaction & Upvotes</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="centrality">Centrality Measure</label>
-          <select name="centrality" class="form-control" id="centrality">
-              <option value="degree" selected>Degree</option>
-              <option value="betweenness">Betweenness</option>
-              <option value="hits-hub">HITS hub</option>
-              <option value="hits-auth">HITS Auth</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <button type="submit" class="form-control btn btn-success">Submit</button>
-        </div>
-      </form>
-    </div>
-    <div id="score" class="tab-pane fade">
-      <h3>Filter by the desired lower and upper influence score</h3>
-      <form action="/score" target="_blank">
-        <div class="form-group">
-          <label for="min_score">From:</label>
-          <input type="number" class="form-control" id="min_score" placeholder="Lower Score Bound" name="min_score">
-        </div>
-        <div class="form-group">
-          <label for="max_score">To:</label>
-          <input type="number" class="form-control" id="max_score" placeholder="Upper Score Bound" name="max_score">
+          <div id="score" class="tab-pane fade">
+            <h3>Filter by the desired lower and upper influence score</h3>
+            <div class="form-group">
+              <label for="min_score">Lower Influence Score:</label>
+              <input type="number" class="form-control" id="min_score" placeholder="Lower Score Bound" name="min_score">
+            </div>
+            <div class="form-group">
+              <label for="max_score">Upper Influence Score</label>
+              <input type="number" class="form-control" id="max_score" placeholder="Upper Score Bound" name="max_score">
+            </div>
+          </div>
+          
+          <div id="field" class="tab-pane fade">
+            <h3>Filter by the desired predicted field of influence</h3>
+            <div class="form-group">
+              <label for="field_list">Field of Influence</label>
+              <p>(Hold down the Ctrl (windows) or Command (Mac) button to select multiple options)</p>
+              <select name="fields" class="form-control" id="field_list" multiple>
+                  <option value="politic">Politic</option>
+                  <option value="economy">Economy</option>
+                  <option value="sport">Sport</option>
+                  <option value="entertainment">Entertainment</option>
+                  <option value="technology">Technology</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="operation">Operation</label>
+              <select name="operation" class="form-control" id="operation">
+                <option value="OR" selected>OR</option>  
+                <option value="AND">AND</option>
+              </select>
+            </div>
+          </div>
         </div>
         <div class="form-group">
           <label for="date">Date:</label>
@@ -121,15 +92,15 @@
               <option value="activity_and_upvotes_influence_score">Activity & Upvotes</option>
               <option value="connection_and_activity_influence_score">Interaction & Activity</option>
               <option value="connection_and_upvotes_influence_score">Interaction & Upvotes</option>
-          </select>
+            </select>
         </div>
         <div class="form-group">
           <label for="centrality">Centrality Measure</label>
           <select name="centrality" class="form-control" id="centrality">
-              <option value="degree" selected>Degree</option>
-              <option value="betweenness">Betweenness</option>
-              <option value="hits-hub">HITS hub</option>
-              <option value="hits-auth">HITS Auth</option>
+            <option value="degree" selected>Degree</option>
+            <option value="betweenness">Betweenness</option>
+            <option value="hits-hub">HITS hub</option>
+            <option value="hits-auth">HITS Auth</option>
           </select>
         </div>
         <div class="form-group">
@@ -137,67 +108,5 @@
         </div>
       </form>
     </div>
-    <div id="field" class="tab-pane fade">
-      <h3>Filter by the desired predicted field of influence</h3>
-
-      <form action="/field" target="_blank">
-
-        <div class="form-group">
-          <label for="field_list">Field of Influence</label>
-          <p>(Hold down the Ctrl (windows) or Command (Mac) button to select multiple options)</p>
-          <select name="fields" class="form-control" id="field_list" multiple>
-              <option value="politic">Politic</option>
-              <option value="economy">Economy</option>
-              <option value="sport">Sport</option>
-              <option value="entertainment">Entertainment</option>
-              <option value="technology">Technology</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="operation">Operation</label>
-          <select name="operation" class="form-control" id="operation">
-            <option value="OR" selected>OR</option>  
-            <option value="AND">AND</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label for="date">Date:</label>
-          <input type="date" class="form-control" id="date" name="date" value="2021-03-26" data-date-format="YYYY-MM-DD">
-        </div>
-
-        <div class="form-group">
-          <label for="score_type">Score Type</label>
-          <select name="score_type" class="form-control" id="score_type">
-              <option value="all_influence_score">Total</option>
-              <option value="activity_influence_score">Activity</option>
-              <option value="connection_influence_score">Interaction</option>
-              <option value="upvotes_influence_score">Upvotes</option>
-              <option value="activity_and_upvotes_influence_score">Activity & Upvotes</option>
-              <option value="connection_and_activity_influence_score">Interaction & Activity</option>
-              <option value="connection_and_upvotes_influence_score">Interaction & Upvotes</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="centrality">Centrality Measure</label>
-          <select name="centrality" class="form-control" id="centrality">
-              <option value="degree" selected>Degree</option>
-              <option value="betweenness">Betweenness</option>
-              <option value="hits-hub">HITS hub</option>
-              <option value="hits-auth">HITS Auth</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <button type="submit" class="form-control btn btn-success">Submit</button>
-        </div>
-
-      </form>
-    </div>
-  </div>
-</div>
-
-</body>
+  </body>
 </html>
