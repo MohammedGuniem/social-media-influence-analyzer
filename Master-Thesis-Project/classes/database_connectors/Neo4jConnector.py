@@ -103,6 +103,15 @@ class GraphDBConnector:
 
     """ Reading methods """
 
+    def get_user_graphs(self):
+        with self.driver.session() as session:
+            query = (
+                "SHOW DATABASES WHERE name STARTS WITH 'usergraph'"
+            )
+            result = session.read_transaction(
+                self._get_available_user_graphs, query)
+            return result
+
     def get_graph(self, database):
         with self.driver.session(database=database) as session:
             query = (
@@ -276,3 +285,13 @@ class GraphDBConnector:
         for record in result:
             centrality[record['name']] = record['centrality']
         return centrality
+
+    @staticmethod
+    def _get_available_user_graphs(tx, query):
+        result = tx.run(query)
+        available_databases = []
+        for record in result:
+            db = record["name"].replace("usergraph", "")
+            db = db[0:4] + "-" + db[4:6] + "-" + db[6:8]
+            available_databases.append(db)
+        return available_databases

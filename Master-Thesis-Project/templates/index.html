@@ -35,11 +35,11 @@
           <div id="path" class="tab-pane fade">
             <h3>Influence Path(s) between two users</h3>
             <div class="form-group">
-              <label for="source_name">From:</label>
+              <label for="source_name">From Username:</label>
               <input type="text" class="form-control" id="source_name" placeholder="Source Username" name="source_name">
             </div>
             <div class="form-group">
-              <label for="target_name">To:</label>
+              <label for="target_name">To Username:</label>
               <input type="text" class="form-control" id="target_name" placeholder="Target Username" name="target_name">
             </div>
           </div>
@@ -79,20 +79,29 @@
           </div>
         </div>
         <div class="form-group">
-          <label for="date">Date:</label>
-          <input type="date" class="form-control" id="date" name="date" value="2021-03-26" data-date-format="YYYY-MM-DD">
+          <label for="score_type">Date:</label>
+          <select name="date" class="form-control" id="date">
+            {% for db_date in user_graphs %}
+              <option 
+              value="{{ db_date }}"
+              {% if loop.last %}
+                  selected
+              {% endif %}
+              >{{ db_date }}</option>
+            {% endfor %}
+          </select>
         </div>
         <div class="form-group">
           <label for="score_type">Score Type</label>
           <select name="score_type" class="form-control" id="score_type">
-              <option value="all_influence_score">Total</option>
+              <option value="all_influence_score" selected>Total</option>
               <option value="activity_influence_score">Activity</option>
               <option value="connection_influence_score">Interaction</option>
               <option value="upvotes_influence_score">Upvotes</option>
               <option value="activity_and_upvotes_influence_score">Activity & Upvotes</option>
               <option value="connection_and_activity_influence_score">Interaction & Activity</option>
               <option value="connection_and_upvotes_influence_score">Interaction & Upvotes</option>
-            </select>
+          </select>
         </div>
         <div class="form-group">
           <label for="centrality">Centrality Measure</label>

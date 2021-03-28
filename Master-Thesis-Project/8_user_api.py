@@ -61,7 +61,8 @@ def constructJSGraph(neo4j_graph, database_name, centrality, score_type):
 
 @app.route('/')
 def index():
-    return render_template("index.html")
+    user_graphs = neo4j_db_connector.get_user_graphs()
+    return render_template("index.html", user_graphs=user_graphs)
 
 
 # Example - GUI: http://localhost:5000/graph?date=20210326&score_type=all_influence_score&centrality=degree
