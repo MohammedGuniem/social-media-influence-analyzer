@@ -1,15 +1,15 @@
-from classes.statistics.CrawlingRegister import CrawlingRegister
-from classes.statistics.RunningTime import Timer
-from datetime import date
-from pathlib import Path
-import praw
-import json
+from classes.crawling.CrawlingRuntimeRegister import RuntimeRegister
+import time
 
 
 class TestCrawler:
 
+    def __init__(self):
+        self.runtime_register = RuntimeRegister("Test Network")
+
     # Method to crawl groups information.
     def getGroups(self):
+        start = time.time()
         dummy_groups = [
             {
                 "id": "Test",
@@ -20,10 +20,13 @@ class TestCrawler:
                 "display_name": "Test_2"
             }
         ]
+        self.runtime_register.groups_count = len(dummy_groups)
+        self.runtime_register.groups_crawling_time = time.time() - start
         return dummy_groups
 
     # Method to crawl submissions information.
     def getSubmissions(self):
+        start = time.time()
         dummy_submissions = [
             {
                 "id": "S_1",
@@ -62,10 +65,14 @@ class TestCrawler:
                 "upvotes": 7
             }
         ]
+        self.runtime_register.submissions_type = "New"
+        self.runtime_register.submissions_count = len(dummy_submissions)
+        self.runtime_register.submissions_crawling_time = time.time() - start
         return dummy_submissions
 
     # Method to crawl comments information.
     def getComments(self):
+        start = time.time()
         dummy_comments = [
             {
                 "id": "TC_1",
@@ -198,5 +205,6 @@ class TestCrawler:
                 "upvotes": 2
             }
         ]
-
+        self.runtime_register.comments_count = len(dummy_comments)
+        self.runtime_register.comments_crawling_time = time.time() - start
         return dummy_comments

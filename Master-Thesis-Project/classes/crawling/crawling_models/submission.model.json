@@ -1,9 +1,0 @@
-{
-  "id": "id",
-  "author_id": "author.id",
-  "author_name": "author.name",
-  "num_comments": "num_comments",
-  "subreddit_id": "subreddit.id",
-  "title": "title",
-  "upvotes": "score"
-}
