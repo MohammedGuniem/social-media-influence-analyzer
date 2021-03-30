@@ -29,7 +29,7 @@ topic_subreddits_mapping = {
 data = {"training_data": []}
 for category, subreddits in topic_subreddits_mapping.items():
     for subreddit in subreddits:
-        submissions = crawler.crawlSubmissions(
+        submissions = crawler.getSubmissions(
             subreddits=[{"display_name": subreddit}], submissions_type="New", submission_limit=100)
         for submission in submissions:
             data["training_data"].append({

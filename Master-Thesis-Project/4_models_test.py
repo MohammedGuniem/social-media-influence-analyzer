@@ -10,57 +10,36 @@ import os
 
 load_dotenv()
 
-# Reading documents from test .json file.
-with open("4_models_test_case.json", 'r') as model_file:
-    test = json.load(model_file)
-
-subreddits_display_names = []
-for subreddit in test["subreddits"]:
-    subreddits_display_names.append(subreddit['display_name'])
-
-test_id = test["id"]
-
-# Writing documents to mongoDB.
 mongo_db_connector = MongoDBConnector(
     os.environ.get('mongo_connnection_string'),
     collection_name=test_id
 )
 
-for docs in ["Subreddits", "Submissions", "Comments"]:
-    mongo_db_connector.writeToDB(
-        database_name="Subreddits_DB" if docs == "Subreddits" else F"Test_{docs}_DB",
-        collection_name=test_id,
-        data=test[docs.lower()]
-    )
-
-# Making a neo4j graph connector
 neo4j_db_connector = GraphDBConnector(
     uri=os.environ.get('neo4j_connection_string'),
     user=os.environ.get('neo4j_username'),
     password=os.environ.get('neo4j_password'),
 )
 
-for model_name in ["activitygraph", "usergraph"]:
-    if model_name == "activitygraph":
-        model = ActivityGraph(
-            mongo_db_connector=mongo_db_connector,
-            neo4j_db_connector=neo4j_db_connector
-        )
-    elif model_name == "usergraph":
+for model_name in ["usergraph", "activitygraph"]:
+    if model_name == "usergraph":
         model = UserGraph(
             mongo_db_connector=mongo_db_connector,
             neo4j_db_connector=neo4j_db_connector
         )
-    else:
-        import sys
-        sys.exit(0)
+    elif model_name == "activitygraph":
+        continue
+        model = ActivityGraph(
+            mongo_db_connector=mongo_db_connector,
+            neo4j_db_connector=neo4j_db_connector
+        )
 
     print(F"{model_name} Model >> Data feed from: {model.mongo_db_connector.collection_name}")
 
     print(F"{model_name} Model >> Building model with all possible scoring combinations...")
     for display_name in subreddits_display_names:
         model.build_model(subreddit_display_name=display_name,
-                          submission_type=test_id)
+                          submission_type="New")
 
     database_name = F"{test_id}{model_name}{str(date.today()).replace('-','')}"
     model.save(database_name)

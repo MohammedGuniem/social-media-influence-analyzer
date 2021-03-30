@@ -9,6 +9,27 @@ class Graph:
         self.nodes = {}
         self.edges = {}
 
+    def extract_score(self, edge_props):
+        return {'interaction': edge_props['interaction'],
+                'activity': edge_props['activity'],
+                'upvotes': edge_props['upvotes'],
+                'connection_and_activity': edge_props['connection_and_activity'],
+                'connection_and_upvotes': edge_props['connection_and_upvotes'],
+                'activity_and_upvotes': edge_props['activity_and_upvotes'],
+                'total': edge_props['total']}
+
+    def get_edge_scores(self, connection_weight, activity_weight, upvotes_weight):
+        edge_scores = {
+            "connection_influence_score": connection_weight,
+            "activity_influence_score": activity_weight,
+            "upvotes_influence_score": upvotes_weight,
+            "connection_and_activity_influence_score":  connection_weight + activity_weight,
+            "connection_and_upvotes_influence_score": connection_weight + upvotes_weight,
+            "activity_and_upvotes_influence_score": activity_weight + upvotes_weight,
+            "all_influence_score": connection_weight + activity_weight + upvotes_weight
+        }
+        return edge_scores
+
     def build_graph(self, submissions_types):
         self.nodes = {}
         self.edges = {}

@@ -124,60 +124,60 @@ class MongoDBConnector:
         data = self.readFromDB(database_name="admin")
         return data
 
-    def getSubredditInfo(self, display_name):
+    def getGroupInfo(self, network_name, display_name):
         data = self.readFromDB(
-            database_name="Subreddits_DB",
+            database_name=F"{network_name}_Groups_DB",
             query={"display_name": display_name},
             single=True
         )
         return data
 
-    def getSubredditsInfo(self):
-        data = self.readFromDB(database_name="Subreddits_DB")
+    def getGroups(self, network_name):
+        data = self.readFromDB(database_name=F"{network_name}_Groups_DB")
         return data
 
-    def getSubmissionsOnSubreddit(self, subreddit_id, Type):
+    def getSubmissionsOnGroup(self, network_name, submissions_type, group_id):
         data = self.readFromDB(
-            database_name=F"{Type}_Submissions_DB",
-            query={"subreddit_id": subreddit_id}
+            database_name=F"{network_name}_{submissions_type}_Submissions_DB",
+            query={"id": group_id}
         )
         return data
 
-    def getCommentsOnSubmission(self, submission_id, Type):
+    def getCommentsOnSubmission(self, network_name, submissions_type, submission_id):
         data = self.readFromDB(
-            database_name=F"{Type}_Comments_DB",
-            query={"submission_id": "t3_"+submission_id}
+            database_name=F"{network_name}_{submissions_type}_Comments_DB",
+            query={"submission_id": submission_id}
         )
         return data
 
-    def getCommentInfo(self, comment_id, Type):
+    def getCommentInfo(self, network_name, submissions_type, comment_id):
         data = self.readFromDB(
-            database_name=F"{Type}_Comments_DB",
+            database_name=F"{network_name}_{submissions_type}_Comments_DB",
             query={"id": comment_id},
             single=True
         )
         return data
 
-    def getCommentChildren(self, comment_id, Type):
+    def getCommentChildren(self, network_name, submissions_type, comment_id, Type):
         data = self.readFromDB(
-            database_name=F"{Type}_Comments_DB",
+            database_name=F"{network_name}_{submissions_type}_Comments_DB",
             query={"parent_id": F"t1_{comment_id}"}
         )
         return data
 
-    def get_children_count(self, comments_array, submission_type):
+    def getChildrenCount(self, network_name, submissions_type, comments_array):
         children_array = []
-        children_of_children_num = []
+        descendants = []
         for comment in comments_array:
             children = self.getCommentChildren(
-                comment_id=comment['id'], Type=submission_type)
+                network_name, submissions_type, comment_id=comment['id'])
 
             children_array += children
-            children_of_children_num.append(len(children))
+            descendants.append(len(children))
 
-        if sum(children_of_children_num) == 0:
+        if sum(descendants) == 0:
             return 0
         else:
-            score = sum(children_of_children_num) + self.get_children_count(
-                comments_array=children_array, submission_type=submission_type)
+            score = sum(descendants) + self.getChildrenCount(
+                network_name, submissions_type, comments_array=children_array)
         return score
