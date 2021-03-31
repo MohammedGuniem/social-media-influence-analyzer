@@ -79,10 +79,10 @@ class GraphDBConnector:
 
         # Constructing query
         query = ""
-        query += "MATCH (from:"+from_node['type'] + \
-            " { network_id: '"+from_node['id']+"' })\n"
-        query += "MATCH (to:"+to_node['type'] + \
-            " { network_id: '"+to_node['id']+"' })\n"
+        query += "MATCH (from:"+from_node.type + \
+            " { network_id: '"+from_node.id+"' })\n"
+        query += "MATCH (to:"+to_node.type + \
+            " { network_id: '"+to_node.id+"' })\n"
         query += "MERGE(from)-[r:"+edge_type+"]->(to)"
         query += "\nON CREATE SET\n"
         query += edge_props

@@ -68,7 +68,7 @@ class RedditCrawler:
                     "author_id": submission.author.id,
                     "author_name": submission.author.name,
                     "num_comments": submission.num_comments,
-                    "subreddit_id": submission.subreddit.id,
+                    "group_id": submission.subreddit.id,
                     "title": submission.title,
                     "upvotes": submission.score
                 }
@@ -88,6 +88,8 @@ class RedditCrawler:
         self.runtime_register.submissions_crawling_time = time.time() - start
 
         return all_submissions
+
+        # Method to crawl submissions from a certain subreddit
 
     # Method to crawl comments from a certain submission
     def getComments(self, submissions, submissions_type):
@@ -114,7 +116,7 @@ class RedditCrawler:
                     "comment_body": comment.body,
                     "parent_id": comment.parent_id,
                     "submission_id": comment.link_id,
-                    "subreddit_id": comment.subreddit_id,
+                    "group_id": comment.subreddit_id,
                     "upvotes": comment.score
                 }
 
@@ -132,3 +134,48 @@ class RedditCrawler:
         self.runtime_register.comments_crawling_time = time.time() - start
 
         return all_comments
+
+    # Method to crawl submissions titles used as training data for Text Classification and Influence area detection
+    def getSubmissionsTitles(self, subreddits, submissions_type, submission_limit):
+        start = time.time()
+
+        all_submissions = []
+
+        for subreddit in subreddits:
+
+            extracted_submissions_titles = []
+
+            subreddit_display_name = subreddit['display_name']
+            subreddit = self.redditCrawler.subreddit(subreddit_display_name)
+            if submissions_type == "New":
+                submissions = subreddit.new(limit=submission_limit)
+            elif submissions_type == "Hot":
+                submissions = subreddit.hot(limit=submission_limit)
+            elif submissions_type == "Top":
+                submissions = subreddit.top(limit=submission_limit)
+            elif submissions_type == "Rising":
+                submissions = subreddit.rising(limit=submission_limit)
+            else:
+                print(
+                    "You need to specify one of these 4 valid submission types ['New', 'Hot', 'Top', 'Rising']")
+                return "Error"
+
+            for submission in submissions:
+                if not hasattr(submission, 'title'):
+                    continue
+
+                extracted_submissions_titles.append(submission.title)
+
+            all_submissions += extracted_submissions_titles
+
+            print(
+                F"Subreddit: {subreddit_display_name}, crawled {len(extracted_submissions_titles)} submissions.")
+
+        print(
+            F"Total: crawled {len(all_submissions)} submissions.")
+
+        self.runtime_register.submissions_type = submissions_type
+        self.runtime_register.submissions_count = len(all_submissions)
+        self.runtime_register.submissions_crawling_time = time.time() - start
+
+        return all_submissions

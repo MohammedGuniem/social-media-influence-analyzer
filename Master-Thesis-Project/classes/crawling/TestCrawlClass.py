@@ -12,12 +12,12 @@ class TestCrawler:
         start = time.time()
         dummy_groups = [
             {
-                "id": "Test",
-                "display_name": "Test"
+                "id": "Test_1",
+                "display_name": "TestGroup1"
             },
             {
                 "id": "Test_2",
-                "display_name": "Test_2"
+                "display_name": "TestGroup2"
             }
         ]
         self.runtime_register.groups_count = len(dummy_groups)
@@ -33,7 +33,7 @@ class TestCrawler:
                 "author_id": "U_1",
                 "author_name": "User A",
                 "num_comments": 4,
-                "subreddit_id": "Test",
+                "group_id": "Test_1",
                 "title": "What's up?",
                 "upvotes": 10
             },
@@ -42,7 +42,7 @@ class TestCrawler:
                 "author_id": "U_2",
                 "author_name": "User B",
                 "num_comments": 3,
-                "subreddit_id": "Test",
+                "group_id": "Test_1",
                 "title": "What a lovely day!",
                 "upvotes": 3
             },
@@ -51,7 +51,7 @@ class TestCrawler:
                 "author_id": "U_3",
                 "author_name": "User C",
                 "num_comments": 5,
-                "subreddit_id": "Test",
+                "group_id": "Test_1",
                 "title": "Who likes icecream?",
                 "upvotes": 10
             },
@@ -60,7 +60,7 @@ class TestCrawler:
                 "author_id": "U_3",
                 "author_name": "User C",
                 "num_comments": 1,
-                "subreddit_id": "Test_2",
+                "group_id": "Test_2",
                 "title": "What a lovely day!",
                 "upvotes": 7
             }
@@ -81,7 +81,7 @@ class TestCrawler:
                 "comment_body": "not much",
                 "parent_id": "t3_S_1",
                 "submission_id": "t3_S_1",
-                "subreddit_id": "Test",
+                "group_id": "Test_1",
                 "upvotes": 7
             },
             {
@@ -91,7 +91,7 @@ class TestCrawler:
                 "comment_body": "ok",
                 "parent_id": "t1_TC_1",
                 "submission_id": "t3_S_1",
-                "subreddit_id": "Test",
+                "group_id": "Test_1",
                 "upvotes": 2
             },
             {
@@ -101,7 +101,7 @@ class TestCrawler:
                 "comment_body": "You want to play tennis?",
                 "parent_id": "t1_TC_1",
                 "submission_id": "t3_S_1",
-                "subreddit_id": "Test",
+                "group_id": "Test_1",
                 "upvotes": 3
             },
             {
@@ -111,7 +111,7 @@ class TestCrawler:
                 "comment_body": "Sure",
                 "parent_id": "t1_SC_2",
                 "submission_id": "t3_S_1",
-                "subreddit_id": "Test",
+                "group_id": "Test_1",
                 "upvotes": 8
             },
             {
@@ -121,7 +121,7 @@ class TestCrawler:
                 "comment_body": "amazing",
                 "parent_id": "t3_S_2",
                 "submission_id": "t3_S_2",
-                "subreddit_id": "Test",
+                "group_id": "Test_1",
                 "upvotes": 9
             },
             {
@@ -131,7 +131,7 @@ class TestCrawler:
                 "comment_body": "You want to go running?",
                 "parent_id": "t3_S_2",
                 "submission_id": "t3_S_2",
-                "subreddit_id": "Test",
+                "group_id": "Test_1",
                 "upvotes": 5
             },
             {
@@ -141,7 +141,7 @@ class TestCrawler:
                 "comment_body": "No, thanks",
                 "parent_id": "t1_TC_3",
                 "submission_id": "t3_S_2",
-                "subreddit_id": "Test",
+                "group_id": "Test_1",
                 "upvotes": 8
             },
             {
@@ -151,7 +151,7 @@ class TestCrawler:
                 "comment_body": "Not me",
                 "parent_id": "t3_S_3",
                 "submission_id": "t3_S_3",
-                "subreddit_id": "Test",
+                "group_id": "Test_2",
                 "upvotes": 7
             },
             {
@@ -161,7 +161,7 @@ class TestCrawler:
                 "comment_body": "me too",
                 "parent_id": "t3_S_3",
                 "submission_id": "t3_S_3",
-                "subreddit_id": "Test",
+                "group_id": "Test_2",
                 "upvotes": 5
             },
             {
@@ -171,7 +171,7 @@ class TestCrawler:
                 "comment_body": "I like cake",
                 "parent_id": "t3_S_3",
                 "submission_id": "t3_S_3",
-                "subreddit_id": "Test",
+                "group_id": "Test_2",
                 "upvotes": 10
             },
             {
@@ -181,7 +181,7 @@ class TestCrawler:
                 "comment_body": "that what i thought",
                 "parent_id": "t1_TC_5",
                 "submission_id": "t3_S_3",
-                "subreddit_id": "Test",
+                "group_id": "Test_2",
                 "upvotes": 3
             },
             {
@@ -191,7 +191,7 @@ class TestCrawler:
                 "comment_body": "you are a cool person",
                 "parent_id": "t1_TC_5",
                 "submission_id": "t3_S_3",
-                "subreddit_id": "Test",
+                "group_id": "Test_2",
                 "upvotes": 10
             },
             {
@@ -201,7 +201,7 @@ class TestCrawler:
                 "comment_body": "Yes it is",
                 "parent_id": "t3_S_4",
                 "submission_id": "t3_S_4",
-                "subreddit_id": "Test_2",
+                "group_id": "Test_2",
                 "upvotes": 2
             }
         ]

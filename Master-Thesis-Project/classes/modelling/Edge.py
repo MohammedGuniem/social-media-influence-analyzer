@@ -29,3 +29,12 @@ class Edge:
         scores['activity_and_upvotes'] += activity_score + upvotes_score
         scores['total'] += interaction_score + activity_score + upvotes_score
         self.scores = scores
+
+    def getProps(self):
+        props = {}
+        for score_name, score_value in self.scores.items():
+            props[score_name] = score_value
+        props["groups"] = list(set(self.group_names))
+        props["influence_areas"] = list(set(self.influence_areas))
+
+        return props

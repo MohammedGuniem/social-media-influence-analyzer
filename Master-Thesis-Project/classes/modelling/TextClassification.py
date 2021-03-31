@@ -8,7 +8,7 @@ import pandas as pd
 class TextClassifier:
     def __init__(self, mongo_db_connector):
         data = mongo_db_connector.readFromDB(database_name="Text_Classification_Training_Data", query={
-        }, single=True, collection_name="2021-03-09")
+        }, single=True)
         del data["_id"]
 
         data = pd.DataFrame(data["training_data"])
