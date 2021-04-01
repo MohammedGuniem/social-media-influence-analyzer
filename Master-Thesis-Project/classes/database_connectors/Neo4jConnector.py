@@ -74,7 +74,7 @@ class GraphDBConnector:
 
     @staticmethod
     def _create_or_update_edge(tx, from_node, to_node, edge_type, edge_props):
-        edge_type = F"{edge_type.upper()[0]}{edge_type.lower()[1:]}"
+        edge_type = F"{edge_type[0]}{edge_type[1:]}"
         edge_pointer = "r"
 
         # Constructing query

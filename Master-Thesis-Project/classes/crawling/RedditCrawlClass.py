@@ -69,7 +69,7 @@ class RedditCrawler:
                     "author_name": submission.author.name,
                     "num_comments": submission.num_comments,
                     "group_id": submission.subreddit.id,
-                    "title": submission.title,
+                    "body": submission.title,
                     "upvotes": submission.score
                 }
 
@@ -113,7 +113,7 @@ class RedditCrawler:
                     "id": comment.id,
                     "author_id": comment.author.id,
                     "author_name": comment.author.name,
-                    "comment_body": comment.body,
+                    "body": comment.body,
                     "parent_id": comment.parent_id,
                     "submission_id": comment.link_id,
                     "group_id": comment.subreddit_id,

@@ -1,5 +1,4 @@
 from classes.modelling.TextClassification import TextClassifier
-from classes.modelling.GraphModelling import Graph
 from classes.modelling.Node import Node
 from classes.modelling.Edge import Edge
 
@@ -58,7 +57,7 @@ class UserGraph:
 
             for submission in submissions:
                 influence_area = self.text_classifier.classify_title(
-                    submission['title'])
+                    submission['body'])
 
                 # add submission authors as nodes
                 self.addOrUpdateNode(
@@ -127,9 +126,10 @@ class UserGraph:
 
         # Saving edges in neo4j database graph.
         for edge in self.edges.values():
-            self.neo4j_db_connector.save_edge(
-                from_node=self.nodes[edge.from_node],
-                to_node=self.nodes[edge.to_node],
-                edge_type=edge.relation_type,
-                edge_props=edge.getProps()
-            )
+            if edge.from_node in self.nodes and edge.to_node in self.nodes:
+                self.neo4j_db_connector.save_edge(
+                    from_node=self.nodes[edge.from_node],
+                    to_node=self.nodes[edge.to_node],
+                    edge_type=edge.relation_type,
+                    edge_props=edge.getProps()
+                )
