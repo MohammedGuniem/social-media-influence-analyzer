@@ -193,7 +193,7 @@ class GraphDBConnector:
                      F"  relationshipWeightProperty: '{score_type}' "
                      "}) "
                      "YIELD nodeId, score "
-                     "RETURN gds.util.asNode(nodeId).name AS name, score/sum(r.all_influence_score) as centrality "
+                     "RETURN gds.util.asNode(nodeId).name AS name, score/sum(r.total) as centrality "
                      "ORDER BY centrality DESC "
                      )
             result = session.read_transaction(
@@ -263,14 +263,14 @@ class GraphDBConnector:
                     'target': end_node['network_id'],
                     'props': {
                         'influence_areas': relation_node['influence_areas'],
-                        'subreddits': relation_node['subreddits'],
-                        'connection_influence_score': relation_node['connection_influence_score'],
-                        'activity_influence_score': relation_node['activity_influence_score'],
-                        'upvotes_influence_score': relation_node['upvotes_influence_score'],
-                        'connection_and_activity_influence_score':  relation_node['connection_and_activity_influence_score'],
-                        'connection_and_upvotes_influence_score': relation_node['connection_and_upvotes_influence_score'],
-                        'activity_and_upvotes_influence_score': relation_node['activity_and_upvotes_influence_score'],
-                        'all_influence_score': relation_node['all_influence_score']
+                        'groups': relation_node['groups'],
+                        'interaction': relation_node['interaction'],
+                        'activity': relation_node['activity'],
+                        'upvotes': relation_node['upvotes'],
+                        'interaction_and_activity':  relation_node['interaction_and_activity'],
+                        'interaction_and_upvotes': relation_node['interaction_and_upvotes'],
+                        'activity_and_upvotes': relation_node['activity_and_upvotes'],
+                        'total': relation_node['total']
                     }
                 }
                 if relation not in links:
@@ -294,4 +294,5 @@ class GraphDBConnector:
             db = record["name"].replace("usergraph", "")
             db = db[0:4] + "-" + db[4:6] + "-" + db[6:8]
             available_databases.append(db)
+
         return available_databases

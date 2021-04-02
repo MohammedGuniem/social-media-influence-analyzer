@@ -26,6 +26,9 @@
           <li>
             <a onclick="$('#request_form').attr('action', 'field')" data-toggle="tab" href="#field">Field</a>
           </li>
+          <li>
+            <a onclick="$('#request_form').attr('action', 'activitygraph')" data-toggle="tab" href="#activitygraph">Activity Graph</a>
+          </li>
         </ul>
         <div class="tab-content">
           <div id="graph" class="tab-pane fade in active">
@@ -77,9 +80,14 @@
               </select>
             </div>
           </div>
+
+          <div id="activitygraph" class="tab-pane fade">
+            <h3>An activity graph views the submissions and its comments as trees</h3>
+          </div>
+
         </div>
         <div class="form-group">
-          <label for="score_type">Date:</label>
+          <label for="date">Date:</label>
           <select name="date" class="form-control" id="date">
             {% for db_date in user_graphs %}
               <option 
@@ -94,13 +102,13 @@
         <div class="form-group">
           <label for="score_type">Score Type</label>
           <select name="score_type" class="form-control" id="score_type">
-              <option value="all_influence_score" selected>Total</option>
-              <option value="activity_influence_score">Activity</option>
-              <option value="connection_influence_score">Interaction</option>
-              <option value="upvotes_influence_score">Upvotes</option>
-              <option value="activity_and_upvotes_influence_score">Activity & Upvotes</option>
-              <option value="connection_and_activity_influence_score">Interaction & Activity</option>
-              <option value="connection_and_upvotes_influence_score">Interaction & Upvotes</option>
+              <option value="total" selected>Total</option>
+              <option value="activity">Activity</option>
+              <option value="interaction">Interaction</option>
+              <option value="upvotes">Upvotes</option>
+              <option value="activity_and_upvotes">Activity & Upvotes</option>
+              <option value="interaction_and_activity">Interaction & Activity</option>
+              <option value="interaction_and_upvotes">Interaction & Upvotes</option>
           </select>
         </div>
         <div class="form-group">
