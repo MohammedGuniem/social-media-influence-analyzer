@@ -1,4 +1,6 @@
 from classes.modelling.TextClassification import TextClassifier
+from classes.modelling.Node import Node
+from classes.modelling.Edge import Edge
 
 
 class Graph:
@@ -9,33 +11,36 @@ class Graph:
         self.nodes = {}
         self.edges = {}
 
-    def build_graph(self, submissions_types):
-        self.nodes = {}
-        self.edges = {}
-        subreddits = self.mongo_db_connector.getSubredditsInfo()
+    def addOrUpdateEdge(self, from_node_id, relation_type, to_node_id, influence_area, group_name, interaction_score, activity_score, upvotes_score):
+        edge_id = F"{from_node_id}_{relation_type}_{to_node_id}"
+        if edge_id not in self.edges:
+            edge = Edge(from_node_id, relation_type,
+                        to_node_id, [], [], interaction_score, activity_score, upvotes_score)
+        else:
+            edge = self.edges[edge_id]
 
-        for submissions_type in submissions_types:
-            for subreddit in subreddits:
-                self.build_model(
-                    subreddit_display_name=subreddit["display_name"],
-                    submission_type=submissions_type
-                )
+        edge.influence_areas.append(influence_area)
+        edge.group_names.append(group_name)
+        edge.updateScore(interaction_score, activity_score, upvotes_score)
+
+        self.edges[edge_id] = edge
 
     def save(self, database_name):
         # Create or clear/replace database
         self.neo4j_db_connector.set_database(database_name)
 
         # Saving nodes in neo4j database graph.
-        for node_id, node in self.nodes.items():
+        for node in self.nodes.values():
             self.neo4j_db_connector.save_node(
-                node_id, node['type'], node['props']
+                node.id, node.type, node.props
             )
 
         # Saving edges in neo4j database graph.
-        for edge_id, edge in self.edges.items():
-            self.neo4j_db_connector.save_edge(
-                from_node=self.nodes[edge['from_node_id']],
-                to_node=self.nodes[edge['to_node_id']],
-                edge_type=edge['type'],
-                edge_props=edge['props']
-            )
+        for edge in self.edges.values():
+            if edge.from_node in self.nodes and edge.to_node in self.nodes:
+                self.neo4j_db_connector.save_edge(
+                    from_node=self.nodes[edge.from_node],
+                    to_node=self.nodes[edge.to_node],
+                    edge_type=edge.relation_type,
+                    edge_props=edge.getProps()
+                )
