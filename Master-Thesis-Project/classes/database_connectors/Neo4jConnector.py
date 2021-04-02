@@ -112,12 +112,12 @@ class GraphDBConnector:
                 self._get_available_user_graphs, query)
             return result
 
-    def get_graph(self, database):
+    def get_graph(self, database, relation_type):
         with self.driver.session(database=database) as session:
             query = (
                 "MATCH (n) "
                 "MATCH (m) "
-                "MATCH p=(n)-[:Influences*..]->(m) "
+                F"MATCH p=(n)-[:{relation_type}*..]->(m) "
                 "WITH *, relationships(p) AS relations "
                 "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
             )
@@ -183,7 +183,7 @@ class GraphDBConnector:
         with self.driver.session(database=database) as session:
             query = ("MATCH()-[r] -> () "
                      "CALL gds.alpha.degree.stream({ "
-                     "nodeProjection: 'Redditor', "
+                     "nodeProjection: 'Person', "
                      "relationshipProjection: { "
                      "  Influences: { "
                      "    type: 'Influences', "
@@ -205,7 +205,7 @@ class GraphDBConnector:
             query = ("MATCH p=shortestPath((n)-[:Influences* ..]->(m)) "
                      "WHERE n.name <> m.name "
                      "CALL gds.betweenness.stream({ "
-                     "  nodeProjection: 'Redditor', "
+                     "  nodeProjection: 'Person', "
                      "  relationshipProjection: 'Influences' "
                      "}) "
                      "YIELD nodeId, score "
@@ -223,7 +223,7 @@ class GraphDBConnector:
             while True:
                 query = ("CALL gds.alpha.hits.stream({ "
                          F"hitsIterations: {hitsIterations}, "
-                         "nodeProjection: 'Redditor',  "
+                         "nodeProjection: 'Person',  "
                          "relationshipProjection: 'Influences' "
                          "}) "
                          "YIELD nodeId, values "
@@ -253,8 +253,11 @@ class GraphDBConnector:
                 for this_node in [start_node, end_node]:
                     node = {}
                     node['id'] = this_node['network_id']
-                    node['props'] = {'name': this_node['name'],
-                                     'author_id': this_node['author_id']}
+                    node['props'] = {
+                        'type': this_node['type'],
+                        'name': this_node['name'],
+                        'author_id': this_node['author_id']
+                    }
                     if node not in nodes:
                         nodes.append(node)
 

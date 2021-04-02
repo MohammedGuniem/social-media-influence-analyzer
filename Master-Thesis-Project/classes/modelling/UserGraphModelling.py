@@ -14,6 +14,7 @@ class UserGraph(Graph):
                 ID=node_id,
                 Type=node_type,
                 Props={
+                    'type': node_type,
                     'network_id': node_id,
                     'name': activity_object['author_name'],
                     'author_id': activity_object["author_id"]
@@ -43,7 +44,7 @@ class UserGraph(Graph):
 
                 # add submission authors as nodes
                 self.addOrUpdateNode(
-                    activity_object=submission, node_type="Redditor")
+                    activity_object=submission, node_type="Person")
 
                 # Get all comments on submissions on this group
                 comments = self.mongo_db_connector.getCommentsOnSubmission(
@@ -82,7 +83,7 @@ class UserGraph(Graph):
 
                     # add comment authors as nodes
                     self.addOrUpdateNode(
-                        activity_object=comment, node_type="Redditor")
+                        activity_object=comment, node_type="Person")
 
                     # Draw influence relation between authors/commenters and child commenters
                     self.addOrUpdateEdge(

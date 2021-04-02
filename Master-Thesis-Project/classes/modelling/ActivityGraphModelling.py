@@ -14,6 +14,7 @@ class ActivityGraph(Graph):
                 ID=node_id,
                 Type=node_type,
                 Props={
+                    'type': node_type,
                     'network_id': node_id,
                     'name': F"{activity_object['author_name']} ({node_id})",
                     'author_id': activity_object["author_id"],

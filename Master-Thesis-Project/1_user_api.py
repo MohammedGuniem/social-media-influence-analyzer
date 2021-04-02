@@ -20,10 +20,13 @@ neo4j_db_connector = GraphDBConnector(
 
 
 def constructJSGraph(neo4j_graph, database_name, centrality, score_type):
-    if centrality == "betweenness":
+    if centrality == "degree":
+        centralities = neo4j_db_connector.get_degree_centrality(
+            database_name, score_type)
+    elif centrality == "betweenness":
         centralities = neo4j_db_connector.get_betweenness_centrality(
             database_name)
-    elif centrality.split("-")[0] == "hits":
+    elif centrality and centrality.split("-")[0] == "hits":
         hits_centralities, _ = neo4j_db_connector.get_hits_centrality(
             database_name)
         centralities = {}
@@ -31,8 +34,11 @@ def constructJSGraph(neo4j_graph, database_name, centrality, score_type):
         for k, v in hits_centralities.items():
             centralities[k] = hits_centralities[k][centrality.split("-")[1]]
     else:
-        centralities = neo4j_db_connector.get_degree_centrality(
-            database_name, score_type)
+        activity_colors = {
+            "Submission": "yellow",
+            "Top_comment": "red",
+            "Sub_comment": "blue"
+        }
 
     neo4j_nodes = neo4j_graph['nodes']
     neo4j_edges = neo4j_graph['links']
@@ -40,12 +46,21 @@ def constructJSGraph(neo4j_graph, database_name, centrality, score_type):
     js_graph = {"nodes": [], "edges": []}
 
     for node in neo4j_nodes:
-        js_graph["nodes"].append({
+        js_node = {
             "label": node['props']['name'],
             "id": node['id'],
-            "value": centralities[node['props']['name']],
-            "color": {"background": F"rgba(240, 52, 52, {centralities[node['props']['name']]})"}
-        })
+
+        }
+        if centrality:
+            js_node["value"] = centralities[node['props']['name']]
+            js_node["color"] = {
+                "background": F"rgba(240, 52, 52, {centralities[node['props']['name']]})"}
+        else:
+            js_node["value"] = 1
+            js_node["color"] = {
+                "background": activity_colors[node['props']['type']]}
+
+        js_graph["nodes"].append(js_node)
 
     for edge in neo4j_edges:
         js_graph["edges"].append({
@@ -80,7 +95,7 @@ def graph():
     else:
         database_name = "testusergraph"
 
-    neo4j_graph = neo4j_db_connector.get_graph(database_name)
+    neo4j_graph = neo4j_db_connector.get_graph(database_name, "Influences")
     if data_format == 'json':
         return jsonify(neo4j_graph)
     else:
@@ -89,13 +104,12 @@ def graph():
     return render_template("graph.html", data=js_graph)
 
 
-# Example - GUI: http://localhost:5000/activitygraph?date=20210402&score_type=total&centrality=degree
-# Example - JSON: http://localhost:5000/activitygraph?date=20210402&score_type=total&centrality=degree&format=json
+# Example - GUI: http://localhost:5000/activitygraph?date=20210402&score_type=total
+# Example - JSON: http://localhost:5000/activitygraph?date=20210402&score_type=total&format=json
 @app.route('/activitygraph')
 def activitygraph():
     data_format = request.args.get('format', None)
     day = request.args.get('date', None)
-    centrality = request.args.get('centrality', 'degree')
     score_type = request.args.get('score_type', "total")
 
     if day:
@@ -104,12 +118,12 @@ def activitygraph():
     else:
         database_name = "testactivitygraph"
 
-    neo4j_graph = neo4j_db_connector.get_graph(database_name)
+    neo4j_graph = neo4j_db_connector.get_graph(database_name, "Has")
     if data_format == 'json':
         return jsonify(neo4j_graph)
     else:
         js_graph = constructJSGraph(
-            neo4j_graph, database_name, centrality, score_type)
+            neo4j_graph, database_name, None, score_type)
     return render_template("graph.html", data=js_graph)
 
 
