@@ -119,3 +119,9 @@ class MongoDBConnector:
             score = sum(descendants) + self.getChildrenCount(
                 network_name, submissions_type, comments_array=children_array)
         return score
+
+    def getCrawlingRuntimes(self, network_name):
+        database = self.client["admin"]
+        collection = database["crawling_runtime_register"]
+        runtimes = list(collection.find({"network_name": network_name}))
+        return runtimes
