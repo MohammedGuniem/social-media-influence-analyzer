@@ -44,8 +44,7 @@ submissions_df.groupby("display_name")["display_name"].count().plot(
 neo4j_db_connector = GraphDBConnector(
     uri=os.environ.get('neo4j_connection_string'),
     user=os.environ.get('neo4j_username'),
-    password=os.environ.get('neo4j_password'),
-    database_name="testusergraph20210402"
+    password=os.environ.get('neo4j_password')
 )
 
 neo4j_graph = neo4j_db_connector.get_graph(
