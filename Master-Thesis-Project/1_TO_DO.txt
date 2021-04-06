@@ -1,1 +1,17 @@
 Next, make plots available through web user interface
+
+D:\Skole\DATMAS - Master Thesis\social-media-analysis\Master-Thesis-Project>python 1_analyze_crawling_runtime.py
+Enter the name of the crawled social network: Reddit
+Enter the type of the crawled submissions, leave empty to select all types: Rising
+Enter the start date from which you wish to show crawling log statistics, YYYY-MM-dd: 2021-02-02
+
+D:\Skole\DATMAS - Master Thesis\social-media-analysis\Master-Thesis-Project>python 1_analyze_influence_area.py
+Enter the name of the crawled social network: Reddit
+Enter the type of the crawled submissions: Rising
+Enter the date the neo4j user model was built in, YYYY-MM-dd: 2021-04-02
+
+D:\Skole\DATMAS - Master Thesis\social-media-analysis\Master-Thesis-Project>python 1_analyze_influence_score.py
+Enter the name of the crawled social network: Reddit
+Enter the type of the crawled submissions: Rising
+Enter the date the neo4j user model was built in, YYYY-MM-dd: 2021-04-02
+Enter target score type, leave empty to view all scores: total

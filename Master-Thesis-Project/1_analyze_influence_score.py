@@ -56,8 +56,11 @@ for score_type in score_types:
     links_df[F"{score_type}"].plot(
         kind="box",
         ax=axes[score_types.index(score_type)],
-        title=F"{score_type} score"
+        title=F"{score_type} score",
+        vert=False
     )
+    y_axis = axes[score_types.index(score_type)].axes.get_yaxis()
+    y_axis.set_visible(False)
 
     links_df[F"{score_type}"].plot(
         kind="hist",

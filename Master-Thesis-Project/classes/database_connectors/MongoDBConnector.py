@@ -120,9 +120,10 @@ class MongoDBConnector:
                 network_name, submissions_type, comments_array=children_array)
         return score
 
-    def getCrawlingRuntimes(self, network_name, submissions_type):
+    def getCrawlingRuntimes(self, network_name, submissions_type, from_date):
         query = {
-            "network_name": network_name
+            "network_name": network_name,
+            "timestamp": {"$gte": from_date}
         }
         if submissions_type:
             query["submissions_type"] = submissions_type
