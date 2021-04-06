@@ -21,7 +21,7 @@ MongoDB_connection_string = os.environ.get('mongo_connnection_string')
 mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
 
 data = mongo_db_connector.readFromDB(database_name="Text_Classification_Training_Data", query={
-}, single=True, collection_name="2021-03-09")
+}, single=True, collection_name="2021-03-31")
 del data["_id"]
 
 data = data["training_data"]
