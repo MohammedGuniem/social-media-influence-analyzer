@@ -1,84 +1,143 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-import math
+import datetime
+import time
 
 
 class Statistics:
-    def getSummaryStatistics(data_dict):
-        df = pd.DataFrame(data_dict)
+    def __init__(self):
+        pass
 
-        # Rename '50%' percentile to '50% - median' since it is the same.
-        summary_statistics = df.describe(
-            percentiles=[0.1, 0.25, 0.5, 0.75, 0.9]).rename(index={'50%': '50% - median'})
+    def getCrawlingRuntimes(self, mongo_db_connector, network_name, submissions_type, from_date):
+        from_date = time.mktime(datetime.datetime. strptime(
+            from_date, '%Y-%m-%d').timetuple())
 
-        # Calculate mode and append to statistics dataframe.
-        mode_statistics = df.mode().rename(index={0: 'mode'}).iloc[0]
-        summary_statistics = summary_statistics.append(mode_statistics)
+        runtimes = mongo_db_connector.getCrawlingRuntimes(
+            network_name, submissions_type, from_date)
 
-        # Calculate variance and append to statistics dataframe.
-        var_statistics = pd.DataFrame(
-            df.var()).transpose().rename(index={0: 'var'})
-        summary_statistics = summary_statistics.append(var_statistics)
+        runtimes_df = pd.DataFrame(runtimes)
+        runtimes_df["date"] = pd.to_datetime(
+            runtimes_df['timestamp'], unit='s')
+        runtimes_df['date'] = pd.to_datetime(
+            runtimes_df['date'], format="%d.%m.%y").astype(dtype="string")
 
-        return summary_statistics
+        runtimes_df.drop(['timestamp', '_id', 'network_name',
+                          'submissions_type'], axis=1, inplace=True)
 
-    def plot(x, y, xlabel="", ylabel="", legend=""):
-        x = np.array(x)
-        y = np.array(y)
-        plt.scatter(x, y, label="")
-        plt.xlabel(xlabel)
-        plt.ylabel(ylabel)
-        if legend:
-            plt.legend(loc=legend)
+        runtimes_df["per group"] = runtimes_df["groups_crawling_time"] / \
+            runtimes_df["groups_count"]
+        runtimes_df["per submission"] = runtimes_df["submissions_crawling_time"] / \
+            runtimes_df["submissions_count"]
+        runtimes_df["per comment"] = runtimes_df["comments_crawling_time"] / \
+            runtimes_df["comments_count"]
+
+        runtimes_df.set_index(runtimes_df['date'], inplace=True)
+        runtimes_df.rename(
+            columns={'groups_crawling_time': 'groups', 'submissions_crawling_time': 'submissions', 'comments_crawling_time': 'comments'}, inplace=True)
+
+        fig, axes = plt.subplots(1, 2)
+
+        runtimes_df[["date", "per group", "per submission", "per comment"]].plot(
+            kind="area", stacked=True, ax=axes[0], rot=90, fontsize=6, title="Average Crawling runtimes").set(ylabel='seconds')
+
+        runtimes_df[["date", "groups", "submissions", "comments"]].plot(
+            kind="area", stacked=True, ax=axes[1], rot=90, fontsize=6, title="Total Crawling runtimes").set(ylabel='seconds')
+
+        fig.suptitle('Crawling Runtimes Statistics')
+
         plt.show()
 
-    def line_plot(x, y, xlabel="", ylabel="", legend=""):
-        x = np.array(x)
-        y = np.array(y)
-        plt.plot(x, y)
-        plt.xlabel(xlabel)
-        plt.ylabel(ylabel)
-        plt.xlim(min(x)-0.01, max(x)+0.01)
-        plt.ylim(min(y)-0.01, max(y)+0.01)
+    def getInfluenceArea(self, mongo_db_connector, neo4j_db_connector, network_name, submissions_type, model_date):
+        groups = mongo_db_connector.getGroups(network_name)
+
+        submissions = []
+        for group in groups:
+            group_submissions = mongo_db_connector.getSubmissionsOnGroup(
+                network_name, submissions_type, group['id'])
+            submissions += group_submissions
+
+        groups_df = pd.DataFrame(groups).rename(
+            columns={'id': 'group_id'}).drop(['_id'], axis=1)
+
+        submissions_df = pd.DataFrame(submissions).drop(['_id'], axis=1)
+
+        submissions_df = pd.merge(submissions_df, groups_df,
+                                  how='outer', on=['group_id'])
+
+        fig, axes = plt.subplots(1, 3)
+
+        submissions_df.groupby("display_name")["display_name"].count().plot(
+            kind="pie", ax=axes[0], title="Crawled Groups", autopct='%1.1f%%').axis("off")
+
+        neo4j_graph = neo4j_db_connector.get_graph(
+            database=F"usergraph{model_date.replace('-','')}", relation_type="Influences")
+
+        groups = []
+        predicted_influence = []
+        for link in neo4j_graph["links"]:
+            predicted_influence += link["props"]["influence_areas"]
+            groups += link["props"]["groups"]
+
+        groups_df = pd.DataFrame(
+            groups, columns=["groups"])
+
+        groups_df.groupby("groups")[
+            "groups"].count().plot(kind="pie", ax=axes[1], title="Modelled Groups", autopct='%1.1f%%').axis("off")
+
+        predicted_influence_df = pd.DataFrame(
+            predicted_influence, columns=["predicted_influence"])
+
+        predicted_influence_df.groupby("predicted_influence")[
+            "predicted_influence"].count().plot(kind="pie", ax=axes[2], title="Predicted Influence Areas", autopct='%1.1f%%').axis("off")
+
+        fig.suptitle(
+            'Crawled Subreddits vs. Predicted Influence Area vs. Modelled Subreddits')
+
         plt.show()
 
-    def multi_line_plot(x, Y, optimal_x, optimal_y, optimal_label, plot_labels, xlabel="", ylabel="", xlim=[], ylim=[]):
-        for plot_index in range(0, len(Y), 1):
-            plt.plot(x, Y[plot_index],
-                     label=plot_labels[plot_index])
-        plt.plot(optimal_x, optimal_y,
-                 label=optimal_label)
+    def getInfluenceScore(self, neo4j_db_connector, network_name, submissions_type, model_date, score_type):
+        neo4j_graph = neo4j_db_connector.get_graph(
+            database=F"usergraph{model_date.replace('-','')}", relation_type="Influences")
 
-        plt.xlabel(xlabel)
-        plt.ylabel(ylabel)
-        if len(xlim) == 2:
-            plt.xlim(xlim[0], xlim[1])
-        if len(ylim) == 2:
-            plt.ylim(ylim[0], ylim[1])
-        plt.legend()
-        plt.show()
+        if score_type:
+            score_types = [score_type]
+            fig, axes = plt.subplots(2, 1)
+            fig.suptitle(F"Influence Scores Distribution using {score_type}")
+        else:
+            score_types = ["interaction", "activity", "upvotes", "interaction_and_activity",
+                           "activity_and_upvotes", "interaction_and_upvotes", "total"]
+            fig, axes = plt.subplots(2, 7, figsize=(24, 10))
+            fig.tight_layout(pad=4.0)
+            fig.suptitle("Influence Scores Distribution")
 
-    def subplot_histograms(data):
-        number_of_histograms = len(data.keys())
-        number_of_rows = 4
-        number_of_columns = math.ceil(number_of_histograms/number_of_rows)
+        axes = axes.ravel()
 
-        fig, axs = plt.subplots(number_of_rows, number_of_columns,
-                                sharey=True, tight_layout=True)
-        row_number = 0
-        column_number = 0
-        for key, value in data.items():
-            x = np.array(value)
-            possible_answers = len(set(x))
-            axs[row_number, column_number].hist(x, bins=np.arange(
-                min(x), max(x)+2, 1)-0.5, ec="k")
-            axs[row_number, column_number].set_title(key)
+        links = {}
+        for score_type in score_types:
+            links[F"{score_type}"] = []
+            for link in neo4j_graph["links"]:
+                links[F"{score_type}"].append(link['props'][F"{score_type}"])
 
-            if column_number == (number_of_columns-1):
-                column_number = 0
-                row_number += 1
-            else:
-                column_number += 1
+        links_df = pd.DataFrame(links)
+
+        for score_type in score_types:
+            links_df[F"{score_type}"].plot(
+                kind="box",
+                ax=axes[score_types.index(score_type)],
+                title=F"{score_type} score",
+                vert=False
+            )
+            y_axis = axes[score_types.index(score_type)].axes.get_yaxis()
+            y_axis.set_visible(False)
+
+            links_df[F"{score_type}"].plot(
+                kind="hist",
+                bins=links_df[F"{score_type}"].nunique(),
+                ax=axes[score_types.index(score_type)+len(score_types)],
+                title=F"{score_type} score",
+                xticks=links_df[F"{score_type}"],
+                rot=90
+            )
 
         plt.show()
