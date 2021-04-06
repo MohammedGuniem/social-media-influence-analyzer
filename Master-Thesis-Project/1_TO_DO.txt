@@ -1,1 +1,5 @@
-Next, make plots available through web user interface
+- Set training ML crawl inside 1_reddit_crawl.py
+- make neo4j models for different networks
+- clean in neo4j and mongo db database connectors
+- clean up in files and folders
+- make plots available through web user interface
