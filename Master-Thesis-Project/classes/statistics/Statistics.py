@@ -6,14 +6,15 @@ import time
 
 
 class Statistics:
-    def __init__(self):
-        pass
+    def __init__(self, mongo_db_connector, neo4j_db_connector):
+        self.mongo_db_connector = mongo_db_connector
+        self.neo4j_db_connector = neo4j_db_connector
 
-    def getCrawlingRuntimes(self, mongo_db_connector, network_name, submissions_type, from_date):
+    def getCrawlingRuntimes(self, network_name, submissions_type, from_date):
         from_date = time.mktime(datetime.datetime. strptime(
             from_date, '%Y-%m-%d').timetuple())
 
-        runtimes = mongo_db_connector.getCrawlingRuntimes(
+        runtimes = self.mongo_db_connector.getCrawlingRuntimes(
             network_name, submissions_type, from_date)
 
         runtimes_df = pd.DataFrame(runtimes)
@@ -48,12 +49,12 @@ class Statistics:
 
         plt.show()
 
-    def getInfluenceArea(self, mongo_db_connector, neo4j_db_connector, network_name, submissions_type, model_date):
-        groups = mongo_db_connector.getGroups(network_name)
+    def getInfluenceArea(self, network_name, submissions_type, model_date):
+        groups = self.mongo_db_connector.getGroups(network_name)
 
         submissions = []
         for group in groups:
-            group_submissions = mongo_db_connector.getSubmissionsOnGroup(
+            group_submissions = self.mongo_db_connector.getSubmissionsOnGroup(
                 network_name, submissions_type, group['id'])
             submissions += group_submissions
 
@@ -70,7 +71,7 @@ class Statistics:
         submissions_df.groupby("display_name")["display_name"].count().plot(
             kind="pie", ax=axes[0], title="Crawled Groups", autopct='%1.1f%%').axis("off")
 
-        neo4j_graph = neo4j_db_connector.get_graph(
+        neo4j_graph = self.neo4j_db_connector.get_graph(
             database=F"usergraph{model_date.replace('-','')}", relation_type="Influences")
 
         groups = []
@@ -96,8 +97,8 @@ class Statistics:
 
         plt.show()
 
-    def getInfluenceScore(self, neo4j_db_connector, network_name, submissions_type, model_date, score_type):
-        neo4j_graph = neo4j_db_connector.get_graph(
+    def getInfluenceScore(self, network_name, submissions_type, model_date, score_type):
+        neo4j_graph = self.neo4j_db_connector.get_graph(
             database=F"usergraph{model_date.replace('-','')}", relation_type="Influences")
 
         if score_type:
