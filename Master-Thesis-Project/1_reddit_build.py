@@ -9,14 +9,19 @@ import os
 
 load_dotenv()
 
+# Database connector
 mongo_db_connector = MongoDBConnector(
-    os.environ.get('mongo_connnection_string')
+    host=os.environ.get('mongo_db_host'),
+    port=int(os.environ.get('mongo_db_port')),
+    user=os.environ.get('mongo_db_user'),
+    passowrd=os.environ.get('mongo_db_pass')
 )
 
 neo4j_db_connector = GraphDBConnector(
-    uri=os.environ.get('neo4j_connection_string'),
-    user=os.environ.get('neo4j_username'),
-    password=os.environ.get('neo4j_password'),
+    host=os.environ.get('neo4j_db_host'),
+    port=int(os.environ.get('neo4j_db_port')),
+    user=os.environ.get('neo4j_db_user'),
+    password=os.environ.get('neo4j_db_pass'),
 )
 
 user_model = UserGraph(

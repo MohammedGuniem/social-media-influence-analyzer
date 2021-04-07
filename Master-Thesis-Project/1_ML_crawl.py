@@ -8,15 +8,14 @@ import os
 
 load_dotenv()
 
-client_id = os.environ.get('reddit_client_id')
-client_secret = os.environ.get('reddit_client_secret')
-user_agent = os.environ.get('reddit_user_agent')
-username = os.environ.get('reddit_username')
-password = os.environ.get('reddit_password')
-MongoDB_connection_string = os.environ.get('mongo_connnection_string')
-
+# Reddit crawler
 crawler = RedditCrawler(
-    client_id, client_secret, user_agent, username, password)
+    client_id=os.environ.get('reddit_client_id'),
+    client_secret=os.environ.get('reddit_client_secret'),
+    user_agent=os.environ.get('reddit_user_agent'),
+    username=os.environ.get('reddit_username'),
+    password=os.environ.get('reddit_password')
+)
 
 topic_subreddits_mapping = {
     "politic": ["politics", "PoliticsPeopleTwitter", "elections"],
@@ -39,8 +38,13 @@ for category, subreddits in topic_subreddits_mapping.items():
 
 print(F"\n#of titles {len(data)}")
 
-# Database connector
-mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
+# Mongo db database connector
+mongo_db_connector = MongoDBConnector(
+    host=os.environ.get('mongo_db_host'),
+    port=int(os.environ.get('mongo_db_port')),
+    user=os.environ.get('mongo_db_user'),
+    passowrd=os.environ.get('mongo_db_pass')
+)
 
 # Deleting test documents from mongoDB
 mongo_db_connector.remove_collection(

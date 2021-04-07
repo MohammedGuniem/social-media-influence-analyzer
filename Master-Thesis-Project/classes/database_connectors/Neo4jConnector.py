@@ -4,15 +4,30 @@ import json
 
 class GraphDBConnector:
 
-    def __init__(self, uri, user, password, database_name=""):
-        self.driver = GraphDatabase.driver(uri, auth=(user, password))
-        self.database = database_name
+    def __init__(self, host, port, user, password):
+        self.driver = GraphDatabase.driver(
+            F"bolt://{host}:{port}", auth=(user, password))
+        self.database = "neo4j"
+
+    def __del__(self):
+        self.driver.close()
 
     """ Writing methods """
 
-    def set_database(self, database_name):
-        self.database = database_name
-        self.create_or_replace_database(database_name)
+    def prepare_props(self, pointer, props):
+        props_query = ""
+        for key, prop in props.items():
+            props_query += pointer+"."+key.lower()
+            if isinstance(prop, list):
+                props_query += ' = '+str(prop).replace("'", '"')+',\n'
+            elif isinstance(prop, dict):
+                props_query += ' = "'+json.dumps(prop).replace('"', "'")+'",\n'
+            elif isinstance(prop, int):
+                props_query += ' = '+str(prop).replace('"', "'")+',\n'
+            else:
+                props_query += ' = "'+str(prop).replace('"', "'")+'",\n'
+        props_query = props_query[:-2]
+        return props_query
 
     def save_node(self, node_id, node_type, node_props):
         with self.driver.session(database=self.database) as session:
@@ -32,29 +47,6 @@ class GraphDBConnector:
 
             session.write_transaction(
                 self._create_or_update_edge, from_node, to_node, edge_type, edge_props)
-
-    def create_or_replace_database(self, database_name):
-        with self.driver.session() as session:
-            session.write_transaction(
-                self._create_or_replace_database, database_name)
-
-    def __del__(self):
-        self.driver.close()
-
-    def prepare_props(self, pointer, props):
-        props_query = ""
-        for key, prop in props.items():
-            props_query += pointer+"."+key.lower()
-            if isinstance(prop, list):
-                props_query += ' = '+str(prop).replace("'", '"')+',\n'
-            elif isinstance(prop, dict):
-                props_query += ' = "'+json.dumps(prop).replace('"', "'")+'",\n'
-            elif isinstance(prop, int):
-                props_query += ' = '+str(prop).replace('"', "'")+',\n'
-            else:
-                props_query += ' = "'+str(prop).replace('"', "'")+'",\n'
-        props_query = props_query[:-2]
-        return props_query
 
     @staticmethod
     def _create_or_update_node(tx, node_id, node_type, props):
@@ -88,15 +80,6 @@ class GraphDBConnector:
         query += edge_props
         query += "\nON MATCH SET\n"
         query += edge_props
-
-        # Sending query to DB
-        result = tx.run(query)
-
-    @staticmethod
-    def _create_or_replace_database(tx, database_name):
-
-        # Constructing query
-        query = F"CREATE OR REPLACE DATABASE {database_name}"
 
         # Sending query to DB
         result = tx.run(query)

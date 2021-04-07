@@ -16,8 +16,12 @@ import os
 load_dotenv()
 
 # Database connector
-MongoDB_connection_string = os.environ.get('mongo_connnection_string')
-mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
+mongo_db_host = os.environ.get('mongo_db_host')
+mongo_db_port = os.environ.get('mongo_db_port')
+mongo_db_user = os.environ.get('mongo_db_user')
+mongo_db_pass = os.environ.get('mongo_db_pass')
+mongo_db_connector = MongoDBConnector(
+    host=mongo_db_host, port=int(mongo_db_port), user=mongo_db_user, passowrd=mongo_db_pass)
 
 data = mongo_db_connector.readFromDB(database_name="Text_Classification_Training_Data", query={
 }, single=True, collection_name="2021-03-31")

@@ -9,9 +9,9 @@ load_dotenv()
 
 # Making a neo4j graph connector
 neo4j_db_connector = GraphDBConnector(
-    uri=os.environ.get('neo4j_connection_string'),
-    user=os.environ.get('neo4j_username'),
-    password=os.environ.get('neo4j_password'),
+    uri=os.environ.get('neo4j_db_connection_string'),
+    user=os.environ.get('neo4j_db_username'),
+    password=os.environ.get('neo4j_db_password'),
     database_name="testusergraph20210323"
 )
 

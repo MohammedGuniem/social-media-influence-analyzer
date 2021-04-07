@@ -4,8 +4,8 @@ import pymongo
 class MongoDBConnector:
     """ Connection initializer """
 
-    def __init__(self, connection_string):
-        with pymongo.MongoClient(connection_string) as self.client:
+    def __init__(self, host, port, user, passowrd):
+        with pymongo.MongoClient(host=host, port=port, username=user, password=passowrd, authSource='admin', authMechanism='SCRAM-SHA-256') as self.client:
             pass
 
     """ Collection validator """

@@ -6,19 +6,22 @@ import os
 
 load_dotenv()
 
-client_id = os.environ.get('reddit_client_id')
-client_secret = os.environ.get('reddit_client_secret')
-user_agent = os.environ.get('reddit_user_agent')
-username = os.environ.get('reddit_username')
-password = os.environ.get('reddit_password')
-MongoDB_connection_string = os.environ.get('mongo_connnection_string')
-
-# Database connector
-mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
+# Mongo db database connector
+mongo_db_connector = MongoDBConnector(
+    host=os.environ.get('mongo_db_host'),
+    port=int(os.environ.get('mongo_db_port')),
+    user=os.environ.get('mongo_db_user'),
+    passowrd=os.environ.get('mongo_db_pass')
+)
 
 # Reddit crawler
 crawler = RedditCrawler(
-    client_id, client_secret, user_agent, username, password)
+    client_id=os.environ.get('reddit_client_id'),
+    client_secret=os.environ.get('reddit_client_secret'),
+    user_agent=os.environ.get('reddit_user_agent'),
+    username=os.environ.get('reddit_username'),
+    password=os.environ.get('reddit_password')
+)
 
 # Name of social network to be crawled
 social_network_name = "Reddit"
@@ -27,11 +30,11 @@ social_network_name = "Reddit"
 submissions_type = "Rising"
 
 # Crawling groups
-groups = crawler.getGroups(top_n_subreddits=5)
+groups = crawler.getGroups(top_n_subreddits=1)
 
 # Crawling submissions
 submissions = crawler.getSubmissions(
-    subreddits=groups, submission_limit=5, submissions_type=submissions_type)
+    subreddits=groups, submission_limit=1, submissions_type=submissions_type)
 
 # Crawling Comments
 comments = crawler.getComments(submissions, submissions_type)

@@ -6,12 +6,15 @@ import os
 
 load_dotenv()
 
-MongoDB_connection_string = os.environ.get('mongo_connnection_string')
+# Mongo db database connector
+mongo_db_connector = MongoDBConnector(
+    host=os.environ.get('mongo_db_host'),
+    port=int(os.environ.get('mongo_db_port')),
+    user=os.environ.get('mongo_db_user'),
+    passowrd=os.environ.get('mongo_db_pass')
+)
 
-# Database connector
-mongo_db_connector = MongoDBConnector(MongoDB_connection_string)
-
-# Reddit crawler
+# Test crawler
 crawler = TestCrawler()
 
 # Name of social network to be crawled

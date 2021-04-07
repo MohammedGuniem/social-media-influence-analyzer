@@ -26,9 +26,6 @@ class Graph:
         self.edges[edge_id] = edge
 
     def save(self, database_name):
-        # Create or clear/replace database
-        self.neo4j_db_connector.set_database(database_name)
-
         # Saving nodes in neo4j database graph.
         for node in self.nodes.values():
             self.neo4j_db_connector.save_node(
