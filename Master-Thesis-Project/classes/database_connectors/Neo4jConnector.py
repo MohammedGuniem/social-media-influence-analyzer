@@ -190,7 +190,7 @@ class GraphDBConnector:
             return result
 
     def get_betweenness_centrality(self, database):
-        with self.driver.session(database=database) as session:
+        with self.driver.session(database=self.database) as session:
             query = ("MATCH p=shortestPath((n)-[:Influences* ..]->(m)) "
                      "WHERE n.name <> m.name "
                      "CALL gds.betweenness.stream({ "
@@ -206,7 +206,7 @@ class GraphDBConnector:
             return result
 
     def get_hits_centrality(self, database):
-        with self.driver.session(database=database) as session:
+        with self.driver.session(database=self.database) as session:
             hitsIterations = 5
             user_centrality = {}
             while True:

@@ -10,12 +10,12 @@ app = Flask(__name__)
 
 load_dotenv()
 
-# Making a neo4j graph connector
+# Neo4j users database connector
 neo4j_db_connector = GraphDBConnector(
-    uri=os.environ.get('neo4j_db_connection_string'),
-    user=os.environ.get('neo4j_db_username'),
-    password=os.environ.get('neo4j_db_password'),
-    database_name="testusergraph20210402"
+    host=os.environ.get('neo4j_users_db_host'),
+    port=int(os.environ.get('neo4j_users_db_port')),
+    user=os.environ.get('neo4j_users_db_user'),
+    password=os.environ.get('neo4j_users_db_pass'),
 )
 
 
@@ -80,22 +80,18 @@ def index():
     return render_template("index.html", user_graphs=user_graphs)
 
 
-# Example - GUI: http://localhost:5000/graph?date=20210402&score_type=total&centrality=degree
-# Example - JSON: http://localhost:5000/graph?date=20210402&score_type=total&centrality=degree&format=json
+# Example - GUI: http://localhost:5000/graph?date=2021-04-08&score_type=total&centrality=degree
+# Example - JSON: http://localhost:5000/graph?date=2021-04-08&score_type=total&centrality=degree&format=json
 @app.route('/graph')
 def graph():
     data_format = request.args.get('format', None)
-    day = request.args.get('date', None)
+    date = request.args.get('date', None)
     centrality = request.args.get('centrality', 'degree')
     score_type = request.args.get('score_type', "total")
 
-    if day:
-        day = str(day).replace('-', '')
-        database_name = F"usergraph{day}"
-    else:
-        database_name = "testusergraph"
+    neo4j_graph = neo4j_db_connector.get_graph(
+        network_name="Test", date=date, relation_type="Influences")
 
-    neo4j_graph = neo4j_db_connector.get_graph(database_name, "Influences")
     if data_format == 'json':
         return jsonify(neo4j_graph)
     else:
