@@ -8,7 +8,7 @@ import os
 
 load_dotenv()
 
-# Mongo db database connector
+# Mongo database connector
 mongo_db_connector = MongoDBConnector(
     host=os.environ.get('mongo_db_host'),
     port=int(os.environ.get('mongo_db_port')),
@@ -16,11 +16,12 @@ mongo_db_connector = MongoDBConnector(
     passowrd=os.environ.get('mongo_db_pass')
 )
 
+# Neo4j users database connector
 neo4j_db_connector = GraphDBConnector(
-    host=os.environ.get('neo4j_db_host'),
-    port=int(os.environ.get('neo4j_db_port')),
-    user=os.environ.get('neo4j_db_user'),
-    password=os.environ.get('neo4j_db_pass'),
+    host=os.environ.get('neo4j_users_db_host'),
+    port=int(os.environ.get('neo4j_users_db_port')),
+    user=os.environ.get('neo4j_users_db_user'),
+    password=os.environ.get('neo4j_users_db_pass'),
 )
 
 user_model = UserGraph(
@@ -35,6 +36,14 @@ user_model.save(
 
 print(
     F"User Graph: #nodes: {len(user_model.nodes)}, #edges: {len(user_model.edges)}")
+
+# Neo4j activities database connector
+neo4j_db_connector = GraphDBConnector(
+    host=os.environ.get('neo4j_activities_db_host'),
+    port=int(os.environ.get('neo4j_activities_db_port')),
+    user=os.environ.get('neo4j_activities_db_user'),
+    password=os.environ.get('neo4j_activities_db_pass'),
+)
 
 activity_model = ActivityGraph(
     mongo_db_connector=mongo_db_connector,
