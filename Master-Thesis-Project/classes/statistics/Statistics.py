@@ -72,7 +72,7 @@ class Statistics:
             kind="pie", ax=axes[0], title="Crawled Groups", autopct='%1.1f%%').axis("off")
 
         neo4j_graph = self.neo4j_db_connector.get_graph(
-            database=F"usergraph{model_date.replace('-','')}", relation_type="Influences")
+            network_name=network_name, date=model_date, relation_type="Influences")
 
         groups = []
         predicted_influence = []
@@ -99,7 +99,7 @@ class Statistics:
 
     def getInfluenceScore(self, network_name, submissions_type, model_date, score_type):
         neo4j_graph = self.neo4j_db_connector.get_graph(
-            database=F"usergraph{model_date.replace('-','')}", relation_type="Influences")
+            network_name=network_name, date=model_date, relation_type="Influences")
 
         if score_type:
             score_types = [score_type]

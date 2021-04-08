@@ -25,11 +25,15 @@ class Graph:
 
         self.edges[edge_id] = edge
 
-    def save(self, database_name):
+    def save(self, network_name, date):
         # Saving nodes in neo4j database graph.
         for node in self.nodes.values():
             self.neo4j_db_connector.save_node(
-                node.id, node.type, node.props
+                node_id=node.id,
+                node_type=node.type,
+                node_props=node.props,
+                network_name=network_name,
+                date=date
             )
 
         # Saving edges in neo4j database graph.
@@ -39,5 +43,7 @@ class Graph:
                     from_node=self.nodes[edge.from_node],
                     to_node=self.nodes[edge.to_node],
                     edge_type=edge.relation_type,
-                    edge_props=edge.getProps()
+                    edge_props=edge.getProps(),
+                    network_name=network_name,
+                    date=date
                 )

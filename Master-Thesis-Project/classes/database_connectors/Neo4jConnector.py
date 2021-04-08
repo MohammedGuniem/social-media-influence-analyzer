@@ -29,16 +29,16 @@ class GraphDBConnector:
         props_query = props_query[:-2]
         return props_query
 
-    def save_node(self, node_id, node_type, node_props):
+    def save_node(self, node_id, node_type, node_props, network_name, date):
         with self.driver.session(database=self.database) as session:
 
             # Preparing props for ON CREATE and On MATCH for update
             node_props = self.prepare_props(pointer="n", props=node_props)
 
             session.write_transaction(
-                self._create_or_update_node, node_id, node_type, node_props)
+                self._create_or_update_node, node_id, node_type, node_props, network_name, date)
 
-    def save_edge(self, from_node, to_node, edge_type, edge_props):
+    def save_edge(self, from_node, to_node, edge_type, edge_props, network_name, date):
         with self.driver.session(database=self.database) as session:
 
             # Preparing props for ON CREATE and On MATCH for update
@@ -46,16 +46,17 @@ class GraphDBConnector:
                 pointer="r", props=edge_props)
 
             session.write_transaction(
-                self._create_or_update_edge, from_node, to_node, edge_type, edge_props)
+                self._create_or_update_edge, from_node, to_node, edge_type, edge_props, network_name, date)
 
     @staticmethod
-    def _create_or_update_node(tx, node_id, node_type, props):
+    def _create_or_update_node(tx, node_id, node_type, props, network_name, date):
         node_type = node_type.upper()[0] + node_type.lower()[1:]
         pointer = "n"
 
         # Constructing query
         query = "MERGE ("+pointer+":"+node_type + \
-            " {network_id: '"+node_id+"'})"
+            " {network_id: '"+node_id+"', network: '" + \
+                network_name+"', date: '"+date+"'})"
         query += "\nON CREATE SET\n"
         query += props
         query += "\nON MATCH SET\n"
@@ -65,16 +66,18 @@ class GraphDBConnector:
         result = tx.run(query)
 
     @staticmethod
-    def _create_or_update_edge(tx, from_node, to_node, edge_type, edge_props):
+    def _create_or_update_edge(tx, from_node, to_node, edge_type, edge_props, network_name, date):
         edge_type = F"{edge_type[0]}{edge_type[1:]}"
         edge_pointer = "r"
 
         # Constructing query
         query = ""
         query += "MATCH (from:"+from_node.type + \
-            " { network_id: '"+from_node.id+"' })\n"
+            " { network_id: '"+from_node.id+"', network: '" + \
+            network_name+"', date: '"+date+"' })\n"
         query += "MATCH (to:"+to_node.type + \
-            " { network_id: '"+to_node.id+"' })\n"
+            " { network_id: '"+to_node.id+"', network: '" + \
+            network_name+"', date: '"+date+"'  })\n"
         query += "MERGE(from)-[r:"+edge_type+"]->(to)"
         query += "\nON CREATE SET\n"
         query += edge_props
@@ -95,11 +98,11 @@ class GraphDBConnector:
                 self._get_available_user_graphs, query)
             return result
 
-    def get_graph(self, database, relation_type):
-        with self.driver.session(database=database) as session:
+    def get_graph(self, network_name, date, relation_type):
+        with self.driver.session(database=self.database) as session:
             query = (
-                "MATCH (n) "
-                "MATCH (m) "
+                "MATCH (n {network: '"+network_name+"', date: '"+date+"'}) "
+                "MATCH (m {network: '"+network_name+"', date: '"+date+"'}) "
                 F"MATCH p=(n)-[:{relation_type}*..]->(m) "
                 "WITH *, relationships(p) AS relations "
                 "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
@@ -108,11 +111,13 @@ class GraphDBConnector:
                 self._read_graph, query)
             return result
 
-    def get_path(self, from_name, to_name, database):
-        with self.driver.session(database=database) as session:
+    def get_path(self, network_name, date, from_name, to_name, database):
+        with self.driver.session(database=self.database) as session:
             query = (
-                "MATCH (n {name: '"+from_name + "'}) "
-                "MATCH (m {name: '"+to_name + "'}) "
+                "MATCH (n {name: '"+from_name + "', network: '" +
+                network_name+"', date: '"+date+"'}) "
+                "MATCH (m {name: '"+to_name + "', network: '" +
+                network_name+"', date: '"+date+"'}) "
                 "MATCH p=(n)-[:Influences* ..]->(m) "
                 "WITH *, relationships(p) AS relations "
                 "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
@@ -122,16 +127,16 @@ class GraphDBConnector:
                 self._read_graph, query)
             return result
 
-    def filter_by_score(self, score_type, lower_score, upper_score, database):
-        with self.driver.session(database=database) as session:
+    def filter_by_score(self, network_name, date, score_type, lower_score, upper_score, database):
+        with self.driver.session(database=self.database) as session:
             lower, upper = "", ""
             if isinstance(lower_score, int):
                 lower = F"{lower_score} <="
             if isinstance(upper_score, int):
                 upper = F"<= {upper_score}"
             query = (
-                "MATCH (n) "
-                "MATCH (m) "
+                "MATCH (n {network: '"+network_name+"', date: '"+date+"'}) "
+                "MATCH (m {network: '"+network_name+"', date: '"+date+"'})) "
                 "MATCH p=(n)-[r]->(m) "
                 F"WHERE {lower} toInteger(r.{score_type}) {upper} "
                 "WITH *, relationships(p) AS relations "
@@ -141,8 +146,8 @@ class GraphDBConnector:
                 self._read_graph, query)
             return result
 
-    def filter_by_influence_area(self, areas_array, operation, database):
-        with self.driver.session(database=database) as session:
+    def filter_by_influence_area(self, network_name, date, areas_array, operation, database):
+        with self.driver.session(database=self.database) as session:
             if len(areas_array) > 0:
                 filters = []
                 for area in areas_array:
@@ -151,19 +156,20 @@ class GraphDBConnector:
             else:
                 return
 
-            query = ("MATCH(n) "
-                     "MATCH (m) "
-                     "MATCH p=(n)-[r]->(m) "
-                     F"WHERE {filter_syntax} "
-                     "WITH *, relationships(p) AS relations "
-                     "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
-                     )
+            query = (
+                "MATCH (n {network: '"+network_name+"', date: '"+date+"'}) "
+                "MATCH (m {network: '"+network_name+"', date: '"+date+"'}) "
+                "MATCH p=(n)-[r]->(m) "
+                F"WHERE {filter_syntax} "
+                "WITH *, relationships(p) AS relations "
+                "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
+            )
             result = session.read_transaction(
                 self._read_graph, query)
             return result
 
-    def get_degree_centrality(self, database, score_type):
-        with self.driver.session(database=database) as session:
+    def get_degree_centrality(self, network_name, date, database, score_type):
+        with self.driver.session(database=self.database) as session:
             query = ("MATCH()-[r] -> () "
                      "CALL gds.alpha.degree.stream({ "
                      "nodeProjection: 'Person', "

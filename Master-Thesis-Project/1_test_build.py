@@ -3,6 +3,7 @@ from classes.database_connectors.Neo4jConnector import GraphDBConnector
 from classes.modelling.ActivityGraphModelling import ActivityGraph
 from classes.modelling.UserGraphModelling import UserGraph
 from dotenv import load_dotenv
+from datetime import date
 import json
 import os
 
@@ -31,8 +32,8 @@ user_model = UserGraph(
 
 user_model.build(network_name="Test", submissions_type="New")
 
-user_model.save(
-    database_name=F"testusergraph")
+# date=str(date.today()))
+user_model.save(network_name="Test", date="2021-04-09")
 
 print(
     F"User Graph: #nodes: {len(user_model.nodes)}, #edges: {len(user_model.edges)}")
@@ -52,8 +53,8 @@ activity_model = ActivityGraph(
 
 activity_model.build(network_name="Test", submissions_type="New")
 
-activity_model.save(
-    database_name=F"testactivitygraph")
+# date=str(date.today()))
+activity_model.save(network_name="Test", date="2021-04-09")
 
 print(
     F"Activity Graph: #nodes: {len(activity_model.nodes)}, #edges: {len(activity_model.edges)}")
