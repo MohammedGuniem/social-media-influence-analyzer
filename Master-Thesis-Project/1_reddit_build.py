@@ -9,7 +9,7 @@ import os
 
 load_dotenv()
 
-# Database connector
+# Mongo database connector
 mongo_db_connector = MongoDBConnector(
     host=os.environ.get('mongo_db_host'),
     port=int(os.environ.get('mongo_db_port')),
@@ -32,7 +32,8 @@ user_model = UserGraph(
 
 user_model.build(network_name="Reddit", submissions_type="Rising")
 
-user_model.save(database_name=F"usergraph{str(date.today()).replace('-','')}")
+user_model.save(graph_type="user_graph",
+                network_name="Reddit", date=str(date.today()))
 
 print(
     F"User Graph: #nodes: {len(user_model.nodes)}, #edges: {len(user_model.edges)}")
@@ -52,8 +53,8 @@ activity_model = ActivityGraph(
 
 activity_model.build(network_name="Reddit", submissions_type="Rising")
 
-activity_model.save(
-    database_name=F"activitygraph{str(date.today()).replace('-','')}")
+activity_model.save(graph_type="activity_graph",
+                    network_name="Reddit", date=str(date.today()))
 
 print(
     F"Activity Graph: #nodes: {len(activity_model.nodes)}, #edges: {len(activity_model.edges)}")

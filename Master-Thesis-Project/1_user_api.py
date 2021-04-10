@@ -19,43 +19,29 @@ neo4j_db_connector = GraphDBConnector(
 )
 
 
-def constructJSGraph(neo4j_graph, database_name, centrality, score_type):
-    if centrality == "degree":
-        centralities = neo4j_db_connector.get_degree_centrality(
-            database_name, score_type)
-    elif centrality == "betweenness":
-        centralities = neo4j_db_connector.get_betweenness_centrality(
-            database_name)
-    elif centrality and centrality.split("-")[0] == "hits":
-        hits_centralities, _ = neo4j_db_connector.get_hits_centrality(
-            database_name)
-        centralities = {}
-
-        for k, v in hits_centralities.items():
-            centralities[k] = hits_centralities[k][centrality.split("-")[1]]
-    else:
-        activity_colors = {
-            "Submission": "yellow",
-            "Top_comment": "red",
-            "Sub_comment": "blue"
-        }
-
+def constructJSGraph(neo4j_graph, graph_type, score_type, centrality_max):
     neo4j_nodes = neo4j_graph['nodes']
     neo4j_edges = neo4j_graph['links']
 
     js_graph = {"nodes": [], "edges": []}
 
+    # For activity graph
+    activity_colors = {
+        "Submission": "yellow",
+        "Top_comment": "red",
+        "Sub_comment": "blue"
+    }
+
     for node in neo4j_nodes:
         js_node = {
             "label": node['props']['name'],
             "id": node['id'],
-
         }
-        if centrality:
-            js_node["value"] = centralities[node['props']['name']]
+        if graph_type == "user_graph":
+            js_node["value"] = node['props']['degree_centrality']
             js_node["color"] = {
-                "background": F"rgba(240, 52, 52, {centralities[node['props']['name']]})"}
-        else:
+                "background": F"rgba(240, 52, 52, {node['props']['degree_centrality']/centrality_max})"}
+        elif graph_type == "activity_graph":
             js_node["value"] = 1
             js_node["color"] = {
                 "background": activity_colors[node['props']['type']]}
@@ -80,29 +66,32 @@ def index():
     return render_template("index.html", user_graphs=user_graphs)
 
 
-# Example - GUI: http://localhost:5000/graph?date=2021-04-08&score_type=total&centrality=degree
-# Example - JSON: http://localhost:5000/graph?date=2021-04-08&score_type=total&centrality=degree&format=json
-@app.route('/graph')
-def graph():
+# Example - GUI: http://localhost:5000/graph?graph=Test_2021-04-10&score_type=total&centrality=betweenness
+# Example - JSON: http://localhost:5000/graph?graph=Test_2021-04-10&score_type=total&format=json&centrality=betweenness
+@app.route('/user_graph')
+def user_graph():
     data_format = request.args.get('format', None)
-    date = request.args.get('date', None)
-    centrality = request.args.get('centrality', 'degree')
     score_type = request.args.get('score_type', "total")
-
-    neo4j_graph = neo4j_db_connector.get_graph(
-        network_name="Test", date=date, relation_type="Influences")
+    centrality = request.args.get('centrality', 'degree')
+    graph = request.args.get('graph', None).split("_")
+    neo4j_graph, centralities_max = neo4j_db_connector.get_graph(
+        network_name=graph[0], date=graph[1], relation_type="Influences")
 
     if data_format == 'json':
         return jsonify(neo4j_graph)
     else:
         js_graph = constructJSGraph(
-            neo4j_graph, database_name, centrality, score_type)
+            neo4j_graph=neo4j_graph,
+            graph_type="user_graph",
+            score_type=score_type,
+            centrality_max=centralities_max[centrality]
+        )
     return render_template("graph.html", data=js_graph)
 
 
-# Example - GUI: http://localhost:5000/activitygraph?date=20210402&score_type=total
-# Example - JSON: http://localhost:5000/activitygraph?date=20210402&score_type=total&format=json
-@app.route('/activitygraph')
+# Example - GUI: http://localhost:5000/activity_graph?date=20210402&score_type=total
+# Example - JSON: http://localhost:5000/activity_graph?date=20210402&score_type=total&format=json
+@app.route('/activity_graph')
 def activitygraph():
     data_format = request.args.get('format', None)
     day = request.args.get('date', None)
@@ -191,14 +180,15 @@ def field():
     return render_template("graph.html", data=js_graph)
 
 
-# Example: http://localhost:5000/degree_centrality?date=20210402&score_type=total
+# Example: http://localhost:5000/degree_centrality?network_date=Test_2021-04-08&score_type=total
 @ app.route('/degree_centrality', methods=['GET'])
 def degree_centrality():
+    network_date = request.args.get('network_date', None).split("_")
+    network_name = network_date[0]
+    date = network_date[1]
     score_type = request.args.get('score_type', 'total')
-    day = str(request.args.get('date', str(date.today()))).replace('-', '')
-    database_name = F"usergraph{day}"
     degree_centrality = neo4j_db_connector.get_degree_centrality(
-        database_name, score_type)
+        network_name, date, score_type)
     return jsonify(degree_centrality)
 
 

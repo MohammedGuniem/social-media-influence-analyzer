@@ -32,8 +32,8 @@ user_model = UserGraph(
 
 user_model.build(network_name="Test", submissions_type="New")
 
-# date=str(date.today()))
-user_model.save(network_name="Test", date="2021-04-09")
+user_model.save(graph_type="user_graph",
+                network_name="Test", date=str(date.today()))
 
 print(
     F"User Graph: #nodes: {len(user_model.nodes)}, #edges: {len(user_model.edges)}")
@@ -53,8 +53,8 @@ activity_model = ActivityGraph(
 
 activity_model.build(network_name="Test", submissions_type="New")
 
-# date=str(date.today()))
-activity_model.save(network_name="Test", date="2021-04-09")
+activity_model.save(graph_type="activity_graph",
+                    network_name="Test", date=str(date.today()))
 
 print(
     F"Activity Graph: #nodes: {len(activity_model.nodes)}, #edges: {len(activity_model.edges)}")

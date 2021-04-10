@@ -136,7 +136,7 @@ class RedditCrawler:
         return all_comments
 
     # Method to crawl submissions titles used as training data for Text Classification and Influence area detection
-    def getSubmissionsTitles(self, subreddits, submissions_type, submission_limit):
+    def getSubmissionsTitles(self, subreddits, submissions_type, submissions_limit):
         start = time.time()
 
         all_submissions = []
@@ -148,13 +148,13 @@ class RedditCrawler:
             subreddit_display_name = subreddit['display_name']
             subreddit = self.redditCrawler.subreddit(subreddit_display_name)
             if submissions_type == "New":
-                submissions = subreddit.new(limit=submission_limit)
+                submissions = subreddit.new(limit=submissions_limit)
             elif submissions_type == "Hot":
-                submissions = subreddit.hot(limit=submission_limit)
+                submissions = subreddit.hot(limit=submissions_limit)
             elif submissions_type == "Top":
-                submissions = subreddit.top(limit=submission_limit)
+                submissions = subreddit.top(limit=submissions_limit)
             elif submissions_type == "Rising":
-                submissions = subreddit.rising(limit=submission_limit)
+                submissions = subreddit.rising(limit=submissions_limit)
             else:
                 print(
                     "You need to specify one of these 4 valid submission types ['New', 'Hot', 'Top', 'Rising']")
@@ -179,3 +179,24 @@ class RedditCrawler:
         self.runtime_register.submissions_crawling_time = time.time() - start
 
         return all_submissions
+
+    def getInfluenceAreaTrainingData(self, submissions_limit):
+        topic_subreddits_mapping = {
+            "politic": ["politics", "PoliticsPeopleTwitter", "elections"],
+            "economy": ["Economics", "economy", "business"],
+            "sport": ["sports", "olympics", "worldcup"],
+            "entertainment": ["movies", "comedy", "culture"],
+            "technology": ["technology", "science", "Futurology"]
+        }
+
+        data = {"training_data": []}
+        for category, subreddits in topic_subreddits_mapping.items():
+            for subreddit in subreddits:
+                submissions = self.getSubmissionsTitles(
+                    subreddits=[{"display_name": subreddit}], submissions_type="New", submissions_limit=submissions_limit)
+                for submission_title in submissions:
+                    data["training_data"].append({
+                        "title": submission_title,
+                        "label": category
+                    })
+        return data

@@ -25,7 +25,7 @@ class Graph:
 
         self.edges[edge_id] = edge
 
-    def save(self, network_name, date):
+    def save(self, graph_type, network_name, date):
         # Saving nodes in neo4j database graph.
         for node in self.nodes.values():
             self.neo4j_db_connector.save_node(
@@ -47,3 +47,9 @@ class Graph:
                     network_name=network_name,
                     date=date
                 )
+
+        # Calculate centralitites for user graph nodes
+        if graph_type == "user_graph":
+            for centrality in ["degree_centrality", "betweenness_centrality", "hits_centrality_"]:
+                self.neo4j_db_connector.calculate_centrality(
+                    network_name=network_name, date=date, centrality=centrality)

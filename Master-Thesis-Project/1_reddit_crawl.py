@@ -30,14 +30,18 @@ social_network_name = "Reddit"
 submissions_type = "Rising"
 
 # Crawling groups
-groups = crawler.getGroups(top_n_subreddits=1)
+groups = crawler.getGroups(top_n_subreddits=3)
 
 # Crawling submissions
 submissions = crawler.getSubmissions(
-    subreddits=groups, submission_limit=1, submissions_type=submissions_type)
+    subreddits=groups, submission_limit=3, submissions_type=submissions_type)
 
 # Crawling Comments
 comments = crawler.getComments(submissions, submissions_type)
+
+# Fetching training submission titles to determine influence area using machine learning
+training_data = crawler.getInfluenceAreaTrainingData(
+    submissions_limit=100)
 
 collection_name = str(date.today())
 
@@ -61,6 +65,10 @@ mongo_db_connector.writeToDB(
     collection_name=collection_name,
     data=comments
 )
+
+# Writing training submission titles to determine influence area using machine learning
+mongo_db_connector.writeToDB(database_name="Text_Classification_Training_Data",
+                             collection_name=str(date.today()), data=[training_data])
 
 # Fetching the registered runtimes from this crawling run
 runtime_register = crawler.runtime_register.getRunningTime()

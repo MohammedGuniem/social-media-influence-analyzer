@@ -1,7 +1,17 @@
+doing
+- store and retreive centralities
+- view graphs in a proper way on the user api
+- Reddit Graph takes very long time to retreive, find solution
+
+to do
 - change text in test data to refelect different topics
 - Remove the multiple database functionality and store all models in one database
-- Set training ML crawl inside 1_reddit_crawl.py
 - make neo4j models for different networks
 - clean in neo4j and mongo db database connectors
 - clean up in files and folders
 - make plots available through web user interface
+- add try catch and logging files
+- add props on node click in js
+
+done
+- Set training ML crawl inside 1_reddit_crawl.py

@@ -12,10 +12,10 @@
     <div class="container">
       <h2>Social Media Influence Analyzer</h2>
       <p>This solution enables you to detect influence fields and identify Influencers in a social media network</p>
-      <form id="request_form" action="/graph" target="_blank">
+      <form id="request_form" action="/user_graph" target="_blank">
         <ul class="nav nav-tabs">
           <li class="active">
-            <a onclick="$('#request_form').attr('action', 'graph')" data-toggle="tab" href="#graph">Graph</a>
+            <a onclick="$('#request_form').attr('action', 'user_graph')" data-toggle="tab" href="#graph">Graph</a>
           </li>
           <li>
             <a onclick="$('#request_form').attr('action', 'path')" data-toggle="tab" href="#path">Path</a>
@@ -27,7 +27,7 @@
             <a onclick="$('#request_form').attr('action', 'field')" data-toggle="tab" href="#field">Field</a>
           </li>
           <li>
-            <a onclick="$('#request_form').attr('action', 'activitygraph')" data-toggle="tab" href="#activitygraph">Activity Graph</a>
+            <a onclick="$('#request_form').attr('action', 'activity_graph')" data-toggle="tab" href="#activitygraph">Activity Graph</a>
           </li>
         </ul>
         <div class="tab-content">
@@ -87,15 +87,15 @@
 
         </div>
         <div class="form-group">
-          <label for="date">Date:</label>
-          <select name="date" class="form-control" id="date">
-            {% for db_date in user_graphs %}
+          <label for="graph">Select a Graph:</label>
+          <select name="graph" class="form-control" id="graph">
+            {% for graph in user_graphs %}
               <option 
-              value="{{ db_date }}"
+              value="{{ graph.network }}_{{ graph.date }}"
               {% if loop.last %}
                   selected
               {% endif %}
-              >{{ db_date }}</option>
+              >{{ graph.network }}: {{ graph.date }}</option>
             {% endfor %}
           </select>
         </div>

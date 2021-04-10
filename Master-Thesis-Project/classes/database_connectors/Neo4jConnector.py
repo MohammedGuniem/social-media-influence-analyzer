@@ -48,6 +48,34 @@ class GraphDBConnector:
             session.write_transaction(
                 self._create_or_update_edge, from_node, to_node, edge_type, edge_props, network_name, date)
 
+    def calculate_centrality(self, network_name, date, centrality):
+        with self.driver.session(database=self.database) as session:
+            procedure_name = ""
+            additional = ""
+            if centrality == "degree_centrality":
+                procedure_name = "gds.alpha.degree.write"
+            elif centrality == "betweenness_centrality":
+                procedure_name = "gds.betweenness.write"
+            elif centrality == "hits_centrality_":
+                procedure_name = "gds.alpha.hits.write"
+                additional = ",hitsIterations: 10"
+
+            query = (
+                F"CALL {procedure_name}"
+                "({ "
+                F"nodeQuery: 'MATCH (n:Person) WHERE n.network = \"{network_name}\" and n.date = \"{date}\" RETURN id(n) AS id', "
+                F"relationshipQuery: 'MATCH (n:Person)-[:Influences]->(m:Person) "
+                F"WHERE n.network = \"{network_name}\" and n.date = \"{date}\" "
+                F"and m.network = \"{network_name}\" and m.date = \"{date}\" "
+                "RETURN id(n) AS source, id(m) AS target',"
+                F"writeProperty: '{centrality}'"
+                F"{additional}"
+                "})"
+            )
+            result = session.write_transaction(
+                self._calculate_centrality, query)
+            return result
+
     @staticmethod
     def _create_or_update_node(tx, node_id, node_type, props, network_name, date):
         node_type = node_type.upper()[0] + node_type.lower()[1:]
@@ -87,12 +115,17 @@ class GraphDBConnector:
         # Sending query to DB
         result = tx.run(query)
 
+    @staticmethod
+    def _calculate_centrality(tx, query):
+        result = tx.run(query)
+        return result
+
     """ Reading methods """
 
     def get_user_graphs(self):
         with self.driver.session() as session:
             query = (
-                "SHOW DATABASES WHERE name STARTS WITH 'usergraph'"
+                "MATCH(n) RETURN distinct (n.network) as network, (n.date) as date"
             )
             result = session.read_transaction(
                 self._get_available_user_graphs, query)
@@ -107,9 +140,22 @@ class GraphDBConnector:
                 "WITH *, relationships(p) AS relations "
                 "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
             )
-            result = session.read_transaction(
+            print(query)
+            graph = session.read_transaction(
                 self._read_graph, query)
-            return result
+
+            query = (
+                "MATCH (n {network: '"+network_name+"', date: '"+date+"'})"
+                "RETURN "
+                "max(n.degree_centrality) AS max_degree, "
+                "max(n.betweenness_centrality) AS max_betweenness, "
+                "max(n.hits_centrality_hub) AS max_hits_hub, "
+                "max(n.hits_centrality_auth) AS max_hits_auth"
+            )
+            centralities_max = session.read_transaction(
+                self._read_centralities_max, query)
+
+            return graph, centralities_max
 
     def get_path(self, network_name, date, from_name, to_name, database):
         with self.driver.session(database=self.database) as session:
@@ -168,66 +214,6 @@ class GraphDBConnector:
                 self._read_graph, query)
             return result
 
-    def get_degree_centrality(self, network_name, date, database, score_type):
-        with self.driver.session(database=self.database) as session:
-            query = ("MATCH()-[r] -> () "
-                     "CALL gds.alpha.degree.stream({ "
-                     "nodeProjection: 'Person', "
-                     "relationshipProjection: { "
-                     "  Influences: { "
-                     "    type: 'Influences', "
-                     F"    properties: '{score_type}' "
-                     "  } "
-                     "}, "
-                     F"  relationshipWeightProperty: '{score_type}' "
-                     "}) "
-                     "YIELD nodeId, score "
-                     "RETURN gds.util.asNode(nodeId).name AS name, score/sum(r.total) as centrality "
-                     "ORDER BY centrality DESC "
-                     )
-            result = session.read_transaction(
-                self._calculate_centrality, query)
-            return result
-
-    def get_betweenness_centrality(self, database):
-        with self.driver.session(database=self.database) as session:
-            query = ("MATCH p=shortestPath((n)-[:Influences* ..]->(m)) "
-                     "WHERE n.name <> m.name "
-                     "CALL gds.betweenness.stream({ "
-                     "  nodeProjection: 'Person', "
-                     "  relationshipProjection: 'Influences' "
-                     "}) "
-                     "YIELD nodeId, score "
-                     "RETURN gds.util.asNode(nodeId).name AS name, round(score/count(p), 3) as centrality "
-                     "ORDER BY centrality DESC "
-                     )
-            result = session.read_transaction(
-                self._calculate_centrality, query)
-            return result
-
-    def get_hits_centrality(self, database):
-        with self.driver.session(database=self.database) as session:
-            hitsIterations = 5
-            user_centrality = {}
-            while True:
-                query = ("CALL gds.alpha.hits.stream({ "
-                         F"hitsIterations: {hitsIterations}, "
-                         "nodeProjection: 'Person',  "
-                         "relationshipProjection: 'Influences' "
-                         "}) "
-                         "YIELD nodeId, values "
-                         "RETURN gds.util.asNode(nodeId).name AS name, {auth: values.auth, hub: values.hub} AS centrality "
-                         )
-                centrality = session.read_transaction(
-                    self._calculate_centrality, query)
-
-                if centrality.keys() == user_centrality.keys():
-                    break
-                else:
-                    user_centrality = centrality
-                    hitsIterations += 5
-            return centrality, hitsIterations
-
     @staticmethod
     def _read_graph(tx, query):
         result = tx.run(query)
@@ -242,11 +228,10 @@ class GraphDBConnector:
                 for this_node in [start_node, end_node]:
                     node = {}
                     node['id'] = this_node['network_id']
-                    node['props'] = {
-                        'type': this_node['type'],
-                        'name': this_node['name'],
-                        'author_id': this_node['author_id']
-                    }
+                    node['props'] = {}
+                    for attr, val in this_node.items():
+                        if attr != "network_id":
+                            node['props'][attr] = val
                     if node not in nodes:
                         nodes.append(node)
 
@@ -271,20 +256,25 @@ class GraphDBConnector:
         return {"nodes": nodes, "links": links}
 
     @staticmethod
-    def _calculate_centrality(tx, query):
+    def _read_centralities_max(tx, query):
         result = tx.run(query)
-        centrality = {}
+        centralities_max = {}
         for record in result:
-            centrality[record['name']] = record['centrality']
-        return centrality
+            centralities_max["degree"] = record["max_degree"]
+            centralities_max["betweenness"] = record["max_betweenness"]
+            centralities_max["hits_hub"] = record["max_hits_hub"]
+            centralities_max["hits_auth"] = record["max_hits_auth"]
+        return centralities_max
 
     @staticmethod
     def _get_available_user_graphs(tx, query):
         result = tx.run(query)
-        available_databases = []
+        available_graphs = []
         for record in result:
-            db = record["name"].replace("usergraph", "")
-            db = db[0:4] + "-" + db[4:6] + "-" + db[6:8]
-            available_databases.append(db)
+            graph = {
+                "network": record["network"],
+                "date": record["date"]
+            }
+            available_graphs.append(graph)
 
-        return available_databases
+        return available_graphs
