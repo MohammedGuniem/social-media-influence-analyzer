@@ -45,3 +45,6 @@ CALL gds.alpha.hits.write({
   relationshipQuery: 'MATCH (n:Person)-[:Influences]->(m:Person) WHERE n.network = "Test" and n.date = "2021-04-09" and m.network = "Test" and m.date = "2021-04-09" RETURN id(n) AS source, id(m) AS target',
   writeProperty: 'hits_centrality'
 })
+
+MATCH (n)
+DETACH DELETE n

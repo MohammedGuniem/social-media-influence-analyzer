@@ -134,15 +134,28 @@ class GraphDBConnector:
     def get_graph(self, network_name, date, relation_type):
         with self.driver.session(database=self.database) as session:
             query = (
-                "MATCH (n {network: '"+network_name+"', date: '"+date+"'}) "
-                "MATCH (m {network: '"+network_name+"', date: '"+date+"'}) "
-                F"MATCH p=(n)-[:{relation_type}*..]->(m) "
-                "WITH *, relationships(p) AS relations "
-                "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
+                "MATCH(n { "
+                F"network: '{network_name}', "
+                F"date: '{date}' "
+                "}) "
+                "MATCH (s { "
+                F"network: '{network_name}', "
+                F"date: '{date}' "
+                "})-[r]->(t { "
+                F"network: '{network_name}', "
+                F"date: '{date}' "
+                "}) "
             )
-            print(query)
-            graph = session.read_transaction(
-                self._read_graph, query)
+            nodes = session.read_transaction(
+                self._get_graph_nodes, query)
+
+            links = session.read_transaction(
+                self._get_graph_links, query)
+
+            graph = {
+                "nodes": nodes,
+                "links": links
+            }
 
             query = (
                 "MATCH (n {network: '"+network_name+"', date: '"+date+"'})"
@@ -215,6 +228,38 @@ class GraphDBConnector:
             return result
 
     @staticmethod
+    def _get_graph_nodes(tx, query):
+        query = query + "RETURN distinct n AS node"
+        result = tx.run(query)
+        nodes = []
+        for record in result:
+            node = {}
+            node['id'] = record["node"]['network_id']
+            node['props'] = {}
+            for prop, val in record["node"].items():
+                if prop != "network_id":
+                    node['props'][prop] = val
+            if node not in nodes:
+                nodes.append(node)
+        return nodes
+
+    @staticmethod
+    def _get_graph_links(tx, query):
+        query = query + "RETURN distinct s AS source, r AS relation, t AS target"
+        result = tx.run(query)
+        links = []
+        for record in result:
+            relation = {}
+            relation['source'] = record["source"]['network_id']
+            relation['target'] = record["target"]['network_id']
+            relation['props'] = {}
+            for prop, val in record["relation"].items():
+                relation['props'][prop] = val
+            if relation not in links:
+                links.append(relation)
+        return links
+
+    @ staticmethod
     def _read_graph(tx, query):
         result = tx.run(query)
         nodes, links = [], []
@@ -255,7 +300,7 @@ class GraphDBConnector:
 
         return {"nodes": nodes, "links": links}
 
-    @staticmethod
+    @ staticmethod
     def _read_centralities_max(tx, query):
         result = tx.run(query)
         centralities_max = {}
@@ -266,7 +311,7 @@ class GraphDBConnector:
             centralities_max["hits_auth"] = record["max_hits_auth"]
         return centralities_max
 
-    @staticmethod
+    @ staticmethod
     def _get_available_user_graphs(tx, query):
         result = tx.run(query)
         available_graphs = []

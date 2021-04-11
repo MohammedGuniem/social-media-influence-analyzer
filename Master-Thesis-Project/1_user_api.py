@@ -66,8 +66,8 @@ def index():
     return render_template("index.html", user_graphs=user_graphs)
 
 
-# Example - GUI: http://localhost:5000/graph?graph=Test_2021-04-10&score_type=total&centrality=betweenness
-# Example - JSON: http://localhost:5000/graph?graph=Test_2021-04-10&score_type=total&format=json&centrality=betweenness
+# Example - GUI: http://localhost:5000/user_graph?graph=Test_2021-04-11&score_type=total&centrality=betweenness
+# Example - JSON: http://localhost:5000/user_graph?graph=Test_2021-04-11&score_type=total&centrality=betweenness&format=json
 @app.route('/user_graph')
 def user_graph():
     data_format = request.args.get('format', None)
@@ -89,8 +89,12 @@ def user_graph():
     return render_template("graph.html", data=js_graph)
 
 
+""" check all below """
+
 # Example - GUI: http://localhost:5000/activity_graph?date=20210402&score_type=total
 # Example - JSON: http://localhost:5000/activity_graph?date=20210402&score_type=total&format=json
+
+
 @app.route('/activity_graph')
 def activitygraph():
     data_format = request.args.get('format', None)
