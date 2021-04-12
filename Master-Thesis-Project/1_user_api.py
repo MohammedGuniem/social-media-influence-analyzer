@@ -91,50 +91,32 @@ def user_graph():
 
 """ check all below """
 
-# Example - GUI: http://localhost:5000/activity_graph?date=20210402&score_type=total
-# Example - JSON: http://localhost:5000/activity_graph?date=20210402&score_type=total&format=json
 
-
-@app.route('/activity_graph')
-def activitygraph():
-    data_format = request.args.get('format', None)
-    day = request.args.get('date', None)
-    score_type = request.args.get('score_type', "total")
-
-    if day:
-        day = str(day).replace('-', '')
-        database_name = F"activitygraph{day}"
-    else:
-        database_name = "testactivitygraph"
-
-    neo4j_graph = neo4j_db_connector.get_graph(database_name, "Has")
-    if data_format == 'json':
-        return jsonify(neo4j_graph)
-    else:
-        js_graph = constructJSGraph(
-            neo4j_graph, database_name, None, score_type)
-    return render_template("graph.html", data=js_graph)
-
-
-# Example - GUI: http://localhost:5000/path?date=20210402&score_type=total&source_name=What_the_hellll&target_name=Golden_Renegade&centrality=degree
-# Example - JSON: http://localhost:5000/path?date=20210402&score_type=total&source_name=What_the_hellll&target_name=Golden_Renegade&centrality=degree&format=json
+# Example - GUI: http://localhost:5000/path?graph=Test_2021-04-11&score_type=total&centrality=degree&source_name=mrsbayduck&target_name=EyeHamKnotYew
+# Example - JSON: http://localhost:5000/path?graph=Test_2021-04-11&score_type=total&centrality=degree&source_name=mrsbayduck&target_name=EyeHamKnotYew&format=json
 @ app.route('/path')
 def path():
     data_format = request.args.get('format')
-    day = str(request.args.get('date', str(date.today()))).replace('-', '')
-    database_name = F"usergraph{day}"
+    graph = request.args.get('graph', None).split("_")
     centrality = request.args.get('centrality', 'degree')
     score_type = request.args.get('score_type', "total")
     source_name = request.args.get('source_name', '')
     target_name = request.args.get('target_name', '')
 
-    neo4j_graph = neo4j_db_connector.get_path(
-        source_name, target_name, database_name)
+    neo4j_graph, centralities_max = neo4j_db_connector.get_path(
+        network_name=graph[0],
+        date=graph[1],
+        from_name=source_name,
+        to_name=target_name
+    )
     if data_format == 'json':
         return jsonify(neo4j_graph)
     else:
         js_graph = constructJSGraph(
-            neo4j_graph, database_name, centrality, score_type)
+            neo4j_graph=neo4j_graph, graph_type="user_graph",
+            score_type=score_type,
+            centrality_max=centralities_max[centrality]
+        )
     return render_template("graph.html", data=js_graph)
 
 
@@ -181,6 +163,29 @@ def field():
     else:
         js_graph = constructJSGraph(
             neo4j_graph, database_name, centrality, score_type)
+    return render_template("graph.html", data=js_graph)
+
+
+# Example - GUI: http://localhost:5000/activity_graph?date=20210402&score_type=total
+# Example - JSON: http://localhost:5000/activity_graph?date=20210402&score_type=total&format=json
+@app.route('/activity_graph')
+def activitygraph():
+    data_format = request.args.get('format', None)
+    day = request.args.get('date', None)
+    score_type = request.args.get('score_type', "total")
+
+    if day:
+        day = str(day).replace('-', '')
+        database_name = F"activitygraph{day}"
+    else:
+        database_name = "testactivitygraph"
+
+    neo4j_graph = neo4j_db_connector.get_graph(database_name, "Has")
+    if data_format == 'json':
+        return jsonify(neo4j_graph)
+    else:
+        js_graph = constructJSGraph(
+            neo4j_graph, database_name, None, score_type)
     return render_template("graph.html", data=js_graph)
 
 

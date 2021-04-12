@@ -170,21 +170,34 @@ class GraphDBConnector:
 
             return graph, centralities_max
 
-    def get_path(self, network_name, date, from_name, to_name, database):
+    def get_path(self, network_name, date, from_name, to_name):
         with self.driver.session(database=self.database) as session:
             query = (
-                "MATCH (n {name: '"+from_name + "', network: '" +
-                network_name+"', date: '"+date+"'}) "
-                "MATCH (m {name: '"+to_name + "', network: '" +
-                network_name+"', date: '"+date+"'}) "
-                "MATCH p=(n)-[:Influences* ..]->(m) "
-                "WITH *, relationships(p) AS relations "
-                "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
+                "MATCH (n { "
+                F"name: '{from_name}', network: '{network_name}', date: '{date}' "
+                "}) "
+                "MATCH (m { "
+                F"name: '{to_name}', network: '{network_name}', date: '{date}' "
+                " }) "
+                F"MATCH p=shortestPath((n)-[:Influences* ..]->(m)) WITH *, relationships(p) AS relations "
+                F"WITH *, relationships(p) AS relations "
+                F"RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
             )
+            path_subgraph = session.read_transaction(
+                self._read_path, query)
 
-            result = session.read_transaction(
-                self._read_graph, query)
-            return result
+            query = (
+                "MATCH (n {network: '"+network_name+"', date: '"+date+"'})"
+                "RETURN "
+                "max(n.degree_centrality) AS max_degree, "
+                "max(n.betweenness_centrality) AS max_betweenness, "
+                "max(n.hits_centrality_hub) AS max_hits_hub, "
+                "max(n.hits_centrality_auth) AS max_hits_auth"
+            )
+            centralities_max = session.read_transaction(
+                self._read_centralities_max, query)
+
+            return path_subgraph, centralities_max
 
     def filter_by_score(self, network_name, date, score_type, lower_score, upper_score, database):
         with self.driver.session(database=self.database) as session:
@@ -260,7 +273,7 @@ class GraphDBConnector:
         return links
 
     @ staticmethod
-    def _read_graph(tx, query):
+    def _read_path(tx, query):
         result = tx.run(query)
         nodes, links = [], []
 
@@ -268,35 +281,33 @@ class GraphDBConnector:
             data = path_array['data']
             for relation in data:
                 start_node = dict(relation[0])
-                relation_node = dict(relation[1])
+                relation_info = dict(relation[1])
                 end_node = dict(relation[2])
                 for this_node in [start_node, end_node]:
                     node = {}
-                    node['id'] = this_node['network_id']
                     node['props'] = {}
                     for attr, val in this_node.items():
                         if attr != "network_id":
                             node['props'][attr] = val
+                        else:
+                            node['id'] = val
                     if node not in nodes:
                         nodes.append(node)
 
-                relation = {
+                link = {
                     'source': start_node['network_id'],
                     'target': end_node['network_id'],
-                    'props': {
-                        'influence_areas': relation_node['influence_areas'],
-                        'groups': relation_node['groups'],
-                        'interaction': relation_node['interaction'],
-                        'activity': relation_node['activity'],
-                        'upvotes': relation_node['upvotes'],
-                        'interaction_and_activity':  relation_node['interaction_and_activity'],
-                        'interaction_and_upvotes': relation_node['interaction_and_upvotes'],
-                        'activity_and_upvotes': relation_node['activity_and_upvotes'],
-                        'total': relation_node['total']
-                    }
+                    'props': {}
                 }
-                if relation not in links:
-                    links.append(relation)
+
+                for attr, val in relation_info.items():
+                    if attr != "network_id":
+                        link['props'][attr] = val
+                    else:
+                        link['id'] = val
+
+                if link not in links:
+                    links.append(link)
 
         return {"nodes": nodes, "links": links}
 
