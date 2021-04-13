@@ -1,5 +1,6 @@
 doing
-- split the graph url paramter into network and date
+- change crawling time plot from area to bar plot
+- make plots available through web user interface
 
 to do
 - change crawling time plot from area to bar plot
