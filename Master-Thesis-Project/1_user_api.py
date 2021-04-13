@@ -70,8 +70,9 @@ def constructJSGraph(neo4j_graph, graph_type, score_type, centrality_max):
 
 @app.route('/')
 def index():
-    user_graphs = neo4j_users_db_connector.get_user_graphs()
-    return render_template("index.html", user_graphs=user_graphs)
+    user_graphs = neo4j_users_db_connector.get_graphs()
+    activity_graphs = neo4j_activities_db_connector.get_graphs()
+    return render_template("index.html", user_graphs=user_graphs, activity_graphs=activity_graphs)
 
 
 # Example - GUI: http://localhost:5000/user_graph?graph=Test_2021-04-11&score_type=total&centrality=betweenness

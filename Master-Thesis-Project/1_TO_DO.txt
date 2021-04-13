@@ -1,8 +1,10 @@
 doing
+- split the graph url paramter into network and date
+
+to do
 - change crawling time plot from area to bar plot
 - make plots available through web user interface
 
-to do
 - add legend box to activity graph using on user interface
 - add props on node click in js
 
@@ -10,8 +12,6 @@ to do
 - add try catch and logging files
 - clean in neo4j and mongo db database connectors
 - clean up in files and folders
-
-
 
 done
 - Set training ML crawl inside 1_reddit_crawl.py
@@ -21,3 +21,4 @@ solution is to split query into 2 different queries one returns distinct nodes a
 - Remove the multiple database functionality and store all models in one database
 - view graphs in a proper way on the user api also in json format
 - make neo4j models for different networks
+- use template inheritance, make one template of each filter graph functionality

@@ -136,13 +136,13 @@ class GraphDBConnector:
                 self._read_centralities_max, query)
             return centralities_max
 
-    def get_user_graphs(self):
+    def get_graphs(self):
         with self.driver.session() as session:
             query = (
                 "MATCH(n) RETURN distinct (n.network) as network, (n.date) as date"
             )
             result = session.read_transaction(
-                self._get_available_user_graphs, query)
+                self._get_available_graphs, query)
             return result
 
     def get_graph(self, network_name, date, relation_type):
@@ -243,7 +243,7 @@ class GraphDBConnector:
             return result, centralities_max
 
     @ staticmethod
-    def _get_available_user_graphs(tx, query):
+    def _get_available_graphs(tx, query):
         result = tx.run(query)
         available_graphs = []
         for record in result:
