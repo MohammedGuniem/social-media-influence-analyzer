@@ -122,6 +122,20 @@ class GraphDBConnector:
 
     """ Reading methods """
 
+    def get_centralitites_max(self, network_name, date):
+        with self.driver.session(database=self.database) as session:
+            query = (
+                "MATCH (n {network: '"+network_name+"', date: '"+date+"'})"
+                "RETURN "
+                "max(n.degree_centrality) AS max_degree, "
+                "max(n.betweenness_centrality) AS max_betweenness, "
+                "max(n.hits_centrality_hub) AS max_hits_hub, "
+                "max(n.hits_centrality_auth) AS max_hits_auth"
+            )
+            centralities_max = session.read_transaction(
+                self._read_centralities_max, query)
+            return centralities_max
+
     def get_user_graphs(self):
         with self.driver.session() as session:
             query = (
@@ -147,26 +161,17 @@ class GraphDBConnector:
                 "}) "
             )
             nodes = session.read_transaction(
-                self._get_graph_nodes, query)
+                self._get_all_graph_nodes, query)
 
             links = session.read_transaction(
-                self._get_graph_links, query)
+                self._get_all_graph_links, query)
 
             graph = {
                 "nodes": nodes,
                 "links": links
             }
 
-            query = (
-                "MATCH (n {network: '"+network_name+"', date: '"+date+"'})"
-                "RETURN "
-                "max(n.degree_centrality) AS max_degree, "
-                "max(n.betweenness_centrality) AS max_betweenness, "
-                "max(n.hits_centrality_hub) AS max_hits_hub, "
-                "max(n.hits_centrality_auth) AS max_hits_auth"
-            )
-            centralities_max = session.read_transaction(
-                self._read_centralities_max, query)
+            centralities_max = self.get_centralitites_max(network_name, date)
 
             return graph, centralities_max
 
@@ -184,22 +189,13 @@ class GraphDBConnector:
                 F"RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
             )
             path_subgraph = session.read_transaction(
-                self._read_path, query)
+                self._read_subgraph, query)
 
-            query = (
-                "MATCH (n {network: '"+network_name+"', date: '"+date+"'})"
-                "RETURN "
-                "max(n.degree_centrality) AS max_degree, "
-                "max(n.betweenness_centrality) AS max_betweenness, "
-                "max(n.hits_centrality_hub) AS max_hits_hub, "
-                "max(n.hits_centrality_auth) AS max_hits_auth"
-            )
-            centralities_max = session.read_transaction(
-                self._read_centralities_max, query)
+            centralities_max = self.get_centralitites_max(network_name, date)
 
             return path_subgraph, centralities_max
 
-    def filter_by_score(self, network_name, date, score_type, lower_score, upper_score, database):
+    def filter_by_score(self, network_name, date, score_type, lower_score, upper_score):
         with self.driver.session(database=self.database) as session:
             lower, upper = "", ""
             if isinstance(lower_score, int):
@@ -208,17 +204,20 @@ class GraphDBConnector:
                 upper = F"<= {upper_score}"
             query = (
                 "MATCH (n {network: '"+network_name+"', date: '"+date+"'}) "
-                "MATCH (m {network: '"+network_name+"', date: '"+date+"'})) "
+                "MATCH (m {network: '"+network_name+"', date: '"+date+"'}) "
                 "MATCH p=(n)-[r]->(m) "
                 F"WHERE {lower} toInteger(r.{score_type}) {upper} "
                 "WITH *, relationships(p) AS relations "
                 "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
             )
             result = session.read_transaction(
-                self._read_graph, query)
-            return result
+                self._read_subgraph, query)
 
-    def filter_by_influence_area(self, network_name, date, areas_array, operation, database):
+            centralities_max = self.get_centralitites_max(network_name, date)
+
+            return result, centralities_max
+
+    def filter_by_influence_area(self, network_name, date, areas_array, operation):
         with self.driver.session(database=self.database) as session:
             if len(areas_array) > 0:
                 filters = []
@@ -237,11 +236,38 @@ class GraphDBConnector:
                 "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
             )
             result = session.read_transaction(
-                self._read_graph, query)
-            return result
+                self._read_subgraph, query)
+
+            centralities_max = self.get_centralitites_max(network_name, date)
+
+            return result, centralities_max
+
+    @ staticmethod
+    def _get_available_user_graphs(tx, query):
+        result = tx.run(query)
+        available_graphs = []
+        for record in result:
+            graph = {
+                "network": record["network"],
+                "date": record["date"]
+            }
+            available_graphs.append(graph)
+
+        return available_graphs
+
+    @ staticmethod
+    def _read_centralities_max(tx, query):
+        result = tx.run(query)
+        centralities_max = {}
+        for record in result:
+            centralities_max["degree"] = record["max_degree"]
+            centralities_max["betweenness"] = record["max_betweenness"]
+            centralities_max["hits_hub"] = record["max_hits_hub"]
+            centralities_max["hits_auth"] = record["max_hits_auth"]
+        return centralities_max
 
     @staticmethod
-    def _get_graph_nodes(tx, query):
+    def _get_all_graph_nodes(tx, query):
         query = query + "RETURN distinct n AS node"
         result = tx.run(query)
         nodes = []
@@ -257,7 +283,7 @@ class GraphDBConnector:
         return nodes
 
     @staticmethod
-    def _get_graph_links(tx, query):
+    def _get_all_graph_links(tx, query):
         query = query + "RETURN distinct s AS source, r AS relation, t AS target"
         result = tx.run(query)
         links = []
@@ -273,7 +299,7 @@ class GraphDBConnector:
         return links
 
     @ staticmethod
-    def _read_path(tx, query):
+    def _read_subgraph(tx, query):
         result = tx.run(query)
         nodes, links = [], []
 
@@ -310,27 +336,3 @@ class GraphDBConnector:
                     links.append(link)
 
         return {"nodes": nodes, "links": links}
-
-    @ staticmethod
-    def _read_centralities_max(tx, query):
-        result = tx.run(query)
-        centralities_max = {}
-        for record in result:
-            centralities_max["degree"] = record["max_degree"]
-            centralities_max["betweenness"] = record["max_betweenness"]
-            centralities_max["hits_hub"] = record["max_hits_hub"]
-            centralities_max["hits_auth"] = record["max_hits_auth"]
-        return centralities_max
-
-    @ staticmethod
-    def _get_available_user_graphs(tx, query):
-        result = tx.run(query)
-        available_graphs = []
-        for record in result:
-            graph = {
-                "network": record["network"],
-                "date": record["date"]
-            }
-            available_graphs.append(graph)
-
-        return available_graphs

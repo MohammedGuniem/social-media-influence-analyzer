@@ -1,15 +1,17 @@
 doing
-- view graphs in a proper way on the user api also in json format
+- change crawling time plot from area to bar plot
+- make plots available through web user interface
 
 to do
+- add legend box to activity graph using on user interface
+- add props on node click in js
+
 - change text in test data to refelect different topics
-- make neo4j models for different networks
+- add try catch and logging files
 - clean in neo4j and mongo db database connectors
 - clean up in files and folders
-- make plots available through web user interface
-- change crawling time plot from area to bar plot
-- add try catch and logging files
-- add props on node click in js
+
+
 
 done
 - Set training ML crawl inside 1_reddit_crawl.py
@@ -17,3 +19,5 @@ done
 solution is to split query into 2 different queries one returns distinct nodes and the other returns distinct links
 - store and retreive centralities
 - Remove the multiple database functionality and store all models in one database
+- view graphs in a proper way on the user api also in json format
+- make neo4j models for different networks
