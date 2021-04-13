@@ -9,7 +9,7 @@ import os
 
 load_dotenv()
 
-# Mongo database connector
+# Mongo db database connector
 mongo_db_connector = MongoDBConnector(
     host=os.environ.get('mongo_db_host'),
     port=int(os.environ.get('mongo_db_port')),

@@ -40,10 +40,10 @@ class Statistics:
         fig, axes = plt.subplots(1, 2)
 
         runtimes_df[["date", "per group", "per submission", "per comment"]].plot(
-            kind="area", stacked=True, ax=axes[0], rot=90, fontsize=6, title="Average Crawling runtimes").set(ylabel='seconds')
+            kind="bar", stacked=True, ax=axes[0], rot=35, fontsize=6, title="Average Crawling runtimes").set(ylabel='seconds')
 
         runtimes_df[["date", "groups", "submissions", "comments"]].plot(
-            kind="area", stacked=True, ax=axes[1], rot=90, fontsize=6, title="Total Crawling runtimes").set(ylabel='seconds')
+            kind="bar", stacked=True, ax=axes[1], rot=35, fontsize=6, title="Total Crawling runtimes").set(ylabel='seconds')
 
         fig.suptitle('Crawling Runtimes Statistics')
 
@@ -71,7 +71,7 @@ class Statistics:
         submissions_df.groupby("display_name")["display_name"].count().plot(
             kind="pie", ax=axes[0], title="Crawled Groups", autopct='%1.1f%%').axis("off")
 
-        neo4j_graph = self.neo4j_db_connector.get_graph(
+        neo4j_graph, centralities_max = self.neo4j_db_connector.get_graph(
             network_name=network_name, date=model_date, relation_type="Influences")
 
         groups = []
@@ -98,7 +98,7 @@ class Statistics:
         plt.show()
 
     def getInfluenceScore(self, network_name, submissions_type, model_date, score_type):
-        neo4j_graph = self.neo4j_db_connector.get_graph(
+        neo4j_graph, centralities_max = self.neo4j_db_connector.get_graph(
             network_name=network_name, date=model_date, relation_type="Influences")
 
         if score_type:
