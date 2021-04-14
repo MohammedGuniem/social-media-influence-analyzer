@@ -21,13 +21,13 @@
   <div class="form-group">
     <label for="graph">Select a Graph:</label>
     <select name="graph" class="form-control" id="graph">
-      {% for graph in user_graphs %}
+      {% for graph in graphs %}
         <option 
         value="{{ graph.network }}_{{ graph.date }}"
         {% if loop.last %}
-            selected
+          selected
         {% endif %}
-        >{{ graph.network }}: {{ graph.date }}</option>
+        >{{ graph.network }} - {{ graph.date }}</option>
       {% endfor %}
     </select>
   </div>

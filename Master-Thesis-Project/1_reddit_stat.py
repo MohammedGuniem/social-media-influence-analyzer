@@ -27,7 +27,6 @@ stat = Statistics(mongo_db_connector, neo4j_db_connector)
 stat.getCrawlingRuntimes(network_name="Reddit",
                          submissions_type="Rising", from_date="2021-04-01")
 
-
 stat.getInfluenceArea(network_name="Reddit",
                       submissions_type="Rising", model_date="2021-04-14")
 

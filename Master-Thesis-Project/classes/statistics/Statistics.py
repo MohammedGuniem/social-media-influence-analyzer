@@ -32,17 +32,26 @@ class Statistics:
             runtimes_df["submissions_count"]
         runtimes_df["per comment"] = runtimes_df["comments_crawling_time"] / \
             runtimes_df["comments_count"]
+        runtimes_df["per training submission"] = runtimes_df["text_classification_submissions_crawling_time"] / \
+            runtimes_df["text_classification_submissions_count"]
+
+        # text_classification_submissions_count text_classification_submissions_crawling_time
 
         runtimes_df.set_index(runtimes_df['date'], inplace=True)
         runtimes_df.rename(
-            columns={'groups_crawling_time': 'groups', 'submissions_crawling_time': 'submissions', 'comments_crawling_time': 'comments'}, inplace=True)
+            columns={
+                'groups_crawling_time': 'groups',
+                'submissions_crawling_time': 'submissions',
+                'comments_crawling_time': 'comments',
+                'text_classification_submissions_crawling_time': 'training submissions'
+            }, inplace=True)
 
         fig, axes = plt.subplots(1, 2)
 
-        runtimes_df[["date", "per group", "per submission", "per comment"]].plot(
+        runtimes_df[["date", "per group", "per submission", "per comment", "per training submission"]].plot(
             kind="bar", stacked=True, ax=axes[0], rot=35, fontsize=6, title="Average Crawling runtimes").set(ylabel='seconds')
 
-        runtimes_df[["date", "groups", "submissions", "comments"]].plot(
+        runtimes_df[["date", "groups", "submissions", "comments", "training submissions"]].plot(
             kind="bar", stacked=True, ax=axes[1], rot=35, fontsize=6, title="Total Crawling runtimes").set(ylabel='seconds')
 
         fig.suptitle('Crawling Runtimes Statistics')
