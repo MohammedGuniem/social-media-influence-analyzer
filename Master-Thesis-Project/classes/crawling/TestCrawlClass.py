@@ -5,7 +5,7 @@ import time
 class TestCrawler:
 
     def __init__(self):
-        self.runtime_register = RuntimeRegister("Test Network")
+        self.runtime_register = RuntimeRegister("Test")
 
     # Method to crawl groups information.
     def getGroups(self):

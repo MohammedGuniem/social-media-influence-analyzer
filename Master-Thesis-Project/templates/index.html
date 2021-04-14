@@ -28,6 +28,9 @@
           <li>
             <a data-toggle="tab" href="#activity_graph">Activity Graph</a>
           </li>
+          <li>
+            <a data-toggle="tab" href="#statistics">Statistics</a>
+          </li>
         </ul>
         <div class="tab-content">
           <div id="user_graph" class="tab-pane fade in active">
@@ -44,6 +47,9 @@
           </div>
           <div id="activity_graph" class="tab-pane fade">
             {% include 'activity_form.html' %}
+          </div>
+          <div id="statistics" class="tab-pane fade">
+            {% include 'statistics_form.html' %}
           </div>
         </div>
     </div>

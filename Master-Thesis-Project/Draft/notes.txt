@@ -48,3 +48,5 @@ CALL gds.alpha.hits.write({
 
 MATCH (n)
 DETACH DELETE n
+
+C:\Program Files\Java\OpenJDK11\jdk-11.0.2

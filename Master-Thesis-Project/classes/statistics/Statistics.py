@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import datetime
 import time
+import os
+import shutil
 
 
 class Statistics:
@@ -11,13 +13,14 @@ class Statistics:
         self.neo4j_db_connector = neo4j_db_connector
 
     def getCrawlingRuntimes(self, network_name, submissions_type, from_date):
-        from_date = time.mktime(datetime.datetime. strptime(
+        unix_from_date = time.mktime(datetime.datetime. strptime(
             from_date, '%Y-%m-%d').timetuple())
 
         runtimes = self.mongo_db_connector.getCrawlingRuntimes(
-            network_name, submissions_type, from_date)
+            network_name, submissions_type, unix_from_date)
 
         runtimes_df = pd.DataFrame(runtimes)
+
         runtimes_df["date"] = pd.to_datetime(
             runtimes_df['timestamp'], unit='s')
         runtimes_df['date'] = pd.to_datetime(
@@ -56,7 +59,12 @@ class Statistics:
 
         fig.suptitle('Crawling Runtimes Statistics')
 
-        plt.show()
+        path = F"{os.getcwd()}/statistics_plots/crawling/{network_name}/{from_date}/"
+        self.create_directory_if_not_found(
+            path=path)
+        plot_img_name = F"bar_plot_{submissions_type}.jpg"
+        plt.savefig(
+            F"{path}{plot_img_name}", format="jpg")
 
     def getInfluenceArea(self, network_name, submissions_type, model_date):
         groups = self.mongo_db_connector.getGroups(network_name)
@@ -104,11 +112,21 @@ class Statistics:
         fig.suptitle(
             'Crawled Subreddits vs. Predicted Influence Area vs. Modelled Subreddits')
 
-        plt.show()
+        path = F"{os.getcwd()}/statistics_plots/influence_areas_and_subreddits/{network_name}/{model_date}/"
+        self.create_directory_if_not_found(
+            path=path)
+        plot_img_name = F"pie_plot_{submissions_type}.jpg"
+        plt.savefig(
+            F"{path}{plot_img_name}", format="jpg")
 
-    def getInfluenceScore(self, network_name, submissions_type, model_date, score_type):
+    def getInfluenceScore(self, network_name, model_date, score_type):
         neo4j_graph, centralities_max = self.neo4j_db_connector.get_graph(
             network_name=network_name, date=model_date, relation_type="Influences")
+
+        if score_type:
+            request_score_type = score_type
+        else:
+            request_score_type = "all_scores"
 
         if score_type:
             score_types = [score_type]
@@ -150,4 +168,13 @@ class Statistics:
                 rot=90
             )
 
-        plt.show()
+        path = F"{os.getcwd()}/statistics_plots/influence_scores/{network_name}/{model_date}/"
+        self.create_directory_if_not_found(
+            path=path)
+        plot_img_name = F"box_plot_{request_score_type}.jpg"
+        plt.savefig(
+            F"{path}{plot_img_name}", format="jpg")
+
+    def create_directory_if_not_found(self, path):
+        if not os.path.exists(path):
+            os.makedirs(path)

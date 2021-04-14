@@ -1,5 +1,5 @@
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, send_file
 from dotenv import load_dotenv
 from datetime import date
 import json
@@ -212,6 +212,25 @@ def activity_graph():
             centrality_max=None
         )
     return render_template("graph.html", data=js_graph)
+
+
+@app.route('/statistics')
+def statistics():
+    statistic_measure = request.args.get('statistic_measure', None)
+    submissions_type = request.args.get('submissions_type', 'Rising')
+    graph = request.args.get('graph', None).split("_")
+    score_type = request.args.get('score_type', "total")
+
+    plt_img_path = F"statistics_plots/{statistic_measure}/{graph[0]}/{graph[1]}/"
+    if statistic_measure == "crawling":
+        plt_img_path += F"bar_plot_{submissions_type}.jpg"
+    elif statistic_measure == "influence_areas_and_subreddits":
+        plt_img_path += F"pie_plot_{submissions_type}.jpg"
+    elif statistic_measure == "influence_scores":
+        plt_img_path += F"box_plot_{score_type}.jpg"
+    else:
+        return "Unknown type of statistics"
+    return send_file(plt_img_path, mimetype="image/jpg")
 
 
 if __name__ == '__main__':
