@@ -1,5 +1,6 @@
 doing
-- make plots available through web user interface
+- remember to generate 2021-04-15 Rising Subreddits
+- remember to generate 2021-04-15 New Submissions
 
 to do
 - add legend box to activity graph using on user interface
@@ -21,3 +22,4 @@ solution is to split query into 2 different queries one returns distinct nodes a
 - use template inheritance, make one template of each filter graph functionality
 - change crawling time plot from area to bar plot
 - Added running time register when crawling training data for text classification
+- make plots available through web user interface
