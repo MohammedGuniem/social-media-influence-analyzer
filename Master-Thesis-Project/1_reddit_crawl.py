@@ -34,7 +34,7 @@ groups = crawler.getGroups(top_n_subreddits=5)
 
 # Crawling submissions
 submissions = crawler.getSubmissions(
-    subreddits=groups, submission_limit=5, submissions_type=submissions_type)
+    subreddits=groups, submission_limit=3, submissions_type=submissions_type)
 
 # Crawling Comments
 comments = crawler.getComments(submissions, submissions_type)
