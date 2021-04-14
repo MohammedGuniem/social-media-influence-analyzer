@@ -10,11 +10,14 @@ class RuntimeRegister:
         self.network_name = network_name
         self.groups_count = 0
         self.groups_crawling_time = 0
-        self.submissions_type = 0
+        self.submissions_type = ""
         self.submissions_count = 0
         self.submissions_crawling_time = 0
         self.comments_count = 0
         self.comments_crawling_time = 0
+        self.text_classification_submissions_type = ""
+        self.text_classification_submissions_count = 0
+        self.text_classification_submissions_crawling_time = 0
 
     def getRunningTime(self):
         return {
@@ -26,5 +29,8 @@ class RuntimeRegister:
             "submissions_count": self.submissions_count,
             "submissions_crawling_time": round(self.submissions_crawling_time),
             "comments_count": self.comments_count,
-            "comments_crawling_time": round(self.comments_crawling_time)
+            "comments_crawling_time": round(self.comments_crawling_time),
+            "text_classification_submissions_type": self.text_classification_submissions_type,
+            "text_classification_submissions_count": self.text_classification_submissions_count,
+            "text_classification_submissions_crawling_time": self.text_classification_submissions_crawling_time
         }

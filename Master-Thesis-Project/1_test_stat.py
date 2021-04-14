@@ -25,13 +25,13 @@ neo4j_db_connector = GraphDBConnector(
 stat = Statistics(mongo_db_connector, neo4j_db_connector)
 
 stat.getCrawlingRuntimes(network_name="Test Network",
-                         submissions_type="New", from_date="2021-03-01")
+                         submissions_type="New", from_date="2021-04-01")
 
 stat.getInfluenceArea(network_name="Test",
-                      submissions_type="New", model_date="2021-04-08")
+                      submissions_type="New", model_date="2021-04-11")
 
 stat.getInfluenceScore(network_name="Test",
-                       submissions_type="New", model_date="2021-04-08", score_type="total")
+                       submissions_type="New", model_date="2021-04-11", score_type="total")
 
 stat.getInfluenceScore(network_name="Test", submissions_type="New",
-                       model_date="2021-04-08", score_type=None)
+                       model_date="2021-04-11", score_type=None)

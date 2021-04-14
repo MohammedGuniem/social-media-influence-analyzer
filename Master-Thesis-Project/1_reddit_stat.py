@@ -23,18 +23,16 @@ neo4j_db_connector = GraphDBConnector(
 )
 
 stat = Statistics(mongo_db_connector, neo4j_db_connector)
-"""
-stat.getCrawlingRuntimes(network_name="Reddit",
-                         submissions_type="Rising", from_date="2021-03-01")
 
-"""
+stat.getCrawlingRuntimes(network_name="Reddit",
+                         submissions_type="Rising", from_date="2021-04-01")
+
+
 stat.getInfluenceArea(network_name="Reddit",
-                      submissions_type="Rising", model_date="2021-04-02")
-"""
+                      submissions_type="Rising", model_date="2021-04-14")
 
 stat.getInfluenceScore(network_name="Reddit",
-                       submissions_type="Rising", model_date="2021-04-02", score_type="total")
+                       submissions_type="Rising", model_date="2021-04-14", score_type="total")
 
 stat.getInfluenceScore(network_name="Reddit", submissions_type="Rising",
-                       model_date="2021-04-02", score_type=None)
-"""
+                       model_date="2021-04-14", score_type=None)

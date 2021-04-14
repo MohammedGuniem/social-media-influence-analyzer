@@ -137,8 +137,6 @@ class RedditCrawler:
 
     # Method to crawl submissions titles used as training data for Text Classification and Influence area detection
     def getSubmissionsTitles(self, subreddits, submissions_type, submissions_limit):
-        start = time.time()
-
         all_submissions = []
 
         for subreddit in subreddits:
@@ -174,13 +172,11 @@ class RedditCrawler:
         print(
             F"Total: crawled {len(all_submissions)} submissions.")
 
-        self.runtime_register.submissions_type = submissions_type
-        self.runtime_register.submissions_count = len(all_submissions)
-        self.runtime_register.submissions_crawling_time = time.time() - start
-
         return all_submissions
 
-    def getInfluenceAreaTrainingData(self, submissions_limit):
+    def getInfluenceAreaTrainingData(self, submissions_limit, submissions_type):
+        start = time.time()
+
         topic_subreddits_mapping = {
             "politic": ["politics", "PoliticsPeopleTwitter", "elections"],
             "economy": ["Economics", "economy", "business"],
@@ -193,10 +189,17 @@ class RedditCrawler:
         for category, subreddits in topic_subreddits_mapping.items():
             for subreddit in subreddits:
                 submissions = self.getSubmissionsTitles(
-                    subreddits=[{"display_name": subreddit}], submissions_type="New", submissions_limit=submissions_limit)
+                    subreddits=[{"display_name": subreddit}], submissions_type=submissions_type, submissions_limit=submissions_limit)
                 for submission_title in submissions:
                     data["training_data"].append({
                         "title": submission_title,
                         "label": category
                     })
+
+        self.runtime_register.text_classification_submissions_type = submissions_type
+        self.runtime_register.text_classification_submissions_count = len(
+            data["training_data"])
+        self.runtime_register.text_classification_submissions_crawling_time = time.time() - \
+            start
+
         return data

@@ -30,18 +30,20 @@ social_network_name = "Reddit"
 submissions_type = "Rising"
 
 # Crawling groups
-groups = crawler.getGroups(top_n_subreddits=3)
+groups = crawler.getGroups(top_n_subreddits=5)
 
 # Crawling submissions
 submissions = crawler.getSubmissions(
-    subreddits=groups, submission_limit=3, submissions_type=submissions_type)
+    subreddits=groups, submission_limit=5, submissions_type=submissions_type)
 
 # Crawling Comments
 comments = crawler.getComments(submissions, submissions_type)
 
 # Fetching training submission titles to determine influence area using machine learning
 training_data = crawler.getInfluenceAreaTrainingData(
-    submissions_limit=100)
+    submissions_limit=100,
+    submissions_type=submissions_type
+)
 
 collection_name = str(date.today())
 

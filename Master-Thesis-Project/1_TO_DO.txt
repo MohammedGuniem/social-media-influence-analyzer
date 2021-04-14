@@ -1,11 +1,7 @@
 doing
-- change crawling time plot from area to bar plot
 - make plots available through web user interface
 
 to do
-- change crawling time plot from area to bar plot
-- make plots available through web user interface
-
 - add legend box to activity graph using on user interface
 - add props on node click in js
 
@@ -23,3 +19,5 @@ solution is to split query into 2 different queries one returns distinct nodes a
 - view graphs in a proper way on the user api also in json format
 - make neo4j models for different networks
 - use template inheritance, make one template of each filter graph functionality
+- change crawling time plot from area to bar plot
+- Added running time register when crawling training data for text classification
