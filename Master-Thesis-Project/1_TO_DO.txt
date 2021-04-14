@@ -2,10 +2,11 @@ doing
 - remember to generate 2021-04-15 Rising Subreddits
 - remember to generate 2021-04-15 New Submissions
 
-to do
 - add legend box to activity graph using on user interface
 - add props on node click in js
 
+to do
+- Fix dimesions of plots on user api
 - change text in test data to refelect different topics
 - add try catch and logging files
 - clean in neo4j and mongo db database connectors
