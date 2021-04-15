@@ -11,7 +11,8 @@
 *.pyc
 
 ## logs
-/Master-Thesis-Project/Logs/*
+Master-Thesis-Project/Logs/*
 
 ## plots
-/Master-Thesis-Project/statistics_plots/*
+Master-Thesis-Project/statistics_plots/*
+
