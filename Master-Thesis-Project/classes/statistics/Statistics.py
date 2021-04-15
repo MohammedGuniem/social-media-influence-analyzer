@@ -52,10 +52,10 @@ class Statistics:
         fig, axes = plt.subplots(1, 2)
 
         runtimes_df[["date", "per group", "per submission", "per comment", "per training submission"]].plot(
-            kind="bar", stacked=True, ax=axes[0], rot=35, fontsize=6, title="Average Crawling runtimes").set(ylabel='seconds')
+            kind="bar", stacked=True, ax=axes[0], rot='horizontal', fontsize=8, title="Average Crawling runtimes").set(ylabel='seconds')
 
         runtimes_df[["date", "groups", "submissions", "comments", "training submissions"]].plot(
-            kind="bar", stacked=True, ax=axes[1], rot=35, fontsize=6, title="Total Crawling runtimes").set(ylabel='seconds')
+            kind="bar", stacked=True, ax=axes[1], rot='horizontal', fontsize=8, title="Total Crawling runtimes").set(ylabel='seconds')
 
         fig.suptitle('Crawling Runtimes Statistics')
 

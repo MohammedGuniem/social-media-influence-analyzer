@@ -4,7 +4,6 @@ from classes.modelling.ActivityGraphModelling import ActivityGraph
 from classes.modelling.UserGraphModelling import UserGraph
 from dotenv import load_dotenv
 from datetime import date
-import json
 import os
 
 load_dotenv()
