@@ -4,8 +4,6 @@ doing
 
 to do
 - change text in test data to refelect different topics
-- clean up in files and folders
-- clean in neo4j and mongo db database connectors
 
 done
 - Set training ML crawl inside 1_reddit_crawl.py
@@ -24,3 +22,5 @@ solution is to split query into 2 different queries one returns distinct nodes a
 - Adjusted dimesions of plots on user api
 - put from_date on crawling UI - decided to let this go, although it is possible to do this using the statistics class method
 - add try catch and logging files and driver python code
+- clean up in files and folders
+- clean in neo4j and mongo db database connectors
