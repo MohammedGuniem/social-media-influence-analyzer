@@ -2,15 +2,14 @@ doing
 - remember to generate 2021-04-16 Rising Subreddits
 - remember to generate 2021-04-16 New Submissions
 
-- add props on node click in js
 - Fix dimesions of plots on user api
 - put from_date on crawling UI
 
 to do
 - change text in test data to refelect different topics
 - add try catch and logging files
-- clean in neo4j and mongo db database connectors
 - clean up in files and folders
+- clean in neo4j and mongo db database connectors
 
 
 done
@@ -26,3 +25,4 @@ solution is to split query into 2 different queries one returns distinct nodes a
 - Added running time register when crawling training data for text classification
 - make plots available through web user interface
 - add node type to label in activity at UI
+- add props on node click in js

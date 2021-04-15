@@ -7,13 +7,18 @@
     <style>
         #graphcanvas {
             width: 98vw;
-            height: 98vh;
+            height: 80vh;
         }
     </style>
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
+    <h4>Node Information:</h4>
+    <div id="nodeInfo">Select a node</div>
+    <h4>Edge Information:</h4>
+    <div id="edgeInfo">Select an edge</div>
+    <br />
     <div id="graphcanvas"></div>
     <script>
         var graph = JSON.parse('{{ data|tojson|safe }}');
@@ -69,6 +74,43 @@
         };
             
         var network = new vis.Network(container, graph, options);
+        network.on("click", function (params) {
+            var node_id = params.nodes[0]
+            if (node_id) {
+                var node = this.body.nodes[node_id];
+                if ('{{ graph_type }}' == 'user_graph') {
+                    document.getElementById("nodeInfo").innerText = 
+                        `Username: ${node.options.label},`
+                        +` User ID: ${node_id},`
+                        +` centrality: ${node.options.value}`
+                } else if ('{{ graph_type }}' == 'activity_graph') {
+                    var label = node.options.label
+                    var type = (node.options.label.split("\n")[0]).replace("_"," ")
+                    var username = (node.options.label.split("\n")[1]).replace(`(${node_id})`,"")
+                    document.getElementById("nodeInfo").innerText = 
+                        `Type: ${type},`
+                        +` Username: ${username},`
+                        +` User ID: ${node_id}`
+                }  
+            }
+            var edge_id = params.edges[0]
+            if (edge_id) {
+                var edge = this.body.edges[edge_id];
+                if ('{{ graph_type }}' == 'user_graph') {
+                    document.getElementById("edgeInfo").innerText = 
+                        `From: ${edge.options.from},`
+                        +` To: ${edge.options.to},`
+                        +` Score: ${edge.options.value},`
+                        +` Influence areas: ${edge.options.label.split("\n")[1]}`
+                } else if ('{{ graph_type }}' == 'activity_graph') {
+                    document.getElementById("edgeInfo").innerText = 
+                        `From: ${edge.options.from},`
+                        +` To: ${edge.options.to},`
+                        +` Score: ${edge.options.value},`
+                        +` Influence areas: ${edge.options.label.split("\n")[1]}`
+                }
+            }
+        });
     </script>
 </body>
 </html>

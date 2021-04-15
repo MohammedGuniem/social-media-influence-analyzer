@@ -103,7 +103,7 @@ def user_graph():
             score_type=score_type,
             centrality_max=centralities_max[centrality]
         )
-    return render_template("graph.html", data=js_graph)
+    return render_template("graph.html", data=js_graph, graph_type="user_graph")
 
 
 # Example - GUI: http://localhost:5000/path?graph=Test_2021-04-11&score_type=total&centrality=degree&source_name=mrsbayduck&target_name=EyeHamKnotYew
@@ -132,7 +132,7 @@ def path():
             score_type=score_type,
             centrality_max=centralities_max[centrality]
         )
-    return render_template("graph.html", data=js_graph)
+    return render_template("graph.html", data=js_graph, graph_type="user_graph")
 
 
 # Example - GUI: http://localhost:5000/score?graph=Test_2021-04-11&score_type=total&min_score=0&max_score=10&centrality=degree
@@ -163,7 +163,7 @@ def score():
             score_type=score_type,
             centrality_max=centralities_max[centrality]
         )
-    return render_template("graph.html", data=js_graph)
+    return render_template("graph.html", data=js_graph, graph_type="user_graph")
 
 
 # Example - GUI: http://localhost:5000/field?graph=Test_2021-04-11&score_type=total&fields=sport&fields=entertainment&operation=OR&centrality=degree
@@ -193,7 +193,7 @@ def field():
             score_type=score_type,
             centrality_max=centralities_max[centrality]
         )
-    return render_template("graph.html", data=js_graph)
+    return render_template("graph.html", data=js_graph, graph_type="user_graph")
 
 
 # Example - GUI: http://localhost:5000/activity_graph?graph=Test_2021-04-11&score_type=total
@@ -215,7 +215,7 @@ def activity_graph():
             score_type=score_type,
             centrality_max=None
         )
-    return render_template("graph.html", data=js_graph)
+    return render_template("graph.html", data=js_graph, graph_type="activity_graph")
 
 
 @app.route('/statistics')
