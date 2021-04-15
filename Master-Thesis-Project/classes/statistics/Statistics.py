@@ -63,8 +63,9 @@ class Statistics:
         self.create_directory_if_not_found(
             path=path)
         plot_img_name = F"bar_plot_{submissions_type}.jpg"
+        fig.set_size_inches(15, 10)
         plt.savefig(
-            F"{path}{plot_img_name}", format="jpg")
+            F"{path}{plot_img_name}", format="jpg", dpi=500)
 
     def getInfluenceArea(self, network_name, submissions_type, model_date):
         groups = self.mongo_db_connector.getGroups(network_name)
@@ -116,8 +117,10 @@ class Statistics:
         self.create_directory_if_not_found(
             path=path)
         plot_img_name = F"pie_plot_{submissions_type}.jpg"
+
+        fig.set_size_inches(15, 10)
         plt.savefig(
-            F"{path}{plot_img_name}", format="jpg")
+            F"{path}{plot_img_name}", format="jpg", dpi=500)
 
     def getInfluenceScore(self, network_name, model_date, score_type):
         neo4j_graph, centralities_max = self.neo4j_db_connector.get_graph(
@@ -172,8 +175,9 @@ class Statistics:
         self.create_directory_if_not_found(
             path=path)
         plot_img_name = F"box_plot_{request_score_type}.jpg"
+        fig.set_size_inches(15, 10)
         plt.savefig(
-            F"{path}{plot_img_name}", format="jpg")
+            F"{path}{plot_img_name}", format="jpg", dpi=500)
 
     def create_directory_if_not_found(self, path):
         if not os.path.exists(path):
