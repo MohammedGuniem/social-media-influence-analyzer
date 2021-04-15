@@ -17,19 +17,12 @@
     <div id="graphcanvas"></div>
     <script>
         var graph = JSON.parse('{{ data|tojson|safe }}');
+        console.log(graph);
 
         var container = document.getElementById("graphcanvas");
 
         var options = {
             nodes: {
-                shape: "dot",
-                color: {
-                    highlight: {
-                        border: '#2B7CE9',
-                        background: '#D2E5FF'
-                    },
-                    border: "#f03434"
-                 },
                 borderWidth: 1
             },
             edges: {
@@ -65,6 +58,20 @@
             physics: {
                 barnesHut: { gravitationalConstant: -10000 },
                 stabilization: { iterations: 2500 },
+            },
+            groups: {
+                Submission: {
+                    shape: "dot",
+                    color: "yellow",
+                },
+                Topcomment: {
+                    shape: "dot",
+                    color: "blue",
+                },
+                Subcomment: {
+                    shape: "dot",
+                    color: "red",
+                }
             },
         };
             

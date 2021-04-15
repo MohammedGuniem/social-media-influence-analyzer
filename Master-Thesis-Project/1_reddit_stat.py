@@ -2,6 +2,7 @@ from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
 from classes.statistics.Statistics import Statistics
 from dotenv import load_dotenv
+from datetime import date
 import os
 
 load_dotenv()
@@ -24,15 +25,17 @@ neo4j_db_connector = GraphDBConnector(
 
 stat = Statistics(mongo_db_connector, neo4j_db_connector)
 
+today_date = str(date.today())
+
 stat.getCrawlingRuntimes(network_name="Reddit",
-                         submissions_type="Rising", from_date="2021-04-14")
+                         submissions_type="Rising", from_date=today_date)
 
 stat.getInfluenceArea(network_name="Reddit",
-                      submissions_type="Rising", model_date="2021-04-14")
+                      submissions_type="Rising", model_date=today_date)
 
 for score_type in ["interaction", "activity", "upvotes", "interaction_and_activity", "activity_and_upvotes", "interaction_and_upvotes", "total"]:
     stat.getInfluenceScore(network_name="Reddit",
-                           model_date="2021-04-14", score_type=score_type)
+                           model_date=today_date, score_type=score_type)
 
 stat.getInfluenceScore(network_name="Reddit",
-                       model_date="2021-04-14", score_type=None)
+                       model_date=today_date, score_type=None)

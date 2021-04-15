@@ -50,9 +50,12 @@ def constructJSGraph(neo4j_graph, graph_type, score_type, centrality_max):
             js_node["color"] = {
                 "background": F"rgba(240, 52, 52, {node['props']['degree_centrality']/centrality_max})"}
         elif graph_type == "activity_graph":
+            node_type = node['props']['type']
+            js_node["label"] = F"{node_type}\\n{js_node['label']}"
             js_node["value"] = 1
             js_node["color"] = {
-                "background": activity_colors[node['props']['type']]}
+                "background": activity_colors[node_type]
+            }
 
         js_graph["nodes"].append(js_node)
 
@@ -62,7 +65,8 @@ def constructJSGraph(neo4j_graph, graph_type, score_type, centrality_max):
             "to": edge['target'],
             "color": "rgba(50, 121, 168)",
             "value": edge['props'][score_type],
-            "label": F"{str(edge['props'][score_type])}\\n{', '.join(edge['props']['influence_areas'])}"
+            "label": F"{str(edge['props'][score_type])}\\n{', '.join(edge['props']['influence_areas'])}",
+            "length": 250
         })
 
     return js_graph
