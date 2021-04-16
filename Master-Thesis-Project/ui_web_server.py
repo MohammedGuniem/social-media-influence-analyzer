@@ -96,7 +96,7 @@ def user_graph():
         network_name=network_name, date=date, relation_type="Influences")
 
     if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
-        return F"Users Graph not found, make sure you use the corret network name and crawling date in the 'graph' url parameter"
+        return F"Users Graph not found, make sure you use the correct network name and crawling date in the 'graph' url parameter"
     elif data_format == 'json':
         return jsonify(neo4j_graph)
     else:
@@ -176,16 +176,17 @@ def score():
     return render_template("graph.html", data=js_graph, graph_type="user_graph")
 
 
-# Example - GUI: http://localhost:5000/field?graph=Test_2021-04-11&score_type=total&fields=sport&fields=entertainment&operation=OR&centrality=degree
-# Example - JSON: http://localhost:5000/field?graph=Test_2021-04-11&score_type=total&fields=sport&fields=entertainment&operation=OR&centrality=degree&format=json
-@ app.route('/field', methods=['GET'])
-def field():
+# Example - GUI: http://localhost:5000/influence_area?graph=Test_2021-04-11&score_type=total&influence_areas=sport&influence_areas=entertainment&operation=OR&centrality=degree
+# Example - JSON: http://localhost:5000/field?graph=Test_2021-04-11&score_type=total&influence_areas=sport&influence_areas=entertainment&operation=OR&centrality=degree&format=json
+@ app.route('/influence_area', methods=['GET'])
+def influence_area():
     graph = request.args.get('graph', None).split("_")
     network_name, date = graph[0], graph[1]
     score_type = request.args.get('score_type', 'total')
-    fields = request.args.to_dict(flat=False)
-    if 'fields' in fields:
-        fields = fields['fields']
+    influence_areas = request.args.to_dict(flat=False)
+
+    if 'influence_areas' in influence_areas:
+        influence_areas = influence_areas['influence_areas']
     operation = request.args.get('operation', 'OR')
     centrality = request.args.get('centrality', 'degree')
     data_format = request.args.get('format')
@@ -193,12 +194,12 @@ def field():
     neo4j_graph, centralities_max = neo4j_users_db_connector.filter_by_influence_area(
         network_name=network_name,
         date=date,
-        areas_array=fields,
+        areas_array=influence_areas,
         operation=operation
     )
 
     if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
-        return F"No edges having the influence field(s) {fields} was found using {operation} operation"
+        return F"No edges having the influence area(s) {influence_areas} was found using {operation} operation"
     elif data_format == 'json':
         return jsonify(neo4j_graph)
     else:
@@ -224,7 +225,7 @@ def activity_graph():
         network_name=network_name, date=date, relation_type="Has")
 
     if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
-        return "Activities Graph not found, make sure you use the corret network name and crawling date in the 'graph' url parameter"
+        return "Activities Graph not found, make sure you use the correct network name and crawling date in the 'graph' url parameter"
     elif data_format == 'json':
         return jsonify(neo4j_graph)
     else:

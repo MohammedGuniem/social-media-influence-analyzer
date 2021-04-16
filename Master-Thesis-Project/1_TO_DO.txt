@@ -3,7 +3,6 @@ doing
 - remember to generate 2021-04-17 New Submissions
 
 to do
-make common method for the common url parameter in UI
 
 done
 - Set training ML crawl inside 1_reddit_crawl.py
