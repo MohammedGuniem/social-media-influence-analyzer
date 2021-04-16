@@ -3,7 +3,7 @@
 
     <div class="form-group">
         <label for="statistic_measure">Select a statistics measure:</label>
-        <select name="statistic_measure" class="form-control" id="statistic_measure">
+        <select name="statistic_measure" class="form-control" id="statistic_measure" required>
             <option value="crawling">Crawling Statistics</option>
             <option value="influence_areas_and_subreddits">Influence Areas vs. Subreddits Statistics</option>
             <option value="influence_scores">Influence score Statistics</option>
@@ -11,14 +11,14 @@
     </div>
     <div class="form-group">
         <label for="submissions_type">Select type of crawled submissions:</label>
-        <select name="submissions_type" class="form-control" id="submissions_type">
+        <select name="submissions_type" class="form-control" id="submissions_type" required>
             <option value="Rising">Rising</option>
             <option value="New">New</option>
         </select>
     </div>
     <div class="form-group">
         <label for="graph">Select a Graph:</label>
-        <select name="graph" class="form-control" id="graph">
+        <select name="graph" class="form-control" id="graph" required>
           {% for graph in graphs %}
             <option 
             value="{{ graph.network }}_{{ graph.date }}"
@@ -31,7 +31,7 @@
     </div>
     <div class="form-group">
         <label for="score_type">Score Type</label>
-        <select name="score_type" class="form-control" id="score_type">
+        <select name="score_type" class="form-control" id="score_type" required>
             <option value="all_scores">All scores</option>
             <option value="total" selected>Total</option>
             <option value="activity">Activity</option>

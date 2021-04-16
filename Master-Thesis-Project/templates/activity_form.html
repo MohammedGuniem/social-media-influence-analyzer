@@ -2,7 +2,7 @@
     <h3>An activity graph views the submissions and its comments as trees</h3>
     <div class="form-group">
         <label for="graph">Select a Graph:</label>
-        <select name="graph" class="form-control" id="graph">
+        <select name="graph" class="form-control" id="graph" required>
         {% for graph in graphs %}
             <option 
             value="{{ graph.network }}_{{ graph.date }}"
@@ -15,7 +15,7 @@
     </div>
     <div class="form-group">
         <label for="score_type">Score Type</label>
-        <select name="score_type" class="form-control" id="score_type">
+        <select name="score_type" class="form-control" id="score_type" required>
             <option value="total" selected>Total</option>
             <option value="activity">Activity</option>
             <option value="interaction">Interaction</option>

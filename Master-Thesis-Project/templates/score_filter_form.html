@@ -2,15 +2,15 @@
   <h3>Filter by the desired lower and upper influence score</h3>
   <div class="form-group">
     <label for="min_score">Lower Influence Score:</label>
-    <input type="number" class="form-control" id="min_score" placeholder="Lower Score Bound" name="min_score">
+    <input type="number" class="form-control" id="min_score" placeholder="Lower Score Bound" name="min_score" required>
   </div>
   <div class="form-group">
     <label for="max_score">Upper Influence Score</label>
-    <input type="number" class="form-control" id="max_score" placeholder="Upper Score Bound" name="max_score">
+    <input type="number" class="form-control" id="max_score" placeholder="Upper Score Bound" name="max_score" required>
   </div>
   <div class="form-group">
     <label for="graph">Select a Graph:</label>
-    <select name="graph" class="form-control" id="graph">
+    <select name="graph" class="form-control" id="graph" required>
       {% for graph in graphs %}
         <option 
         value="{{ graph.network }}_{{ graph.date }}"
@@ -23,7 +23,7 @@
   </div>
   <div class="form-group">
     <label for="score_type">Score Type</label>
-    <select name="score_type" class="form-control" id="score_type">
+    <select name="score_type" class="form-control" id="score_type" required>
         <option value="total" selected>Total</option>
         <option value="activity">Activity</option>
         <option value="interaction">Interaction</option>
@@ -35,7 +35,7 @@
   </div>
   <div class="form-group">
     <label for="centrality">Centrality Measure</label>
-    <select name="centrality" class="form-control" id="centrality">
+    <select name="centrality" class="form-control" id="centrality" required>
       <option value="degree" selected>Degree</option>
       <option value="betweenness">Betweenness</option>
       <option value="hits_hub">HITS hub</option>

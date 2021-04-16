@@ -1,9 +1,9 @@
 doing
-- remember to generate 2021-04-16 Rising Subreddits
-- remember to generate 2021-04-16 New Submissions
+- remember to generate 2021-04-17 Rising Subreddits
+- remember to generate 2021-04-17 New Submissions
 
 to do
-- change text in test data to refelect different topics
+make common method for the common url parameter in UI
 
 done
 - Set training ML crawl inside 1_reddit_crawl.py
@@ -24,3 +24,5 @@ solution is to split query into 2 different queries one returns distinct nodes a
 - add try catch and logging files and driver python code
 - clean up in files and folders
 - clean in neo4j and mongo db database connectors
+- change text in test data to refelect different topics
+- added extra url check at the web UI and made all input fields required

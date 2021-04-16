@@ -88,13 +88,16 @@ def index():
 @app.route('/user_graph')
 def user_graph():
     data_format = request.args.get('format', None)
-    score_type = request.args.get('score_type', "total")
+    score_type = request.args.get('score_type', 'total')
     centrality = request.args.get('centrality', 'degree')
     graph = request.args.get('graph', None).split("_")
+    network_name, date = graph[0], graph[1]
     neo4j_graph, centralities_max = neo4j_users_db_connector.get_graph(
-        network_name=graph[0], date=graph[1], relation_type="Influences")
+        network_name=network_name, date=date, relation_type="Influences")
 
-    if data_format == 'json':
+    if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
+        return F"Users Graph not found, make sure you use the corret network name and crawling date in the 'graph' url parameter"
+    elif data_format == 'json':
         return jsonify(neo4j_graph)
     else:
         js_graph = constructJSGraph(
@@ -112,18 +115,22 @@ def user_graph():
 def path():
     data_format = request.args.get('format')
     graph = request.args.get('graph', None).split("_")
+    network_name, date = graph[0], graph[1]
     centrality = request.args.get('centrality', 'degree')
-    score_type = request.args.get('score_type', "total")
+    score_type = request.args.get('score_type', 'total')
     source_name = request.args.get('source_name', '')
     target_name = request.args.get('target_name', '')
 
     neo4j_graph, centralities_max = neo4j_users_db_connector.get_path(
-        network_name=graph[0],
-        date=graph[1],
+        network_name=network_name,
+        date=date,
         from_name=source_name,
         to_name=target_name
     )
-    if data_format == 'json':
+
+    if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
+        return F"No path is found between {source_name} and {target_name}"
+    elif data_format == 'json':
         return jsonify(neo4j_graph)
     else:
         js_graph = constructJSGraph(
@@ -141,20 +148,23 @@ def path():
 def score():
     data_format = request.args.get('format')
     graph = request.args.get('graph', None).split("_")
+    network_name, date = graph[0], graph[1]
     min_score = int(request.args.get('min_score', 0))
     max_score = int(request.args.get('max_score', 0))
     score_type = request.args.get('score_type', 'total')
     centrality = request.args.get('centrality', 'degree')
 
     neo4j_graph, centralities_max = neo4j_users_db_connector.filter_by_score(
-        network_name=graph[0],
-        date=graph[1],
+        network_name=network_name,
+        date=date,
         score_type=score_type,
         lower_score=min_score,
         upper_score=max_score
     )
 
-    if data_format == 'json':
+    if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
+        return F"No edges having the score between {min_score} and {max_score} was found"
+    elif data_format == 'json':
         return jsonify(neo4j_graph)
     else:
         js_graph = constructJSGraph(
@@ -171,20 +181,25 @@ def score():
 @ app.route('/field', methods=['GET'])
 def field():
     graph = request.args.get('graph', None).split("_")
+    network_name, date = graph[0], graph[1]
     score_type = request.args.get('score_type', 'total')
-    fields = request.args.to_dict(flat=False)['fields']
+    fields = request.args.to_dict(flat=False)
+    if 'fields' in fields:
+        fields = fields['fields']
     operation = request.args.get('operation', 'OR')
     centrality = request.args.get('centrality', 'degree')
     data_format = request.args.get('format')
 
     neo4j_graph, centralities_max = neo4j_users_db_connector.filter_by_influence_area(
-        network_name=graph[0],
-        date=graph[1],
+        network_name=network_name,
+        date=date,
         areas_array=fields,
         operation=operation
     )
 
-    if data_format == 'json':
+    if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
+        return F"No edges having the influence field(s) {fields} was found using {operation} operation"
+    elif data_format == 'json':
         return jsonify(neo4j_graph)
     else:
         js_graph = constructJSGraph(
@@ -201,12 +216,16 @@ def field():
 @app.route('/activity_graph')
 def activity_graph():
     graph = request.args.get('graph', None).split("_")
+    network_name, date = graph[0], graph[1]
     score_type = request.args.get('score_type', "total")
     data_format = request.args.get('format', None)
 
     neo4j_graph, centralities_max = neo4j_activities_db_connector.get_graph(
-        network_name=graph[0], date=graph[1], relation_type="Has")
-    if data_format == 'json':
+        network_name=network_name, date=date, relation_type="Has")
+
+    if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
+        return "Activities Graph not found, make sure you use the corret network name and crawling date in the 'graph' url parameter"
+    elif data_format == 'json':
         return jsonify(neo4j_graph)
     else:
         js_graph = constructJSGraph(
@@ -223,9 +242,10 @@ def statistics():
     statistic_measure = request.args.get('statistic_measure', None)
     submissions_type = request.args.get('submissions_type', 'Rising')
     graph = request.args.get('graph', None).split("_")
+    network_name, date = graph[0], graph[1]
     score_type = request.args.get('score_type', "total")
 
-    plt_img_path = F"statistics_plots/{statistic_measure}/{graph[0]}/{graph[1]}/"
+    plt_img_path = F"statistics_plots/{statistic_measure}/{network_name}/{date}/"
     if statistic_measure == "crawling":
         plt_img_path += F"bar_plot_{submissions_type}.jpg"
     elif statistic_measure == "influence_areas_and_subreddits":
@@ -233,8 +253,12 @@ def statistics():
     elif statistic_measure == "influence_scores":
         plt_img_path += F"box_plot_{score_type}.jpg"
     else:
-        return "Unknown type of statistics"
-    return send_file(plt_img_path, mimetype="image/jpg")
+        return "Unknown type of statistics, parameters might be missing"
+
+    if os.path.isfile(plt_img_path):
+        return send_file(plt_img_path, mimetype="image/jpg")
+    else:
+        return "Statistics from this network and date is not available, make sure you are using the correct network, submission type, date and score"
 
 
 if __name__ == '__main__':
