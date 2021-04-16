@@ -7,6 +7,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import KFold
 from sklearn.pipeline import Pipeline
 from dotenv import load_dotenv
+from datetime import date
 import pandas as pd
 import numpy as np
 import random
@@ -23,8 +24,10 @@ mongo_db_pass = os.environ.get('mongo_db_pass')
 mongo_db_connector = MongoDBConnector(
     host=mongo_db_host, port=int(mongo_db_port), user=mongo_db_user, passowrd=mongo_db_pass)
 
+today_date = str(date.today())
+
 data = mongo_db_connector.readFromDB(database_name="Text_Classification_Training_Data", query={
-}, single=True, collection_name="2021-03-31")
+}, single=True, collection_name=today_date)
 del data["_id"]
 
 data = data["training_data"]
@@ -57,3 +60,30 @@ y_pred = text_clf.predict(X_test)
 print(classification_report(y_test, y_pred, target_names=list(set(labels))))
 
 print(confusion_matrix(y_test, y_pred))
+
+print()
+print("Small test")
+test_titles = [
+    {
+        "title": "Tech giant invests 30 billions in renewable energy",
+        "expected_topic_class": "economy"
+    },
+    {
+        "title": "If only America could have short election cycles like near everywhere else",
+        "expected_topic_class": "politic"
+    },
+    {
+        "title": "100 days to go until Tokyo 2020",
+        "expected_topic_class": "sport"
+    },
+    {
+        "title": "Kroger Is Amassing A Robot Army To Battle Amazon, Walmart",
+        "expected_topic_class": "technology"
+    }
+]
+print("title, expected, predicted")
+for record in test_titles:
+    title = record['title']
+    expected_topic_class = record['expected_topic_class']
+    predicted_topic_class = text_clf.predict([title])
+    print(F"{title}, {expected_topic_class}, {predicted_topic_class}")

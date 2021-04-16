@@ -106,7 +106,13 @@ class RedditCrawler:
             submission.comments.replace_more(limit=3)
             for comment in submission.comments.list():
 
-                if not hasattr(comment.author, 'id') or not hasattr(comment.author, 'name'):
+                # This to check if the comment is valid and provides a username and user ID
+                # unfortunately this check does not work, if we merge all checks into one using OR operator
+                if not hasattr(comment, 'author'):
+                    continue
+                elif not hasattr(comment.author, 'id'):
+                    continue
+                elif not hasattr(comment.author, 'name'):
                     continue
 
                 extracted_comment = {

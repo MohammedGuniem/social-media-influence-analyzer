@@ -13,11 +13,11 @@ class TestCrawler:
         dummy_groups = [
             {
                 "id": "Test_1",
-                "display_name": "TestGroup1"
+                "display_name": "Economy_and_Politic_Group"
             },
             {
                 "id": "Test_2",
-                "display_name": "TestGroup2"
+                "display_name": "Sport_and_Technology_Group"
             }
         ]
         self.runtime_register.groups_count = len(dummy_groups)
@@ -34,7 +34,7 @@ class TestCrawler:
                 "author_name": "User A",
                 "num_comments": 4,
                 "group_id": "Test_1",
-                "body": "What's up?",
+                "body": "Tech giant invests 30 billions in renewable energy",
                 "upvotes": 10
             },
             {
@@ -43,7 +43,7 @@ class TestCrawler:
                 "author_name": "User B",
                 "num_comments": 3,
                 "group_id": "Test_1",
-                "body": "What a lovely day!",
+                "body": "If only America could have short election cycles like near everywhere else",
                 "upvotes": 3
             },
             {
@@ -51,8 +51,8 @@ class TestCrawler:
                 "author_id": "U_3",
                 "author_name": "User C",
                 "num_comments": 5,
-                "group_id": "Test_1",
-                "body": "Who likes icecream?",
+                "group_id": "Test_2",
+                "body": "100 days to go until Tokyo 2020",
                 "upvotes": 10
             },
             {
@@ -61,7 +61,7 @@ class TestCrawler:
                 "author_name": "User C",
                 "num_comments": 1,
                 "group_id": "Test_2",
-                "body": "What a lovely day!",
+                "body": "Kroger Is Amassing A Robot Army To Battle Amazon, Walmart",
                 "upvotes": 7
             }
         ]
