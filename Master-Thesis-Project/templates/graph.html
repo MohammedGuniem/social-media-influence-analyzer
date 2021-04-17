@@ -78,6 +78,7 @@
         var network = new vis.Network(container, graph, options);
         network.on("click", function (params) {
             var node_id = params.nodes[0]
+            var edge_id = params.edges[0]
             if (node_id) {
                 var node = this.body.nodes[node_id];
                 if ('{{ graph_type }}' == 'user_graph') {
@@ -94,9 +95,7 @@
                         +` Username: ${username},`
                         +` User ID: ${node_id}`
                 }  
-            }
-            var edge_id = params.edges[0]
-            if (edge_id) {
+            } else if (edge_id) {
                 var edge = this.body.edges[edge_id];
                 if ('{{ graph_type }}' == 'user_graph') {
                     document.getElementById("edgeInfo").innerText = 

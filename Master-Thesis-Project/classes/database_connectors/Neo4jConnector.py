@@ -31,20 +31,16 @@ class GraphDBConnector:
 
     def save_node(self, node_id, node_type, node_props, network_name, date):
         with self.driver.session(database=self.database) as session:
-
             # Preparing props for ON CREATE and On MATCH for update
             node_props = self.prepare_props(pointer="n", props=node_props)
-
             session.write_transaction(
                 self._create_or_update_node, node_id, node_type, node_props, network_name, date)
 
     def save_edge(self, from_node, to_node, edge_type, edge_props, network_name, date):
         with self.driver.session(database=self.database) as session:
-
             # Preparing props for ON CREATE and On MATCH for update
             edge_props = self.prepare_props(
                 pointer="r", props=edge_props)
-
             session.write_transaction(
                 self._create_or_update_edge, from_node, to_node, edge_type, edge_props, network_name, date)
 
@@ -59,7 +55,6 @@ class GraphDBConnector:
             elif centrality == "hits_centrality_":
                 procedure_name = "gds.alpha.hits.write"
                 additional = ",hitsIterations: 10"
-
             query = (
                 F"CALL {procedure_name}"
                 "({ "
@@ -80,7 +75,6 @@ class GraphDBConnector:
     def _create_or_update_node(tx, node_id, node_type, props, network_name, date):
         node_type = node_type.upper()[0] + node_type.lower()[1:]
         pointer = "n"
-
         # Constructing query
         query = "MERGE ("+pointer+":"+node_type + \
             " {network_id: '"+node_id+"', network: '" + \
@@ -89,7 +83,6 @@ class GraphDBConnector:
         query += props
         query += "\nON MATCH SET\n"
         query += props
-
         # Sending query to DB
         result = tx.run(query)
 
@@ -97,7 +90,6 @@ class GraphDBConnector:
     def _create_or_update_edge(tx, from_node, to_node, edge_type, edge_props, network_name, date):
         edge_type = F"{edge_type[0]}{edge_type[1:]}"
         edge_pointer = "r"
-
         # Constructing query
         query = ""
         query += "MATCH (from:"+from_node.type + \
@@ -111,7 +103,6 @@ class GraphDBConnector:
         query += edge_props
         query += "\nON MATCH SET\n"
         query += edge_props
-
         # Sending query to DB
         result = tx.run(query)
 
@@ -148,31 +139,21 @@ class GraphDBConnector:
     def get_graph(self, network_name, date, relation_type):
         with self.driver.session(database=self.database) as session:
             query = (
-                "MATCH(n { "
-                F"network: '{network_name}', "
-                F"date: '{date}' "
-                "}) "
                 "MATCH (s { "
                 F"network: '{network_name}', "
                 F"date: '{date}' "
-                "})-[r]->(t { "
+                "}) "
+                "MATCH (t { "
                 F"network: '{network_name}', "
                 F"date: '{date}' "
                 "}) "
+                "MATCH p=(s)-[r]->(t) "
+                "WITH *, relationships(p) AS relations "
+                "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data"
             )
-            nodes = session.read_transaction(
-                self._get_all_graph_nodes, query)
-
-            links = session.read_transaction(
-                self._get_all_graph_links, query)
-
-            graph = {
-                "nodes": nodes,
-                "links": links
-            }
-
+            graph = session.read_transaction(
+                self._read_graph, query)
             centralities_max = self.get_centralitites_max(network_name, date)
-
             return graph, centralities_max
 
     def get_path(self, network_name, date, from_name, to_name):
@@ -189,10 +170,8 @@ class GraphDBConnector:
                 F"RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
             )
             path_subgraph = session.read_transaction(
-                self._read_subgraph, query)
-
+                self._read_graph, query)
             centralities_max = self.get_centralitites_max(network_name, date)
-
             return path_subgraph, centralities_max
 
     def filter_by_score(self, network_name, date, score_type, lower_score, upper_score):
@@ -211,10 +190,8 @@ class GraphDBConnector:
                 "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
             )
             result = session.read_transaction(
-                self._read_subgraph, query)
-
+                self._read_graph, query)
             centralities_max = self.get_centralitites_max(network_name, date)
-
             return result, centralities_max
 
     def filter_by_influence_area(self, network_name, date, areas_array, operation):
@@ -226,7 +203,6 @@ class GraphDBConnector:
                 filter_syntax = F' {operation} '.join(filters)
             else:
                 return
-
             query = (
                 "MATCH (n {network: '"+network_name+"', date: '"+date+"'}) "
                 "MATCH (m {network: '"+network_name+"', date: '"+date+"'}) "
@@ -236,10 +212,8 @@ class GraphDBConnector:
                 "RETURN [relation IN relations | [startNode(relation), (relation), endNode(relation)]] as data "
             )
             result = session.read_transaction(
-                self._read_subgraph, query)
-
+                self._read_graph, query)
             centralities_max = self.get_centralitites_max(network_name, date)
-
             return result, centralities_max
 
     @ staticmethod
@@ -252,7 +226,6 @@ class GraphDBConnector:
                 "date": record["date"]
             }
             available_graphs.append(graph)
-
         return available_graphs
 
     @ staticmethod
@@ -266,43 +239,10 @@ class GraphDBConnector:
             centralities_max["hits_auth"] = record["max_hits_auth"]
         return centralities_max
 
-    @staticmethod
-    def _get_all_graph_nodes(tx, query):
-        query = query + "RETURN distinct n AS node"
-        result = tx.run(query)
-        nodes = []
-        for record in result:
-            node = {}
-            node['id'] = record["node"]['network_id']
-            node['props'] = {}
-            for prop, val in record["node"].items():
-                if prop != "network_id":
-                    node['props'][prop] = val
-            if node not in nodes:
-                nodes.append(node)
-        return nodes
-
-    @staticmethod
-    def _get_all_graph_links(tx, query):
-        query = query + "RETURN distinct s AS source, r AS relation, t AS target"
-        result = tx.run(query)
-        links = []
-        for record in result:
-            relation = {}
-            relation['source'] = record["source"]['network_id']
-            relation['target'] = record["target"]['network_id']
-            relation['props'] = {}
-            for prop, val in record["relation"].items():
-                relation['props'][prop] = val
-            if relation not in links:
-                links.append(relation)
-        return links
-
     @ staticmethod
-    def _read_subgraph(tx, query):
+    def _read_graph(tx, query):
         result = tx.run(query)
         nodes, links = [], []
-
         for path_array in result:
             data = path_array['data']
             for relation in data:
@@ -319,20 +259,36 @@ class GraphDBConnector:
                             node['id'] = val
                     if node not in nodes:
                         nodes.append(node)
-
                 link = {
                     'source': start_node['network_id'],
                     'target': end_node['network_id'],
                     'props': {}
                 }
-
                 for attr, val in relation_info.items():
                     if attr != "network_id":
                         link['props'][attr] = val
                     else:
                         link['id'] = val
-
                 if link not in links:
                     links.append(link)
-
         return {"nodes": nodes, "links": links}
+
+    """ Deleting methods """
+
+    def delete_graph(self, network_name, date):
+        with self.driver.session() as session:
+            query = (
+                "MATCH (n {"
+                F"network: '{network_name}'"
+                "})"
+                F"WHERE n.date < '{date}'"
+                "DETACH DELETE n"
+            )
+            result = session.write_transaction(
+                self._delete_graph, query)
+            return result
+
+    @staticmethod
+    def _delete_graph(tx, query):
+        result = tx.run(query)
+        return result

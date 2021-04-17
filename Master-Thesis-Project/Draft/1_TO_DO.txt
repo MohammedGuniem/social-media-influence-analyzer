@@ -1,6 +1,6 @@
 doing
-- remember to generate 2021-04-17 Rising Subreddits
-- remember to generate 2021-04-17 New Submissions
+- remember to generate 2021-04-18 Rising Subreddits
+- remember to generate 2021-04-18 New Submissions
 
 to do
 
@@ -25,3 +25,8 @@ solution is to split query into 2 different queries one returns distinct nodes a
 - clean in neo4j and mongo db database connectors
 - change text in test data to refelect different topics
 - added extra url check at the web UI and made all input fields required
+- make full graph query more efficient
+- found out why an edge get selected when selecting a node
+- sort graphs before sending to client
+- make a delete script for data older than 30 days
+- make sure influence area read from right crawl date 

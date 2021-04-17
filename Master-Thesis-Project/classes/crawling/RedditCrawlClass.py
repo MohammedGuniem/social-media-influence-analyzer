@@ -180,6 +180,7 @@ class RedditCrawler:
 
         return all_submissions
 
+    # Method to crawl trainingdata to enable topic classification of a certain submission
     def getInfluenceAreaTrainingData(self, submissions_limit, submissions_type):
         start = time.time()
 
@@ -202,10 +203,10 @@ class RedditCrawler:
                         "label": category
                     })
 
-        self.runtime_register.text_classification_submissions_type = submissions_type
-        self.runtime_register.text_classification_submissions_count = len(
+        self.runtime_register.training_submissions_type = submissions_type
+        self.runtime_register.training_submissions_count = len(
             data["training_data"])
-        self.runtime_register.text_classification_submissions_crawling_time = time.time() - \
+        self.runtime_register.training_submissions_crawling_time = time.time() - \
             start
 
         return data

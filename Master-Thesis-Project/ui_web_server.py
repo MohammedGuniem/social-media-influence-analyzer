@@ -80,6 +80,8 @@ def index():
     for graph in user_graphs:
         if graph in activity_graphs:
             valid_graphs.append(graph)
+    valid_graphs = sorted(valid_graphs, key=lambda graph: (
+        graph['network'], graph['date']))
     return render_template("index.html", graphs=valid_graphs)
 
 

@@ -4,10 +4,11 @@ from classes.modelling.Edge import Edge
 
 
 class Graph:
-    def __init__(self, mongo_db_connector, neo4j_db_connector):
+    def __init__(self, mongo_db_connector, neo4j_db_connector, network_name, submissions_type, date):
         self.mongo_db_connector = mongo_db_connector
         self.neo4j_db_connector = neo4j_db_connector
-        self.text_classifier = TextClassifier(mongo_db_connector)
+        self.text_classifier = TextClassifier(
+            mongo_db_connector, network_name, submissions_type, date)
         self.nodes = {}
         self.edges = {}
 

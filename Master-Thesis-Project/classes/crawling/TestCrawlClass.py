@@ -73,6 +73,7 @@ class TestCrawler:
     # Method to crawl comments information.
     def getComments(self):
         start = time.time()
+
         dummy_comments = [
             {
                 "id": "TC_1",
@@ -208,3 +209,56 @@ class TestCrawler:
         self.runtime_register.comments_count = len(dummy_comments)
         self.runtime_register.comments_crawling_time = time.time() - start
         return dummy_comments
+
+    # Method to crawl trainingdata to enable topic classification of a certain submission
+    def getInfluenceAreaTrainingData(self):
+        start = time.time()
+        data = {
+            "training_data": [
+                {
+                    "title": "Canada and USA have unveiled their Olympic uniforms and the internet -...",
+                    "label": "sport"
+                },
+                {
+                    "title": "Hi Reddit I’m Sakura Kokumai, and I’m training to become the first Kar...",
+                    "label": "sport"
+                },
+                {
+                    "title": "California to hunt greenhouse gas leaks and superemitters with monitor...",
+                    "label": "technology"
+                },
+                {
+                    "title": "Researchers creating a safer, cleaner way to recover rare-earth metals...",
+                    "label": "technology"
+                },
+                {
+                    "title": "Biden White House's secret weapon on infrastructure: small businesses",
+                    "label": "economy"
+                },
+                {
+                    "title": "Binance destroys $595 million worth of BNB tokens in its largest-ever ...",
+                    "label": "economy"
+                },
+                {
+                    "title": "What are some of your cinematic hot takes?",
+                    "label": "entertainment"
+                },
+                {
+                    "title": "Bill & Ted's Bogus Journey (1991) - Two Stations Merge Scene (8/10) | ...",
+                    "label": "entertainment"
+                },
+                {
+                    "title": "IG Knocks Pompeo For Having State Staff Do Errands That Were ‘Personal...",
+                    "label": "politic"
+                },
+                {
+                    "title": "As voting fight moves westward, accusations of racism follow",
+                    "label": "politic"
+                }
+            ]
+        }
+        self.runtime_register.training_submissions_type = "New"
+        self.runtime_register.training_submissions_count = len(
+            data["training_data"])
+        self.runtime_register.training_submissions_crawling_time = time.time() - start
+        return data

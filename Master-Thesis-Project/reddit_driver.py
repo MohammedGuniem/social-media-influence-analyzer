@@ -10,19 +10,10 @@ from datetime import date
 import logging
 import os
 
-network_name = "Reddit"
-date = str(date.today())
-
-log_path = F"Logs/{network_name}/{date}/"
-
-# Create logs file if not found
-if not os.path.exists(log_path):
-    os.makedirs(log_path)
-
-# create error logger
-logging.basicConfig(filename=F'{log_path}/errors.log', level=logging.INFO)
-
 try:
+    network_name = "Reddit"
+    date = str(date.today())
+
     load_dotenv()
 
     print("Stage 1 - Crawling data...")
@@ -90,7 +81,7 @@ try:
     )
 
     # Writing training submission titles to determine influence area using machine learning
-    mongo_db_connector.writeToDB(database_name="Text_Classification_Training_Data",
+    mongo_db_connector.writeToDB(database_name=F"{social_network_name}_{submissions_type}_Training_Data",
                                  collection_name=date, data=[training_data])
 
     # Fetching the registered runtimes from this crawling run
@@ -115,7 +106,10 @@ try:
 
     user_model = UserGraph(
         mongo_db_connector=mongo_db_connector,
-        neo4j_db_connector=neo4j_db_users_connector
+        neo4j_db_connector=neo4j_db_users_connector,
+        network_name=network_name,
+        submissions_type=submissions_type,
+        date=date
     )
 
     user_model.build(network_name=network_name, submissions_type="Rising")
@@ -136,7 +130,10 @@ try:
 
     activity_model = ActivityGraph(
         mongo_db_connector=mongo_db_connector,
-        neo4j_db_connector=neo4j_db_activities_connector
+        neo4j_db_connector=neo4j_db_activities_connector,
+        network_name=network_name,
+        submissions_type=submissions_type,
+        date=date
     )
 
     activity_model.build(network_name=network_name, submissions_type="Rising")
@@ -165,4 +162,14 @@ try:
                            model_date=date, score_type=None)
 
 except Exception as e:
+    log_path = F"Logs/{network_name}/{date}/"
+
+    # create logs file if not found
+    if not os.path.exists(log_path):
+        os.makedirs(log_path)
+
+    # create error logger
+    logging.basicConfig(filename=F'{log_path}/errors.log', level=logging.INFO)
+
+    # log error
     logging.error(F'\nError: {ctime(time())}\n{str(e)}\n', exc_info=True)

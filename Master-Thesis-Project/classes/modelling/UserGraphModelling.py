@@ -4,8 +4,9 @@ from classes.modelling.Edge import Edge
 
 
 class UserGraph(Graph):
-    def __init__(self, mongo_db_connector, neo4j_db_connector):
-        super().__init__(mongo_db_connector, neo4j_db_connector)
+    def __init__(self, mongo_db_connector, neo4j_db_connector, network_name, submissions_type, date):
+        super().__init__(mongo_db_connector, neo4j_db_connector,
+                         network_name, submissions_type, date)
 
     def addOrUpdateNode(self, activity_object, node_type):
         node_id = activity_object["author_id"]
