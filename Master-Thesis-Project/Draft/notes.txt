@@ -50,3 +50,6 @@ MATCH (n)
 DETACH DELETE n
 
 C:\Program Files\Java\OpenJDK11\jdk-11.0.2
+
+# How to set up reddit_crawler in Windows task scheduler
+https://www.jcchouinard.com/python-automation-using-task-scheduler/

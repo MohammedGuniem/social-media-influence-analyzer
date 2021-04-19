@@ -3,6 +3,8 @@ doing
 - remember to generate 2021-04-18 New Submissions
 
 to do
+- secure url parameters by allowing a certain range of input strings
+- put image in frame when getting statistics
 
 done
 - Set training ML crawl inside 1_reddit_crawl.py
@@ -30,3 +32,4 @@ solution is to split query into 2 different queries one returns distinct nodes a
 - sort graphs before sending to client
 - make a delete script for data older than 30 days
 - make sure influence area read from right crawl date 
+- made nodes and edges sticky in js UI

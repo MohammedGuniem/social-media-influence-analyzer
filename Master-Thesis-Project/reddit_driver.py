@@ -38,8 +38,8 @@ try:
     # Name of social network to be crawled
     social_network_name = network_name
 
-    # Setting the submissions type to Rising
-    submissions_type = "Rising"
+    # Setting the submissions type to New
+    submissions_type = "New"
 
     # Crawling groups
     groups = crawler.getGroups(top_n_subreddits=3)
@@ -112,7 +112,8 @@ try:
         date=date
     )
 
-    user_model.build(network_name=network_name, submissions_type="Rising")
+    user_model.build(network_name=network_name,
+                     submissions_type=submissions_type)
 
     user_model.save(graph_type="user_graph",
                     network_name=network_name, date=date)
@@ -136,7 +137,8 @@ try:
         date=date
     )
 
-    activity_model.build(network_name=network_name, submissions_type="Rising")
+    activity_model.build(network_name=network_name,
+                         submissions_type=submissions_type)
 
     activity_model.save(graph_type="activity_graph",
                         network_name=network_name, date=date)
@@ -149,10 +151,10 @@ try:
     stat = Statistics(mongo_db_connector, neo4j_db_users_connector)
 
     stat.getCrawlingRuntimes(network_name=network_name,
-                             submissions_type="Rising", from_date=date)
+                             submissions_type=submissions_type, from_date=date)
 
     stat.getInfluenceArea(network_name=network_name,
-                          submissions_type="Rising", model_date=date)
+                          submissions_type=submissions_type, model_date=date)
 
     for score_type in ["interaction", "activity", "upvotes", "interaction_and_activity", "activity_and_upvotes", "interaction_and_upvotes", "total"]:
         stat.getInfluenceScore(network_name=network_name,
