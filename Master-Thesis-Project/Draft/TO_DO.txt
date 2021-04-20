@@ -32,3 +32,5 @@ solution is to split query into 2 different queries one returns distinct nodes a
 - make sure influence area read from right crawl date 
 - made nodes and edges sticky in js UI
 - add submission_type to neo4j graphs
+- Adding while loop and execution plan to driver scripts
+- Also adding stages and stage selection in driver scripts

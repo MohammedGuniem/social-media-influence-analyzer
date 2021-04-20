@@ -12,146 +12,173 @@ import logging
 import os
 
 try:
-    # Name of social network to be crawled
-    network_name = "Test"
+    exec_plan = {
+        "run_1": {
+            "network_name": "Test",
+            "submissions_type": "New",
+            "stages": ["crawling", "users_modelling", "activities_modelling", "statistics"]
+        }
+    }
 
-    # Assuming we are crawling the newest submissions
-    submissions_type = "New"
+    for run_id, config in exec_plan.items():
 
-    date = str(date.today())
+        # Name of social network to be crawled
+        network_name = config["network_name"]
 
-    collection_name = date
+        # Assuming we are crawling the newest submissions
+        submissions_type = config["submissions_type"]
 
-    load_dotenv()
+        stages = config["stages"]
 
-    print("Stage 1 - Crawling data...")
+        date = str(date.today())
 
-    # Mongo db database connector
-    mongo_db_connector = MongoDBConnector(
-        host=os.environ.get('mongo_db_host'),
-        port=int(os.environ.get('mongo_db_port')),
-        user=os.environ.get('mongo_db_user'),
-        passowrd=os.environ.get('mongo_db_pass')
-    )
+        collection_name = date
 
-    # Test crawler
-    crawler = TestCrawler()
+        load_dotenv()
 
-    # Crawling groups/subreddits
-    groups = crawler.getGroups()
+        print(F"Date:{date}, Run ID: {run_id}\n")
 
-    # Crawling submissions
-    submissions = crawler.getSubmissions()
+        # Mongo db database connector
+        mongo_db_connector = MongoDBConnector(
+            host=os.environ.get('mongo_db_host'),
+            port=int(os.environ.get('mongo_db_port')),
+            user=os.environ.get('mongo_db_user'),
+            passowrd=os.environ.get('mongo_db_pass')
+        )
 
-    # Crawling Comments
-    comments = crawler.getComments()
+        print("Stage 1 - Crawling data...")
+        if "crawling" in stages:
+            print(
+                F"Crawling {network_name} extracting {submissions_type} submissions")
 
-    # Fetching training submission titles to determine influence area using machine learning
-    training_data = crawler.getInfluenceAreaTrainingData()
+            # Test crawler
+            crawler = TestCrawler()
 
-    # Writing groups/subreddits to mongoDB archive
-    mongo_db_connector.writeToDB(
-        database_name=F"{network_name}_{submissions_type}_Groups_DB",
-        collection_name=collection_name,
-        data=groups
-    )
+            # Crawling groups/subreddits
+            groups = crawler.getGroups()
 
-    # Writing submissions to mongoDB archive
-    mongo_db_connector.writeToDB(
-        database_name=F"{network_name}_{submissions_type}_Submissions_DB",
-        collection_name=collection_name,
-        data=submissions
-    )
+            # Crawling submissions
+            submissions = crawler.getSubmissions()
 
-    # Writing comments to mongoDB archive
-    mongo_db_connector.writeToDB(
-        database_name=F"{network_name}_{submissions_type}_Comments_DB",
-        collection_name=collection_name,
-        data=comments
-    )
+            # Crawling Comments
+            comments = crawler.getComments()
 
-    # Writing training submission titles to determine influence area using machine learning
-    mongo_db_connector.writeToDB(
-        database_name=F"{network_name}_{submissions_type}_Training_Data",
-        collection_name=collection_name, data=[training_data]
-    )
+            # Fetching training submission titles to determine influence area using machine learning
+            training_data = crawler.getInfluenceAreaTrainingData()
 
-    # Fetching the registered runtimes from this crawling run
-    runtime_register = crawler.runtime_register.getRunningTime()
+            # Writing groups/subreddits to mongoDB archive
+            mongo_db_connector.writeToDB(
+                database_name=F"{network_name}_{submissions_type}_Groups_DB",
+                collection_name=collection_name,
+                data=groups
+            )
 
-    # logging the runtime register into admin DB in mongoDB
-    mongo_db_connector.writeToDB(
-        database_name="admin",
-        collection_name="crawling_runtime_register",
-        data=[runtime_register]
-    )
+            # Writing submissions to mongoDB archive
+            mongo_db_connector.writeToDB(
+                database_name=F"{network_name}_{submissions_type}_Submissions_DB",
+                collection_name=collection_name,
+                data=submissions
+            )
 
-    print("\nStage 2 - Building Influence model...")
+            # Writing comments to mongoDB archive
+            mongo_db_connector.writeToDB(
+                database_name=F"{network_name}_{submissions_type}_Comments_DB",
+                collection_name=collection_name,
+                data=comments
+            )
 
-    # Neo4j users database connector
-    neo4j_db_users_connector = GraphDBConnector(
-        host=os.environ.get('neo4j_users_db_host'),
-        port=int(os.environ.get('neo4j_users_db_port')),
-        user=os.environ.get('neo4j_users_db_user'),
-        password=os.environ.get('neo4j_users_db_pass'),
-    )
+            # Writing training submission titles to determine influence area using machine learning
+            mongo_db_connector.writeToDB(
+                database_name=F"{network_name}_{submissions_type}_Training_Data",
+                collection_name=collection_name, data=[training_data]
+            )
 
-    user_model = UserGraph(
-        mongo_db_connector=mongo_db_connector,
-        neo4j_db_connector=neo4j_db_users_connector,
-        network_name=network_name,
-        submissions_type=submissions_type,
-        date=date
-    )
+            # Fetching the registered runtimes from this crawling run
+            runtime_register = crawler.runtime_register.getRunningTime()
 
-    user_model.build()
+            # logging the runtime register into admin DB in mongoDB
+            mongo_db_connector.writeToDB(
+                database_name="admin",
+                collection_name="crawling_runtime_register",
+                data=[runtime_register]
+            )
+        else:
+            print("Jumped over stage 1 as it is not in the stage configuration array.")
 
-    user_model.save(graph_type="user_graph")
+        print("\nStage 2 - Building Users Influence model...")
+        if "users_modelling" in stages:
+            # Neo4j users database connector
+            neo4j_db_users_connector = GraphDBConnector(
+                host=os.environ.get('neo4j_users_db_host'),
+                port=int(os.environ.get('neo4j_users_db_port')),
+                user=os.environ.get('neo4j_users_db_user'),
+                password=os.environ.get('neo4j_users_db_pass'),
+            )
 
-    print(
-        F"User Graph: #nodes: {len(user_model.nodes)}, #edges: {len(user_model.edges)}")
+            user_model = UserGraph(
+                mongo_db_connector=mongo_db_connector,
+                neo4j_db_connector=neo4j_db_users_connector,
+                network_name=network_name,
+                submissions_type=submissions_type,
+                date=date
+            )
 
-    # Neo4j activities database connector
-    neo4j_db_activities_cconnector = GraphDBConnector(
-        host=os.environ.get('neo4j_activities_db_host'),
-        port=int(os.environ.get('neo4j_activities_db_port')),
-        user=os.environ.get('neo4j_activities_db_user'),
-        password=os.environ.get('neo4j_activities_db_pass'),
-    )
+            user_model.build()
 
-    activity_model = ActivityGraph(
-        mongo_db_connector=mongo_db_connector,
-        neo4j_db_connector=neo4j_db_activities_cconnector,
-        network_name=network_name,
-        submissions_type=submissions_type,
-        date=date
-    )
+            user_model.save(graph_type="user_graph")
 
-    activity_model.build()
+            print(
+                F"User Graph: #nodes: {len(user_model.nodes)}, #edges: {len(user_model.edges)}")
+        else:
+            print("Jumped over stage 2 as it is not in the stage configuration array.")
 
-    activity_model.save(graph_type="activity_graph")
+        print("\nStage 3 - Building Activities Influence model...")
+        if "activities_modelling" in stages:
+            # Neo4j activities database connector
+            neo4j_db_activities_cconnector = GraphDBConnector(
+                host=os.environ.get('neo4j_activities_db_host'),
+                port=int(os.environ.get('neo4j_activities_db_port')),
+                user=os.environ.get('neo4j_activities_db_user'),
+                password=os.environ.get('neo4j_activities_db_pass'),
+            )
 
-    print(
-        F"Activity Graph: #nodes: {len(activity_model.nodes)}, #edges: {len(activity_model.edges)}")
+            activity_model = ActivityGraph(
+                mongo_db_connector=mongo_db_connector,
+                neo4j_db_connector=neo4j_db_activities_cconnector,
+                network_name=network_name,
+                submissions_type=submissions_type,
+                date=date
+            )
 
-    print("\nStage 3 - Drawing statistics...")
+            activity_model.build()
 
-    stat = Statistics(
-        mongo_db_connector,
-        neo4j_db_users_connector,
-        network_name,
-        submissions_type,
-        date
-    )
+            activity_model.save(graph_type="activity_graph")
 
-    stat.getCrawlingRuntimes()
+            print(
+                F"Activity Graph: #nodes: {len(activity_model.nodes)}, #edges: {len(activity_model.edges)}")
+        else:
+            print("Jumped over stage 3 as it is not in the stage configuration array.")
 
-    stat.getInfluenceArea()
+        print("\nStage 4 - Drawing statistics...")
+        if "statistics" in stages:
+            stat = Statistics(
+                mongo_db_connector,
+                neo4j_db_users_connector,
+                network_name,
+                submissions_type,
+                date
+            )
 
-    for score_type in ["interaction", "activity", "upvotes", "interaction_and_activity", "activity_and_upvotes", "interaction_and_upvotes", "total"]:
-        stat.getInfluenceScore(score_type=score_type)
+            stat.getCrawlingRuntimes()
 
-    stat.getInfluenceScore(score_type=None)
+            stat.getInfluenceArea()
+
+            for score_type in ["interaction", "activity", "upvotes", "interaction_and_activity", "activity_and_upvotes", "interaction_and_upvotes", "total"]:
+                stat.getInfluenceScore(score_type=score_type)
+
+            stat.getInfluenceScore(score_type=None)
+        else:
+            print("Jumped over stage 4 as it is not in the stage configuration array.")
 
 except Exception as e:
     log_path = F"Logs/{date}/{network_name}/{submissions_type}/"
