@@ -8,16 +8,19 @@ import shutil
 
 
 class Statistics:
-    def __init__(self, mongo_db_connector, neo4j_db_connector):
+    def __init__(self, mongo_db_connector, neo4j_db_connector, network_name, submissions_type, date):
+        self.network_name = network_name
+        self.submissions_type = submissions_type
+        self.date = date
         self.mongo_db_connector = mongo_db_connector
         self.neo4j_db_connector = neo4j_db_connector
 
-    def getCrawlingRuntimes(self, network_name, submissions_type, from_date):
+    def getCrawlingRuntimes(self):
         unix_from_date = time.mktime(datetime.datetime. strptime(
-            from_date, '%Y-%m-%d').timetuple())
+            self.date, '%Y-%m-%d').timetuple())
 
         runtimes = self.mongo_db_connector.getCrawlingRuntimes(
-            network_name, submissions_type, unix_from_date)
+            self.network_name, self.submissions_type, unix_from_date)
 
         runtimes_df = pd.DataFrame(runtimes)
 
@@ -59,21 +62,22 @@ class Statistics:
 
         fig.suptitle('Crawling Runtimes Statistics')
 
-        path = F"{os.getcwd()}/statistics_plots/crawling/{network_name}/{from_date}/"
+        path = F"{os.getcwd()}/statistics_plots/crawling/{self.network_name}/{self.date}/{self.submissions_type}/"
         self.create_directory_if_not_found(
             path=path)
-        plot_img_name = F"bar_plot_{submissions_type}.jpg"
+        plot_img_name = F"crawling_bar_plot.jpg"
         fig.set_size_inches(15, 10)
         plt.savefig(
             F"{path}{plot_img_name}", format="jpg", dpi=500)
 
-    def getInfluenceArea(self, network_name, submissions_type, model_date):
-        groups = self.mongo_db_connector.getGroups(network_name)
+    def getInfluenceArea(self):
+        groups = self.mongo_db_connector.getGroups(
+            self.network_name, self.submissions_type)
 
         submissions = []
         for group in groups:
             group_submissions = self.mongo_db_connector.getSubmissionsOnGroup(
-                network_name, submissions_type, group['id'])
+                self.network_name, self.submissions_type, group['id'])
             submissions += group_submissions
 
         groups_df = pd.DataFrame(groups).rename(
@@ -90,7 +94,7 @@ class Statistics:
             kind="pie", ax=axes[0], title="Crawled Groups", autopct='%1.1f%%').axis("off")
 
         neo4j_graph, centralities_max = self.neo4j_db_connector.get_graph(
-            network_name=network_name, date=model_date, relation_type="Influences")
+            network_name=self.network_name, submissions_type=self.submissions_type, date=self.date, relation_type="Influences")
 
         groups = []
         predicted_influence = []
@@ -113,18 +117,18 @@ class Statistics:
         fig.suptitle(
             'Crawled Subreddits vs. Predicted Influence Area vs. Modelled Subreddits')
 
-        path = F"{os.getcwd()}/statistics_plots/influence_areas_and_subreddits/{network_name}/{model_date}/"
+        path = F"{os.getcwd()}/statistics_plots/influence_areas_and_subreddits/{self.network_name}/{self.date}/{self.submissions_type}/"
         self.create_directory_if_not_found(
             path=path)
-        plot_img_name = F"pie_plot_{submissions_type}.jpg"
+        plot_img_name = F"topics_and_subreddits_pie_plot.jpg"
 
         fig.set_size_inches(15, 10)
         plt.savefig(
             F"{path}{plot_img_name}", format="jpg", dpi=500)
 
-    def getInfluenceScore(self, network_name, model_date, score_type):
+    def getInfluenceScore(self, score_type):
         neo4j_graph, centralities_max = self.neo4j_db_connector.get_graph(
-            network_name=network_name, date=model_date, relation_type="Influences")
+            network_name=self.network_name, submissions_type=self.submissions_type, date=self.date, relation_type="Influences")
 
         if score_type:
             request_score_type = score_type
@@ -171,10 +175,10 @@ class Statistics:
                 rot=90
             )
 
-        path = F"{os.getcwd()}/statistics_plots/influence_scores/{network_name}/{model_date}/"
+        path = F"{os.getcwd()}/statistics_plots/influence_scores/{self.network_name}/{self.date}/{self.submissions_type}/"
         self.create_directory_if_not_found(
             path=path)
-        plot_img_name = F"box_plot_{request_score_type}.jpg"
+        plot_img_name = F"scores_box_plot_{request_score_type}.jpg"
         fig.set_size_inches(15, 10)
         plt.savefig(
             F"{path}{plot_img_name}", format="jpg", dpi=500)

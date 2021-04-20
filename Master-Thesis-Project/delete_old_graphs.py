@@ -9,7 +9,8 @@ import logging
 import os
 
 try:
-    network_name = "Reddit"
+    network_name = "Test"
+    submissions_type = "New"
     today_date = date.today()
     delete_older_than_date = str(today_date - timedelta(30))
 
@@ -25,6 +26,7 @@ try:
 
     neo4j_db_users_connector.delete_graph(
         network_name=network_name,
+        submissions_type=submissions_type,
         date=delete_older_than_date
     )
 
@@ -38,11 +40,12 @@ try:
 
     neo4j_db_activities_cconnector.delete_graph(
         network_name=network_name,
+        submissions_type=submissions_type,
         date=delete_older_than_date
     )
 
 except Exception as e:
-    log_path = F"Logs/{network_name}/{str(today_date)}/"
+    log_path = F"Logs/{str(today_date)}/{network_name}/{submissions_type}/"
 
     # create logs file if not found
     if not os.path.exists(log_path):

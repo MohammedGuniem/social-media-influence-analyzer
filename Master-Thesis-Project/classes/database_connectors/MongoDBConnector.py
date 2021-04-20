@@ -58,20 +58,17 @@ class MongoDBConnector:
 
     """ Data Accessors """
 
-    def getRunningTime(self):
-        data = self.readFromDB(database_name="admin")
-        return data
-
-    def getGroupInfo(self, network_name, display_name):
+    def getGroupInfo(self, network_name, submissions_type, display_name):
         data = self.readFromDB(
-            database_name=F"{network_name}_Groups_DB",
+            database_name=F"{network_name}_{submissions_type}_Groups_DB",
             query={"display_name": display_name},
             single=True
         )
         return data
 
-    def getGroups(self, network_name):
-        data = self.readFromDB(database_name=F"{network_name}_Groups_DB")
+    def getGroups(self, network_name, submissions_type):
+        data = self.readFromDB(
+            database_name=F"{network_name}_{submissions_type}_Groups_DB")
         return data
 
     def getSubmissionsOnGroup(self, network_name, submissions_type, group_id):

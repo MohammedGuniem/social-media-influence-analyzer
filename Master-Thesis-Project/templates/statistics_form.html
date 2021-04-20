@@ -10,23 +10,16 @@
         </select>
     </div>
     <div class="form-group">
-        <label for="submissions_type">Select type of crawled submissions:</label>
-        <select name="submissions_type" class="form-control" id="submissions_type" required>
-            <option value="Rising">Rising</option>
-            <option value="New">New</option>
-        </select>
-    </div>
-    <div class="form-group">
         <label for="graph">Select a Graph:</label>
         <select name="graph" class="form-control" id="graph" required>
-          {% for graph in graphs %}
+        {% for graph in graphs %}
             <option 
-            value="{{ graph.network }}_{{ graph.date }}"
+            value="{{ graph.network }}_{{ graph.date }}_{{ graph.submissions_type }}"
             {% if loop.last %}
                 selected
             {% endif %}
-            >{{ graph.network }} - {{ graph.date }}</option>
-          {% endfor %}
+            >{{ graph.network }} - {{ graph.date }} - {{ graph.submissions_type }} Submissions</option>
+        {% endfor %}
         </select>
     </div>
     <div class="form-group">

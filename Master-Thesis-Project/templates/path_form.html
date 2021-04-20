@@ -10,14 +10,14 @@
   </div>
   <div class="form-group">
     <label for="graph">Select a Graph:</label>
-    <select name="graph" class="form-control" id="graph"  required>
+    <select name="graph" class="form-control" id="graph" required>
       {% for graph in graphs %}
-        <option 
-        value="{{ graph.network }}_{{ graph.date }}"
-        {% if loop.last %}
-          selected
-        {% endif %}
-        >{{ graph.network }} - {{ graph.date }}</option>
+          <option 
+          value="{{ graph.network }}_{{ graph.date }}_{{ graph.submissions_type }}"
+          {% if loop.last %}
+            selected
+          {% endif %}
+          >{{ graph.network }} - {{ graph.date }} - {{ graph.submissions_type }} Submissions</option>
       {% endfor %}
     </select>
   </div>

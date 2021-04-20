@@ -5,11 +5,11 @@
         <select name="graph" class="form-control" id="graph" required>
         {% for graph in graphs %}
             <option 
-            value="{{ graph.network }}_{{ graph.date }}"
+            value="{{ graph.network }}_{{ graph.date }}_{{ graph.submissions_type }}"
             {% if loop.last %}
-                selected
+              selected
             {% endif %}
-            >{{ graph.network }} - {{ graph.date }}</option>
+            >{{ graph.network }} - {{ graph.date }} - {{ graph.submissions_type }} Submissions</option>
         {% endfor %}
         </select>
     </div>

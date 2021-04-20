@@ -7,6 +7,9 @@ class Graph:
     def __init__(self, mongo_db_connector, neo4j_db_connector, network_name, submissions_type, date):
         self.mongo_db_connector = mongo_db_connector
         self.neo4j_db_connector = neo4j_db_connector
+        self.network_name = network_name
+        self.submissions_type = submissions_type
+        self.date = date
         self.text_classifier = TextClassifier(
             mongo_db_connector, network_name, submissions_type, date)
         self.nodes = {}
@@ -26,15 +29,16 @@ class Graph:
 
         self.edges[edge_id] = edge
 
-    def save(self, graph_type, network_name, date):
+    def save(self, graph_type):
         # Saving nodes in neo4j database graph.
         for node in self.nodes.values():
             self.neo4j_db_connector.save_node(
                 node_id=node.id,
                 node_type=node.type,
                 node_props=node.props,
-                network_name=network_name,
-                date=date
+                network_name=self.network_name,
+                submissions_type=self.submissions_type,
+                date=self.date
             )
 
         # Saving edges in neo4j database graph.
@@ -45,12 +49,13 @@ class Graph:
                     to_node=self.nodes[edge.to_node],
                     edge_type=edge.relation_type,
                     edge_props=edge.getProps(),
-                    network_name=network_name,
-                    date=date
+                    network_name=self.network_name,
+                    submissions_type=self.submissions_type,
+                    date=self.date
                 )
 
         # Calculate centralitites for user graph nodes
         if graph_type == "user_graph":
             for centrality in ["degree_centrality", "betweenness_centrality", "hits_centrality_"]:
                 self.neo4j_db_connector.calculate_centrality(
-                    network_name=network_name, date=date, centrality=centrality)
+                    network_name=self.network_name, submissions_type=self.submissions_type, date=self.date, centrality=centrality)
