@@ -36,7 +36,7 @@ try:
 
         load_dotenv()
 
-        print(F"Date:{date}, Run ID: {run_id}\n")
+        print(F"Date: {date}, Run ID: {run_id}\n")
 
         # Mongo db database connector
         mongo_db_connector = MongoDBConnector(

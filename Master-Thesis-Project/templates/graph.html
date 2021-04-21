@@ -1,23 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" href="../static/icons/University_of_Stavanger_emblem.png">
     <title>UiS - SMIA</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="../static/scripts/vis-network.min.js"></script>
+    <script src="../static/scripts/jquery.min.js"></script>
     <style>
         #graphcanvas {
             width: 98vw;
             height: 80vh;
         }
+        .node_select_label {
+            color: red;
+        }
+        .edge_select_label {
+            color: blue;
+        }
     </style>
-    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
     <h4>Node Information:</h4>
-    <div id="nodeInfo">Select a node</div>
+    <div id="nodeInfo"><p class="node_select_label">Select a node</p></div>
     <h4>Edge Information:</h4>
-    <div id="edgeInfo">Select an edge</div>
+    <div id="edgeInfo"><p class="edge_select_label">Select an edge</p></div>
     <br />
     <div id="graphcanvas"></div>
     <script>
@@ -82,33 +89,33 @@
             if (node_id) {
                 var node = this.body.nodes[node_id];
                 if ('{{ graph_type }}' == 'user_graph') {
-                    document.getElementById("nodeInfo").innerText = 
-                        `Username: ${node.options.label},`
-                        +` User ID: ${node_id},`
-                        +` centrality: ${node.options.value}`
+                    document.getElementById("nodeInfo").innerHTML = 
+                        `<code class="node_select_label">Username:</code> <span>${node.options.label}</span>, `
+                        +`<code class="node_select_label">User ID:</code> <span>${node_id}</span>, `
+                        +`<code class="node_select_label">centrality:</code> <span>${node.options.value}</span>`
                 } else if ('{{ graph_type }}' == 'activity_graph') {
                     var label = node.options.label
                     var type = (node.options.label.split("\n")[0]).replace("_"," ")
                     var username = (node.options.label.split("\n")[1]).replace(`(${node_id})`,"")
-                    document.getElementById("nodeInfo").innerText = 
-                        `Type: ${type},`
-                        +` Username: ${username},`
-                        +` User ID: ${node_id}`
+                    document.getElementById("nodeInfo").innerHTML = 
+                        `<code class="node_select_label">Type:</code> <span>${type}</span>, `
+                        +`<code class="node_select_label">Username:</code> <span>${username}</span>, `
+                        +`<code class="node_select_label">User ID:</code> <span>${node_id}</span>`
                 }  
             } else if (edge_id) {
                 var edge = this.body.edges[edge_id];
                 if ('{{ graph_type }}' == 'user_graph') {
-                    document.getElementById("edgeInfo").innerText = 
-                        `From: ${edge.options.from},`
-                        +` To: ${edge.options.to},`
-                        +` Score: ${edge.options.value},`
-                        +` Influence areas: ${edge.options.label.split("\n")[1]}`
+                    document.getElementById("edgeInfo").innerHTML = 
+                        `<code class="edge_select_label">From:</code> <span>${edge.options.from}</span>, `
+                        +`<code class="edge_select_label">To:</code> <span>${edge.options.to}</span>, `
+                        +`<code class="edge_select_label">Score:</code> <span>${edge.options.value}</span>, `
+                        +`<code class="edge_select_label">Influence areas:</code> <span>${edge.options.label.split("\n")[1]}</span>`
                 } else if ('{{ graph_type }}' == 'activity_graph') {
-                    document.getElementById("edgeInfo").innerText = 
-                        `From: ${edge.options.from},`
-                        +` To: ${edge.options.to},`
-                        +` Score: ${edge.options.value},`
-                        +` Influence areas: ${edge.options.label.split("\n")[1]}`
+                    document.getElementById("edgeInfo").innerHTML = 
+                        `<code class="edge_select_label">From:</code> <span>${edge.options.from}</span>, `
+                        +`<code class="edge_select_label">To:</code> <span>${edge.options.to}</span>, `
+                        +`<code class="edge_select_label">Score:</code> <span>${edge.options.value}</span>, `
+                        +`<code class="edge_select_label">Influence areas:</code> <span>${edge.options.label.split("\n")[1]}</span>`
                 }
             }
         });

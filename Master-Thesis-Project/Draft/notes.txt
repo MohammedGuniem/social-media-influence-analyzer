@@ -49,6 +49,7 @@ CALL gds.alpha.hits.write({
 MATCH (n)
 DETACH DELETE n
 
+# Java Path
 C:\Program Files\Java\OpenJDK11\jdk-11.0.2
 
 # How to set up reddit_crawler in Windows task scheduler
