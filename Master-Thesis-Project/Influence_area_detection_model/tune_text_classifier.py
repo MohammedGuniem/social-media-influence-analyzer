@@ -1,3 +1,8 @@
+import sys
+for path in sys.path:
+    if "Influence_area_detection_model" in path:
+        main_project_path = "\\".join(path.split("\\")[0:-1])
+        sys.path.append(main_project_path)
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from sklearn.feature_extraction.text import TfidfTransformer
@@ -24,8 +29,8 @@ mongo_db_pass = os.environ.get('mongo_db_pass')
 mongo_db_connector = MongoDBConnector(
     host=mongo_db_host, port=int(mongo_db_port), user=mongo_db_user, passowrd=mongo_db_pass)
 
-data = mongo_db_connector.readFromDB(database_name="Text_Classification_Training_Data", query={
-}, single=True, collection_name="2021-03-31")
+data = mongo_db_connector.readFromDB(database_name="Reddit_Rising_Training_Data", query={
+}, single=True, collection_name="2021-04-21")
 del data["_id"]
 
 data = data["training_data"]

@@ -12,7 +12,7 @@ try:
     network_name = "Test"
     submissions_type = "New"
     today_date = date.today()
-    delete_older_than_date = str(today_date - timedelta(30))
+    delete_older_than_date = str(today_date + timedelta(30))
 
     load_dotenv()
 

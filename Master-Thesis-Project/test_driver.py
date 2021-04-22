@@ -3,7 +3,7 @@ from classes.database_connectors.Neo4jConnector import GraphDBConnector
 from classes.modelling.ActivityGraphModelling import ActivityGraph
 from classes.modelling.UserGraphModelling import UserGraph
 from classes.crawling.RedditCrawlClass import RedditCrawler
-from classes.crawling.TestCrawlClass import TestCrawler
+from classes.crawling.test.TestCrawlClass import TestCrawler
 from classes.statistics.Statistics import Statistics
 from dotenv import load_dotenv
 from time import time, ctime
@@ -51,8 +51,11 @@ try:
             print(
                 F"Crawling {network_name} extracting {submissions_type} submissions")
 
+            # Path Where test data is to be found relative to this script
+            test_data_path = "classes/crawling/test/TEST_DATA"
+
             # Test crawler
-            crawler = TestCrawler()
+            crawler = TestCrawler(test_data_path)
 
             # Crawling groups/subreddits
             groups = crawler.getGroups()

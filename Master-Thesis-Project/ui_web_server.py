@@ -1,5 +1,7 @@
+from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
 from flask import Flask, jsonify, render_template, request, send_file
+from classes.modelling.TextClassification import TextClassifier
 from dotenv import load_dotenv
 from datetime import date
 import json
@@ -254,6 +256,35 @@ def statistics():
         return send_file(plt_img_path, mimetype="image/jpg")
     else:
         return "Statistics from this network and date is not available, make sure you are using the correct network, submission type, date and score"
+
+
+# /topic_detection_model?graph=Reddit_2021-04-21_Rising
+@app.route('/topic_detection_model')
+def topic_detection_model():
+    graph = request.args.get('graph', None).split("_")
+    network_name, date, submissions_type = graph[0], graph[1], graph[2]
+
+    mongo_db_connector = MongoDBConnector(
+        host=os.environ.get('mongo_db_host'),
+        port=int(os.environ.get('mongo_db_port')),
+        user=os.environ.get('mongo_db_user'),
+        passowrd=os.environ.get('mongo_db_pass')
+    )
+    text_classifier = TextClassifier(
+        mongo_db_connector, network_name, submissions_type, date)
+    model_status = text_classifier.prepare_model()
+    if model_status == "data not found":
+        return F"data not found, the specified '{request.args.get('graph', None)}' graph is not found"
+    evaluation_result = text_classifier.evaluate_model()
+    classification_report, confusion_matrix = text_classifier.get_report()
+    tunning_results = text_classifier.tune_model()
+    result = {
+        "evaluation": evaluation_result,
+        "classification_report": classification_report,
+        "confusion_matrix": confusion_matrix.tolist(),
+        "tunning": tunning_results
+    }
+    return jsonify(result)
 
 
 if __name__ == '__main__':

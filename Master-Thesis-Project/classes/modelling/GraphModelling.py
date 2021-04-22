@@ -12,6 +12,9 @@ class Graph:
         self.date = date
         self.text_classifier = TextClassifier(
             mongo_db_connector, network_name, submissions_type, date)
+        model_status = self.text_classifier.prepare_model()
+        if model_status == "data not found":
+            raise Exception("training data not found")
         self.nodes = {}
         self.edges = {}
 
