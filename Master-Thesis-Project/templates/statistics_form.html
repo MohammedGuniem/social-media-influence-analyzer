@@ -1,0 +1,41 @@
+<form id="request_form" action="/statistics" target="_blank">
+    <h3>View Statistics on User Graph Model</h3>
+
+    <div class="form-group">
+        <label for="statistic_measure">Select a statistics measure:</label>
+        <select name="statistic_measure" class="form-control" id="statistic_measure" required>
+            <option value="crawling">Crawling Statistics</option>
+            <option value="influence_areas_and_subreddits">Influence Areas vs. Subreddits Statistics</option>
+            <option value="influence_scores">Influence score Statistics</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="graph">Select a Graph:</label>
+        <select name="graph" class="form-control" id="graph" required>
+        {% for graph in graphs %}
+            <option 
+            value="{{ graph.network }}_{{ graph.date }}_{{ graph.submissions_type }}"
+            {% if loop.last %}
+                selected
+            {% endif %}
+            >{{ graph.network }} - {{ graph.date }} - {{ graph.submissions_type }} Submissions</option>
+        {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="score_type">Score Type</label>
+        <select name="score_type" class="form-control" id="score_type" required>
+            <option value="all_scores">All scores</option>
+            <option value="total" selected>Total</option>
+            <option value="activity">Activity</option>
+            <option value="interaction">Interaction</option>
+            <option value="upvotes">Upvotes</option>
+            <option value="activity_and_upvotes">Activity & Upvotes</option>
+            <option value="interaction_and_activity">Interaction & Activity</option>
+            <option value="interaction_and_upvotes">Interaction & Upvotes</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="form-control btn btn-success">Submit</button>
+    </div>
+</form>
