@@ -12,7 +12,9 @@ try:
     network_name = "Test"
     submissions_type = "New"
     today_date = date.today()
-    delete_older_than_date = str(today_date + timedelta(30))
+    delete_older_than_date = str(today_date - timedelta(30))
+    print(F"deleting all Neo4j graphs older than {delete_older_than_date}")
+    print(F"having network_name: {network_name} and submissions type = {submissions_type}")
 
     load_dotenv()
 
@@ -44,6 +46,8 @@ try:
         date=delete_older_than_date
     )
 
+    print("done")
+    
 except Exception as e:
     log_path = F"Logs/{str(today_date)}/{network_name}/{submissions_type}/"
 

@@ -22,23 +22,28 @@ class TextClassifier:
             query={},
             single=True
         )
+        self.random_state = 99
 
     def prepare_model(self):
         if not self.data:
             return "data not found"
         del self.data["_id"]
         self.data = self.data["training_data"]
-        random.seed(99)
+        random.seed(self.random_state)
         random.shuffle(self.data)
 
         training_df = pd.DataFrame(self.data)
         features = (training_df["title"]).to_numpy()
         labels = (training_df["label"]).to_numpy()
 
+        tuned_paramters = self.tune_model()
+        alpha = tuned_paramters['best_parameters']['clf__alpha']
+        use_idf = tuned_paramters['best_parameters']['tfidf__use_idf']
+        ngram_range = tuned_paramters['best_parameters']['vect__ngram_range']
         self.text_clf = Pipeline([
-            ('vect', CountVectorizer(ngram_range=(1, 2))),
-            ('tfidf', TfidfTransformer(use_idf=True)),
-            ('clf', SGDClassifier(alpha=0.001, random_state=99)),
+            ('vect', CountVectorizer(ngram_range=ngram_range)),
+            ('tfidf', TfidfTransformer(use_idf=use_idf)),
+            ('clf', SGDClassifier(alpha=alpha, random_state=self.random_state)),
         ])
         self.text_clf.fit(features, labels)
         return "model is fitted and ready for use"
@@ -51,7 +56,7 @@ class TextClassifier:
         text_clf = Pipeline([
             ('vect', CountVectorizer()),
             ('tfidf', TfidfTransformer()),
-            ('clf', SGDClassifier(random_state=99)),
+            ('clf', SGDClassifier(random_state=self.random_state)),
         ])
 
         training_percentage = 0.8
@@ -94,7 +99,7 @@ class TextClassifier:
         precision_scores = []
         recall_scores = []
         f1_scores = []
-        kf = KFold(n_splits=5, shuffle=True, random_state=99)
+        kf = KFold(n_splits=5, shuffle=True, random_state=self.random_state)
         for train_index, test_index in kf.split(features):
             X_train, X_test = list(features[train_index]), list(
                 features[test_index])
@@ -129,7 +134,7 @@ class TextClassifier:
         text_clf = Pipeline([
             ('vect', CountVectorizer(ngram_range=(1, 2))),
             ('tfidf', TfidfTransformer(use_idf=True)),
-            ('clf', SGDClassifier(alpha=0.001, random_state=99)),
+            ('clf', SGDClassifier(alpha=0.001, random_state=self.random_state)),
         ])
         """
         ('clf', MultinomialNB()),
