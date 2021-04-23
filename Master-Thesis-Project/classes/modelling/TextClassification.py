@@ -74,7 +74,7 @@ class TextClassifier:
 
         tunning_results = {
             "best_score": gs_clf.best_score_,
-            "best_parameters": parameters
+            "best_parameters": gs_clf.best_params_
         }
         return tunning_results
 
@@ -118,7 +118,7 @@ class TextClassifier:
             "accuracy": np.mean(accuracy_scores),
             "precision": np.mean(precision_scores),
             "recall": np.mean(recall_scores),
-            "F1-score": np.mean(f1_scores)
+            "F1_score": np.mean(f1_scores)
         }
         return evaluation_result
 
@@ -142,11 +142,12 @@ class TextClassifier:
                                ), list(labels[int(testing_percentage*len(features)):])
         text_clf.fit(X_train, y_train)
         y_pred = text_clf.predict(X_test)
+        labels = list(set(labels))
         class_report = classification_report(
-            y_test, y_pred, target_names=list(set(labels)), output_dict=True)
-        conf_matrix = confusion_matrix(y_test, y_pred)
+            y_test, y_pred, target_names=labels, output_dict=True)
+        conf_matrix = confusion_matrix(y_test, y_pred, labels=labels)
 
-        return class_report, conf_matrix
+        return class_report, conf_matrix, labels
 
     def classify_title(self, title):
         return self.text_clf.predict([title])[0]

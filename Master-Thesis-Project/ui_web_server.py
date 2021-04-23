@@ -28,6 +28,13 @@ neo4j_activities_db_connector = GraphDBConnector(
     password=os.environ.get('neo4j_activities_db_pass'),
 )
 
+# Mongo DB connector
+mongo_db_connector = MongoDBConnector(
+    host=os.environ.get('mongo_db_host'),
+    port=int(os.environ.get('mongo_db_port')),
+    user=os.environ.get('mongo_db_user'),
+    passowrd=os.environ.get('mongo_db_pass')
+)
 
 def constructJSGraph(neo4j_graph, graph_type, score_type, centrality_max):
     neo4j_nodes = neo4j_graph['nodes']
@@ -258,34 +265,30 @@ def statistics():
         return "Statistics from this network and date is not available, make sure you are using the correct network, submission type, date and score"
 
 
-# /topic_detection_model?graph=Reddit_2021-04-21_Rising
 @app.route('/topic_detection_model')
 def topic_detection_model():
     graph = request.args.get('graph', None).split("_")
+    data_format = request.args.get('format', None)
     network_name, date, submissions_type = graph[0], graph[1], graph[2]
 
-    mongo_db_connector = MongoDBConnector(
-        host=os.environ.get('mongo_db_host'),
-        port=int(os.environ.get('mongo_db_port')),
-        user=os.environ.get('mongo_db_user'),
-        passowrd=os.environ.get('mongo_db_pass')
-    )
     text_classifier = TextClassifier(
         mongo_db_connector, network_name, submissions_type, date)
     model_status = text_classifier.prepare_model()
     if model_status == "data not found":
         return F"data not found, the specified '{request.args.get('graph', None)}' graph is not found"
     evaluation_result = text_classifier.evaluate_model()
-    classification_report, confusion_matrix = text_classifier.get_report()
+    classification_report, confusion_matrix, labels = text_classifier.get_report()
     tunning_results = text_classifier.tune_model()
     result = {
+        "labels": labels,
         "evaluation": evaluation_result,
         "classification_report": classification_report,
         "confusion_matrix": confusion_matrix.tolist(),
         "tunning": tunning_results
     }
-    return jsonify(result)
-
-
+    if data_format == 'json':
+        return jsonify(result)
+    return render_template("topic_detection_model.html", result=result)
+    
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=3000)
