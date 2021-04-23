@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="icon" href="../static/icons/University_of_Stavanger_emblem.png">
+    <title>UiS - SMIA</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../static/scripts/bootstrap.min.css">
+    <script src="../static/scripts/jquery.min.js"></script>
+    <script src="../static/scripts/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Social Media Influence Analyzer</h2>
+      <p>This solution enables you to detect influence fields and identify Influencers in a social media network</p>
+        <ul class="nav nav-tabs">
+          <li class="active">
+            <a data-toggle="tab" href="#user_graph">Graph</a>
+          </li>
+          <li>
+            <a data-toggle="tab" href="#path">Path</a>
+          </li>
+          <li>
+            <a data-toggle="tab" href="#score">Score</a>
+          </li>
+          <li>
+            <a data-toggle="tab" href="#field">Field</a>
+          </li>
+          <li>
+            <a data-toggle="tab" href="#activity_graph">Activity Graph</a>
+          </li>
+          <li>
+            <a data-toggle="tab" href="#statistics">Statistics</a>
+          </li>
+          <li>
+            <a data-toggle="tab" href="#topic_detection_model">Topic Detection Model</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div id="user_graph" class="tab-pane fade in active">
+            {% include 'graph_form.html' %}
+          </div>
+          <div id="path" class="tab-pane fade">
+            {% include 'path_form.html' %}
+          </div>
+          <div id="score" class="tab-pane fade">
+            {% include 'score_filter_form.html' %}
+          </div>
+          <div id="field" class="tab-pane fade">
+            {% include 'area_filter_form.html' %}
+          </div>
+          <div id="activity_graph" class="tab-pane fade">
+            {% include 'activity_form.html' %}
+          </div>
+          <div id="statistics" class="tab-pane fade">
+            {% include 'statistics_form.html' %}
+          </div>
+          <div id="topic_detection_model" class="tab-pane fade">
+            {% include 'topic_detection_model_form.html' %}
+          </div>
+        </div>
+    </div>
+  </body>
+</html>

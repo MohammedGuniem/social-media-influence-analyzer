@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="../static/icons/University_of_Stavanger_emblem.png">
+    <title>UiS - SMIA</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        #graphcanvas {
+            width: 98vw;
+            height: 98vh;
+        }
+    </style>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div id="graphcanvas"></div>
+    <script>
+        var graph = JSON.parse('{{ data|tojson|safe }}');
+        console.log(graph);
+
+        var container = document.getElementById("graphcanvas");
+
+        var options = {
+            nodes: {
+                borderWidth: 1
+            },
+            edges: {
+                color: "#4287f5",
+                arrowStrikethrough: false,
+                arrows: "to"
+            },
+            physics: {
+                forceAtlas2Based: {
+                    gravitationalConstant: -26,
+                    centralGravity: 0.005,
+                    springLength: 230,
+                    springConstant: 0.18,
+                    avoidOverlap: 1.5
+                },
+                maxVelocity: 146,
+                solver: 'forceAtlas2Based',
+                timestep: 0.35,
+                stabilization: {
+                    enabled: true,
+                    iterations: 1000,
+                    updateInterval: 25
+                }
+            },
+            autoResize: true,
+            height: '100%',
+            width: '100%',
+            interaction: {
+                navigationButtons: true,
+                keyboard: true,
+                zoomSpeed: 0.3
+            },
+            physics: {
+                barnesHut: { gravitationalConstant: -10000 },
+                stabilization: { iterations: 2500 },
+            },
+            groups: {
+                Submission: {
+                    shape: "dot",
+                    color: "yellow",
+                },
+                Topcomment: {
+                    shape: "dot",
+                    color: "blue",
+                },
+                Subcomment: {
+                    shape: "dot",
+                    color: "red",
+                }
+            },
+        };
+            
+        var network = new vis.Network(container, graph, options);
+    </script>
+</body>
+</html>
