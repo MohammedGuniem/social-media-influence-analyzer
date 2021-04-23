@@ -1,0 +1,31 @@
+<form action="/activity_graph" target="_blank">
+    <h3>An activity graph views the submissions and its comments as trees</h3>
+    <div class="form-group">
+        <label for="graph">Select a Graph:</label>
+        <select name="graph" class="form-control" id="graph" required>
+        {% for graph in graphs %}
+            <option 
+            value="{{ graph.network }}_{{ graph.date }}_{{ graph.submissions_type }}"
+            {% if loop.last %}
+              selected
+            {% endif %}
+            >{{ graph.network }} - {{ graph.date }} - {{ graph.submissions_type }} Submissions</option>
+        {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="score_type">Score Type</label>
+        <select name="score_type" class="form-control" id="score_type" required>
+            <option value="total" selected>Total</option>
+            <option value="activity">Activity</option>
+            <option value="interaction">Interaction</option>
+            <option value="upvotes">Upvotes</option>
+            <option value="activity_and_upvotes">Activity & Upvotes</option>
+            <option value="interaction_and_activity">Interaction & Activity</option>
+            <option value="interaction_and_upvotes">Interaction & Upvotes</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="form-control btn btn-success">Submit</button>
+    </div>
+</form>

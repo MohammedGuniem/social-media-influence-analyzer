@@ -1,45 +1,29 @@
-from classes.statistics.RunningTime import Timer
 import pymongo
 
 
 class MongoDBConnector:
     """ Connection initializer """
 
-    def __init__(self, connection_string, collection_name=None):
-        with pymongo.MongoClient(connection_string) as self.client:
-            if collection_name:
-                self.collection_name = collection_name
-            else:
-                self.collection_name = self.getMostRecentValidCollection()
-            self.timer = Timer()
-            self.writing_runtimes = {"created": self.timer.getCurrentTime()}
-            self.reading_runtimes = {"created": self.timer.getCurrentTime()}
+    def __init__(self, host, port, user, passowrd):
+        with pymongo.MongoClient(host=host, port=port, username=user, password=passowrd, authSource='admin', authMechanism='SCRAM-SHA-256') as self.client:
+            pass
 
     """ Collection validator """
 
-    def getMostRecentValidCollection(self):
-        collections = [
-            set(self.client["Subreddits_DB"].collection_names()),
-            set(self.client["New_Submissions_DB"].collection_names()),
-            set(self.client["New_Comments_DB"].collection_names()),
-            set(self.client["New_Users_DB"].collection_names()),
-            set(self.client["Rising_Submissions_DB"].collection_names()),
-            set(self.client["Rising_Comments_DB"].collection_names()),
-            set(self.client["Rising_Users_DB"].collection_names())
-        ]
-        valid_collections = collections[0]
-        for collection_set in collections:
-            valid_collections &= collection_set
-        valid_collections = sorted(valid_collections, reverse=True)
+    def getMostRecentValidCollection(self, database_name):
+        collections = set(self.client[database_name].collection_names())
+        collections = sorted(collections, reverse=True)
 
-        if len(valid_collections) > 0:
-            return valid_collections[0]
+        if len(collections) > 0:
+            return collections[0]
         return "no valid collection!"
 
     """ Writing and reading methods """
 
     def writeToDB(self, database_name, collection_name, data):
-        start_time = self.timer.getCurrentTime()
+        if not collection_name:
+            collection_name = self.getMostRecentValidCollection(database_name)
+
         if len(data) > 0:
             database = self.client[database_name]
             collection = database[collection_name]
@@ -54,112 +38,93 @@ class MongoDBConnector:
 
             if len(requests) > 0:
                 collection.bulk_write(requests)
-        runtime = self.timer.calculate_runtime(start_time)
-        self.writing_runtimes[database_name] = runtime
 
     def readFromDB(self, database_name, query={}, single=False, collection_name=None):
-        start_time = self.timer.getCurrentTime()
+        if not collection_name:
+            collection_name = self.getMostRecentValidCollection(database_name)
+
         database = self.client[database_name]
         collection = database[collection_name if collection_name else self.collection_name]
         if single:
             docs = collection.find_one(query)
         else:
             docs = list(collection.find(query))
-        runtime = self.timer.calculate_runtime(start_time)
-        self.reading_runtimes[database_name] = runtime
         return docs
 
-    """ Crawling, writing and reading runtimes loggers """
+    """ Removal and cleaning methods """
 
-    def logg_crawling_runtimes(self, crawling_runtime):
-        self.writeToDB(
-            database_name="admin",
-            collection_name="crawling_runtime",
-            data=[crawling_runtime]
-        )
-
-    def logg_writing_runtimes(self):
-        writing_runtimes = self.writing_runtimes
-        self.writeToDB(
-            database_name="admin",
-            collection_name="writing_runtime",
-            data=[writing_runtimes]
-        )
-
-    def logg_reading_runtimes(self):
-        reading_runtimes = self.reading_runtimes
-        self.writeToDB(
-            database_name="admin",
-            collection_name="reading_runtime",
-            data=[reading_runtimes]
-        )
-
-    """ Crawling, writing and reading runtimes getters """
-
-    def get_crawling_runtimes(self):
-        data = self.readFromDB(
-            database_name="admin",
-            collection_name="crawling_runtime"
-        )
-        return data
-
-    def get_writing_runtimes(self):
-        data = self.readFromDB(
-            database_name="admin",
-            collection_name="writing_runtime"
-        )
-        return data
-
-    def get_reading_runtimes(self):
-        data = self.readFromDB(
-            database_name="admin",
-            collection_name="reading_runtime"
-        )
-        return data
+    def remove_collection(self, database_name, collection_name):
+        self.client[database_name].drop_collection(collection_name)
 
     """ Data Accessors """
 
-    def getRunningTime(self):
-        data = self.readFromDB(database_name="admin")
-        return data
-
-    def getSubredditInfo(self, display_name):
+    def getGroupInfo(self, network_name, submissions_type, display_name):
         data = self.readFromDB(
-            database_name="Subreddits_DB",
+            database_name=F"{network_name}_{submissions_type}_Groups_DB",
             query={"display_name": display_name},
             single=True
         )
         return data
 
-    def getSubredditsInfo(self):
-        data = self.readFromDB(database_name="Subreddits_DB")
+    def getGroups(self, network_name, submissions_type):
+        data = self.readFromDB(
+            database_name=F"{network_name}_{submissions_type}_Groups_DB")
         return data
 
-    def getSubmissionsOnSubreddit(self, subreddit_id, Type):
+    def getSubmissionsOnGroup(self, network_name, submissions_type, group_id):
         data = self.readFromDB(
-            database_name=F"{Type}_Submissions_DB",
-            query={"subreddit_id": subreddit_id}
+            database_name=F"{network_name}_{submissions_type}_Submissions_DB",
+            query={"group_id": group_id}
         )
         return data
 
-    def getCommentsOnSubmission(self, submission_id, Type):
+    def getCommentsOnSubmission(self, network_name, submissions_type, submission_id):
         data = self.readFromDB(
-            database_name=F"{Type}_Comments_DB",
-            query={"submission_id": "t3_"+submission_id}
+            database_name=F"{network_name}_{submissions_type}_Comments_DB",
+            query={"submission_id": submission_id}
         )
         return data
 
-    def getCommentInfo(self, comment_id, Type):
+    def getCommentInfo(self, network_name, submissions_type, comment_id):
         data = self.readFromDB(
-            database_name=F"{Type}_Comments_DB",
+            database_name=F"{network_name}_{submissions_type}_Comments_DB",
             query={"id": comment_id},
             single=True
         )
         return data
 
-    def getCommentChildren(self, comment_id, Type):
+    def getCommentChildren(self, network_name, submissions_type, comment_id):
         data = self.readFromDB(
-            database_name=F"{Type}_Comments_DB",
+            database_name=F"{network_name}_{submissions_type}_Comments_DB",
             query={"parent_id": F"t1_{comment_id}"}
         )
         return data
+
+    def getChildrenCount(self, network_name, submissions_type, comments_array):
+        children_array = []
+        descendants = []
+        for comment in comments_array:
+            children = self.getCommentChildren(
+                network_name, submissions_type, comment_id=comment['id'])
+
+            children_array += children
+            descendants.append(len(children))
+
+        if sum(descendants) == 0:
+            return 0
+        else:
+            score = sum(descendants) + self.getChildrenCount(
+                network_name, submissions_type, comments_array=children_array)
+        return score
+
+    def getCrawlingRuntimes(self, network_name, submissions_type, from_date):
+        query = {
+            "network_name": network_name,
+            "timestamp": {"$gte": from_date}
+        }
+        if submissions_type:
+            query["submissions_type"] = submissions_type
+        database = self.client["admin"]
+        collection = database["crawling_runtime_register"]
+        runtimes = list(collection.find(query))
+        return runtimes
