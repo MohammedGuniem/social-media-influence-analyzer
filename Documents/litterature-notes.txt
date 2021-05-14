@@ -1,5 +1,8 @@
 Søkeord for master litteratur
 
+ieee template
+https://template-selector.ieee.org/secure/templateSelector/publicationType
+
 - Processes and techniques
 crawling techniques 
 Machine learning

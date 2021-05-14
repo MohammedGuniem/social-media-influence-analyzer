@@ -3,10 +3,7 @@ from classes.database_connectors.Neo4jConnector import GraphDBConnector
 from flask import Flask, jsonify, render_template, request, send_file
 from classes.modelling.TextClassification import TextClassifier
 from dotenv import load_dotenv
-from datetime import date
-import json
 import os
-
 
 app = Flask(__name__)
 
@@ -291,4 +288,4 @@ def topic_detection_model():
     return render_template("topic_detection_model.html", result=result)
     
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
