@@ -150,3 +150,13 @@ You may use a server technology of your choice, If you are using Windows then yo
 ### Using a Cloud Service
 It is also possible to use a Cloud Service to accomplish this instead of an on-premises setup.
 Refer to the documentation of you Cloud Provider for details on how to set up periodic task and Flask webserver written in Python. 
+
+### Using Docker
+Install: Docker Desktop
+Run: docker-compose up
+Install: Python
+Navigate to you project directory
+Run: pip install -r requirements
+Run: python test_driver.py
+Run: python reddit_driver.py
+Run: python ui_web_server.py
