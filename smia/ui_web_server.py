@@ -3,35 +3,51 @@ from classes.database_connectors.Neo4jConnector import GraphDBConnector
 from flask import Flask, jsonify, render_template, request, send_file
 from classes.modelling.TextClassification import TextClassifier
 from dotenv import load_dotenv
+import time
 import os
 
 app = Flask(__name__)
 
 load_dotenv()
 
-# Neo4j users database connector
-neo4j_users_db_connector = GraphDBConnector(
-    host=os.environ.get('neo4j_users_db_host'),
-    port=int(os.environ.get('neo4j_users_db_port')),
-    user=os.environ.get('neo4j_users_db_user'),
-    password=os.environ.get('neo4j_users_db_pass'),
-)
+number_of_connection_tries = 0
+stop_trying = False # Are all database services up and running?
+while (not stop_trying):
+    try:
+        # Mongo DB connector
+        mongo_db_connector = MongoDBConnector(
+            host="host.docker.internal" if os.environ.get('IS_DOCKER') else os.environ.get('mongo_db_host'),
+            port=int(os.environ.get('mongo_db_port')),
+            user=os.environ.get('mongo_db_user'),
+            passowrd=os.environ.get('mongo_db_pass')
+        )
 
-# Neo4j activity database connector
-neo4j_activities_db_connector = GraphDBConnector(
-    host=os.environ.get('neo4j_activities_db_host'),
-    port=int(os.environ.get('neo4j_activities_db_port')),
-    user=os.environ.get('neo4j_activities_db_user'),
-    password=os.environ.get('neo4j_activities_db_pass'),
-)
+        # Neo4j users database connector
+        neo4j_users_db_connector = GraphDBConnector(
+            host="host.docker.internal" if os.environ.get('IS_DOCKER') else os.environ.get('neo4j_user_db_host'),
+            port=int(os.environ.get('neo4j_users_db_port')),
+            user=os.environ.get('neo4j_users_db_user'),
+            password=os.environ.get('neo4j_users_db_pass')
+        )
+        
+        # Neo4j activity database connector
+        neo4j_activities_db_connector = GraphDBConnector(
+            host="host.docker.internal" if os.environ.get('IS_DOCKER') else os.environ.get('neo4j_activities_db_host'),
+            port=int(os.environ.get('neo4j_activities_db_port')),
+            user=os.environ.get('neo4j_activities_db_user'),
+            password=os.environ.get('neo4j_activities_db_pass')
+        )
 
-# Mongo DB connector
-mongo_db_connector = MongoDBConnector(
-    host=os.environ.get('mongo_db_host'),
-    port=int(os.environ.get('mongo_db_port')),
-    user=os.environ.get('mongo_db_user'),
-    passowrd=os.environ.get('mongo_db_pass')
-)
+        stop_trying = True
+
+    except Exception as e:
+        print("Waiting for database services ...")
+        time.sleep(1)
+        number_of_connection_tries += 1
+        # change this value below if you want the application to wait more than 15 minutes (= 900 seconds)
+        if number_of_connection_tries > 900:
+            stop_trying = True
+
 
 def constructJSGraph(neo4j_graph, graph_type, score_type, centrality_max):
     neo4j_nodes = neo4j_graph['nodes']
