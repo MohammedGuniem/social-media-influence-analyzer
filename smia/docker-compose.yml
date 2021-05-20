@@ -100,6 +100,7 @@ services:
 
   user-interface:
     image: smia/ui:1.0.0
+    restart: unless-stopped
     build: .
     depends_on:
       - mongo-db
