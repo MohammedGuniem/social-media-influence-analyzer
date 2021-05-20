@@ -22,7 +22,7 @@ version: "3.9"
 
 ### Importing test data
 ## Access smia CLI at working directory
-# docker exec -t -i smia_user-interface_1 /bin/bash
+# docker exec -t -i user-interface /bin/bash
 ## Run test driver
 # python test_driver.py
 ## exit CLI
@@ -30,7 +30,7 @@ version: "3.9"
 
 ### Running Reddit crawler
 ## Access smia cli at working directory
-# docker exec -t -i smia_user-interface_1 /bin/bash
+# docker exec -t -i user-interface /bin/bash
 ## Run reddit driver
 # python reddit_driver.py
 ## exit CLI
@@ -100,6 +100,8 @@ services:
 
   user-interface:
     image: smia/ui:1.0.0
+    container_name: user-interface
+    restart: unless-stopped
     build: .
     depends_on:
       - mongo-db
