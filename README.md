@@ -38,19 +38,19 @@ The development of this project is mainly based on Docker Technology, follow the
 - Then, go to localhost:5000 or host.docker.internal:5000 on your browser with javascript enabled.
 - You should now be able to access the GUI interface of the project.
 
-#### Importing datasets
+#### D. Importing datasets
 
 - In your command line, access smia CLI using the command below or version of it depanding on your command line
   `docker exec -t -i user-interface bash`
 
-#### A. Importing the small dummy test dataset
+#### 1. Importing the small dummy test dataset
 
 - Run test driver
   `python test_driver.py`
 
 Note! You might get a couple of warnings when building the user- and activity user graph, this is because the dummy dataset is very small and there is not enough labels in the training dataset for topic classification. The warnings can be ignored as this is just a dummy dataset for development and testing purposes.
 
-#### B. Importing a real-life dataset from crawling Reddit
+#### 2. Importing a real-life dataset from crawling Reddit
 
 - Run reddit driver
   `python reddit_driver.py`
