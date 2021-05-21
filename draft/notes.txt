@@ -54,3 +54,27 @@ C:\Program Files\Java\OpenJDK11\jdk-11.0.2
 
 # How to set up reddit_crawler in Windows task scheduler
 https://www.jcchouinard.com/python-automation-using-task-scheduler/
+
+
+### MONGO DB SERVICE INSTALLATION GUIDES AND TIPS USING DOCKER
+# https://medium.com/bb-tutorials-and-thoughts/develop-nodejs-rest-api-with-mongodb-using-docker-compose-df9a37287aed
+# https://medium.com/rahasak/enable-mongodb-authentication-with-docker-1b9f7d405a94
+# https://docs.mongodb.com/manual/tutorial/enable-authentication/
+
+### NEO4J DB SERVICE INSTALLATION GUIDES AND TIPS USING DOCKER
+# https://thibaut-deveraux.medium.com/how-to-install-neo4j-with-docker-compose-36e3ba939af0
+# https://neo4j.com/docs/graph-data-science/current/installation/
+# https://neo4j.com/docs/graph-data-science/current/installation/
+# https://neo4j.com/developer/docker-run-neo4j/
+
+### PYTHON-FLASK SERVICE INSTALLATION GUIDES AND TIPS USING DOCKER
+# https://docs.docker.com/compose/gettingstarted/
+# https://docs.docker.com/compose/compose-file/compose-file-v3/
+# https://stackoverflow.com/questions/60086741/docker-so-slow-while-installing-pip-requirements
+# https://pythonspeed.com/articles/alpine-docker-python/
+# https://stackoverflow.com/questions/22944631/how-to-get-the-ip-address-of-the-docker-host-from-inside-a-docker-container
+# https://github.com/pallets/flask-sqlalchemy/issues/630
+# https://stackoverflow.com/questions/20813486/exploring-docker-containers-file-system
+
+### Docker
+https://itnext.io/a-beginners-guide-to-deploying-a-docker-application-to-production-using-docker-compose-de1feccd2893
