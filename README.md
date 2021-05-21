@@ -25,11 +25,11 @@ The development of this project is mainly based on Docker Technology, follow the
 #### C. Set up a dockerized development environment
 
 - Open a command line window on you machine as an administrator, preferably git bash
-- Navigate to your location in step A above
+- Navigate to your location in step A above <br />
   `cd {your_location}`
-- Now, navigate to your src code folder
+- Now, navigate to your src code folder <br />
   `cd src`
-- Spin up all configured containers in the docker-compose.yml file process using attached mode
+- Spin up all configured containers in the docker-compose.yml file process using attached mode <br />
   `docker-compose up -d`
 - Docker will now pull images for mongodb and neo4j and then set up the required services for this project.
 - Docker will also build a user-interface image and run this project as a container with Python and its required packages installed.
@@ -40,22 +40,22 @@ The development of this project is mainly based on Docker Technology, follow the
 
 #### D. Importing datasets
 
-- In your command line, access smia CLI using the command below or version of it depanding on your command line
+- In your command line, access smia CLI using the command below or version of it depanding on your command line <br />
   `docker exec -t -i user-interface bash`
 
 #### 1. Importing the small dummy test dataset
 
-- Run test driver
+- Run test driver <br />
   `python test_driver.py`
 
 Note! You might get a couple of warnings when building the user- and activity user graph, this is because the dummy dataset is very small and there is not enough labels in the training dataset for topic classification. The warnings can be ignored as this is just a dummy dataset for development and testing purposes.
 
 #### 2. Importing a real-life dataset from crawling Reddit
 
-- Run reddit driver
+- Run reddit driver <br />
   `python reddit_driver.py`
 
-- exit the CLI
+- exit the CLI <br />
   `exit`
 
 ## II. Setting up the production environment
