@@ -1,21 +1,5 @@
 version: "3.9"
 
-### Importing test data
-## Access smia CLI at working directory
-# docker exec -t -i user-interface /bin/bash
-## Run test driver
-# python test_driver.py
-## exit CLI
-# python test_driver.py
-
-### Running Reddit crawler
-## Access smia cli at working directory
-# docker exec -t -i user-interface /bin/bash
-## Run reddit driver
-# python reddit_driver.py
-## exit CLI
-# python test_driver.py
-
 services:
   mongo-db:
     image: mongo:${mongo_db_version}
