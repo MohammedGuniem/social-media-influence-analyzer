@@ -42,6 +42,9 @@ https://en.wikipedia.org/wiki/Accessibility
 https://en.wikipedia.org/wiki/Interoperability
 https://en.wikipedia.org/wiki/Reusability
 
+[] Statistics about most popular social media platforms
+https://gs.statcounter.com/social-media-stats#monthly-201101-202012
+
 ---------------------------------------------------------------------------------------------------------------
 -> Søkeord for master litteratur
 - Processes and techniques

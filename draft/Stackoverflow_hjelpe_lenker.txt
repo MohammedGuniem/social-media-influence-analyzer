@@ -8,3 +8,5 @@ https://scikit-learn.org/stable/tutorial/text_analytics/working_with_text_data.h
 https://stackoverflow.com/questions/40416072/reading-file-using-relative-path-in-python-project/40416154
 
 https://thispointer.com/python-how-to-copy-a-dictionary-shallow-copy-vs-deep-copy/
+
+https://stackoverflow.com/questions/56741124/how-do-i-add-percentage-in-horizontal-bar-chart
