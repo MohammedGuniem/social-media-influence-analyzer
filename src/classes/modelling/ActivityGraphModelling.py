@@ -47,9 +47,6 @@ class ActivityGraph(Graph):
             for submission in submissions:
                 submission_id = submission["id"]
 
-                influence_area = self.text_classifier.classify_title(
-                    submission['body'])
-
                 # add submissions as nodes
                 self.addOrUpdateNode(
                     activity_object=submission, node_type="Submission")
@@ -60,6 +57,8 @@ class ActivityGraph(Graph):
                     self.submissions_type,
                     "t3_"+submission['id']
                 )
+
+                submission_body = submission['body']
 
                 for comment in comments:
                     comment_id = comment['id']
@@ -74,6 +73,9 @@ class ActivityGraph(Graph):
 
                         # Setting the weight to the upvotes score
                         upvotes_weight = submission["upvotes"]
+
+                        # Constructing a document to predict topic
+                        topic_document = submission_body + " " + comment['body']
 
                     # Comment is a subcomment
                     elif parent_id_prefix == "t1":
@@ -90,6 +92,9 @@ class ActivityGraph(Graph):
                         # Setting the weight to the upvotes score
                         upvotes_weight = parent_comment["upvotes"]
 
+                        # Constructing a document to predict topic
+                        topic_document = submission_body + " " + parent_comment['body'] + " " + comment['body']
+
                     # add sub-comments as nodes
                     self.addOrUpdateNode(
                         activity_object=comment, node_type=node_type)
@@ -100,12 +105,15 @@ class ActivityGraph(Graph):
                         self.mongo_db_connector.getChildrenCount(
                             self.network_name, self.submissions_type, [comment])
 
+                    # Predicting the topic of influence
+                    predicted_influence_area = self.text_classifier.classify_title(topic_document)
+
                     # Draw edge relation between parent (comment or submission) and child comment.
                     self.addOrUpdateEdge(
                         from_node_id=from_node_id,
                         relation_type="Has",
                         to_node_id=comment_id,
-                        influence_area=influence_area,
+                        influence_area=predicted_influence_area,
                         group_name=group_name,
                         interaction_score=interaction_weight,
                         activity_score=activity_weight,

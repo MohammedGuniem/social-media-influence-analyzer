@@ -43,9 +43,6 @@ class UserGraph(Graph):
                 self.network_name, self.submissions_type, group_id)
 
             for submission in submissions:
-                influence_area = self.text_classifier.classify_title(
-                    submission['body'])
-
                 # add submission authors as nodes
                 self.addOrUpdateNode(
                     activity_object=submission, node_type="Person")
@@ -57,16 +54,21 @@ class UserGraph(Graph):
                     "t3_"+submission['id']
                 )
 
+                submission_body = submission['body']
+
                 for comment in comments:
                     comment_author_id = comment['author_id']
 
                     parent_id_prefix = comment['parent_id'][0:2]
                     parent_id = comment['parent_id'][3:]
-
+                    
                     # Comment is top-level
                     if parent_id_prefix == "t3":
                         from_node_id = submission["author_id"]
                         upvotes_weight = submission["upvotes"]
+
+                        # Constructing a document to predict topic
+                        topic_document = submission_body + " " + comment['body']
 
                     # Comment is a thread comment
                     elif parent_id_prefix == "t1":
@@ -80,10 +82,16 @@ class UserGraph(Graph):
                         from_node_id = parent_comment["author_id"]
                         upvotes_weight = parent_comment["upvotes"]
 
+                        # Constructing a document to predict topic
+                        topic_document = submission_body + " " + parent_comment['body'] + " " + comment['body']
+
                     interaction_weight = 1
                     activity_weight = 1 + \
                         self.mongo_db_connector.getChildrenCount(
                             self.network_name, self.submissions_type, [comment])
+
+                    # Predicting the topic of influence
+                    predicted_influence_area = self.text_classifier.classify_title(topic_document)
 
                     # add comment authors as nodes
                     self.addOrUpdateNode(
@@ -94,7 +102,7 @@ class UserGraph(Graph):
                         from_node_id=from_node_id,
                         relation_type="Influences",
                         to_node_id=comment_author_id,
-                        influence_area=influence_area,
+                        influence_area=predicted_influence_area,
                         group_name=group_name,
                         interaction_score=interaction_weight,
                         activity_score=activity_weight,
