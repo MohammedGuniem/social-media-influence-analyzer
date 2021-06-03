@@ -8,7 +8,7 @@ To set up the project on your preffered enviornment, please follow the steps bel
 
 ---
 
-## I. Importing project source code
+> I. Importing project source code
 
 Please follow the step below before precessing into setting up any development or production environments
 
@@ -54,7 +54,7 @@ Please follow the step below before precessing into setting up any development o
 
 ---
 
-## II. Setting up the development environment (Using Docker)
+> II. Setting up the development environment (Using Docker)
 
 #### II-A. Download Docker Desktop
 
@@ -101,7 +101,7 @@ Note! You might get a couple of warnings when building the user- and activity us
 
 ---
 
-## III. Setting up the production environment (User Windows IIS)
+> III. Setting up the production environment (Using Windows IIS)
 
 Follow the steps below to set up a production envirnoment using Windows IIS:
 
@@ -117,8 +117,9 @@ Follow the steps below to set up a production envirnoment using Windows IIS:
   `pip install praw`
   `pip install matplotlib`
   `pip install flask`
+  `pip install wfastcgi`
 
-#### III-B. Install MongoDB Archeive Database Server
+#### III-B. Install MongoDB Archive Database Server
 
 - Install Mongo DB and create user credentials
 - After installation, Open MongoDB Compass and connect to DB
@@ -215,3 +216,47 @@ Follow the steps below to set up a production envirnoment using Windows IIS:
 - At the end, you can go to http://localhost:7475/browser/ at your browser, set a password and note it down
 
 #### III-D. Install User Interface Web Server using IIS.
+
+- Open cmd as administrator and type.
+  `wfastcgi-enable`
+- Open Server Manager and follow the steps below.
+- Enable the CGI feature on IIS. Note down the output of this command for later use
+- Open IIS.
+- Right-click on the server name and select add website.
+- Enter the site name, physical path(the path of the folder where you cloned your flask project), and the site building.
+- From the features view of your site, enter Handler Mappings, and to the right choose Add Module Mapping.
+- in executable you need the path of your python executable file and wfastcgi module file, this path value here is retrieved in cmd after enabling wfastcgi early on in this documentation, it often has the following value if not configured differently
+  `C:\python\python39\python.exe|C:\python\python39\lib\site-packages\wfastcgi.py`
+- Click on Request Restrictions in the same window above and uncheck "Invoke handler only if request is mapped to:"
+- Confirm and agree to the rest of the pop confirmation windows.
+- Go back and select the server name, then select fast CGI settings from the feature view pane.
+- Double-click on your python full path, and enter the collection of your Environment Variables under General.
+- Set the following paths and parameters:
+
+1. PYTHONPATH (Your local python-flask repository path).
+2. WSGI_HANDLER (_.app) where _ equals the name of the flask application file, often it is called app.py or main.py and located in PYTHONPATH.
+3. If your application is expected to process requests from clients in extended period of time, you can change the Activity Timeout parameter to 3600 seconds for example.
+
+- Remember to
+
+1. Install all packages that your flask application needs before you start your webserver.
+2. Add any required environment variables by your application
+3. Add the needed permissions to folders and physical path.
+
+- Redirect HTTP traffic to HTTPS
+- Install the URL Rewrite extension, https://www.iis.net/downloads/microsoft/url-rewrite
+- You might have to close the Server Manager and IIS, then open them again to see the URL Rewrite extension module on your Features View Pane.
+- Open IIS and enter URL Rewrite.
+- Go to Add Rule(s), then choose Blank rule.
+- add the following values
+
+1. Requested URL -> Matches the Pattern
+2. Using -> Regular Expressions
+3. Pattern -> (.\*)
+4. ignore case -> (checked)
+5. Action type -> Redirect
+6. Redirect URL -> (https://{HTTP_HOST}{REQUEST_URL})
+7. Append query string -> (uncecked)
+8. Reditect type -> Permanent (301)
+
+- Click on apply to the right put the redirect rule into effect.
