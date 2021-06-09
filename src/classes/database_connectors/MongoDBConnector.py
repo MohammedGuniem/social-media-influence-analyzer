@@ -10,6 +10,14 @@ class MongoDBConnector:
 
     """ Collection validator """
 
+    def getCollectionsOfDatabase(self, database_name):
+        collections = set(self.client[database_name].collection_names())
+        collections = sorted(collections, reverse=True)
+
+        if len(collections) > 0:
+            return collections
+        return "no valid collection!"
+
     def getMostRecentValidCollection(self, database_name):
         collections = set(self.client[database_name].collection_names())
         collections = sorted(collections, reverse=True)
