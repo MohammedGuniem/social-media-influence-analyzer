@@ -11,12 +11,13 @@ app = Flask(__name__)
 load_dotenv()
 
 number_of_connection_tries = 0
-stop_trying = False # Are all database services up and running?
+stop_trying = False  # Are all database services up and running?
 while (not stop_trying):
     try:
         # Mongo DB connector
         mongo_db_connector = MongoDBConnector(
-            host="host.docker.internal" if os.environ.get('IS_DOCKER') else os.environ.get('mongo_db_host'),
+            host="host.docker.internal" if os.environ.get(
+                'IS_DOCKER') else os.environ.get('mongo_db_host'),
             port=int(os.environ.get('mongo_db_port')),
             user=os.environ.get('mongo_db_user'),
             passowrd=os.environ.get('mongo_db_pass')
@@ -24,15 +25,21 @@ while (not stop_trying):
 
         # Neo4j users database connector
         neo4j_users_db_connector = GraphDBConnector(
-            host="host.docker.internal" if os.environ.get('IS_DOCKER') else os.environ.get('neo4j_user_db_host'),
+            host="host.docker.internal" if os.environ.get(
+                'IS_DOCKER') else os.environ.get('neo4j_users_db_host'),
             port=int(os.environ.get('neo4j_users_db_port')),
             user=os.environ.get('neo4j_users_db_user'),
             password=os.environ.get('neo4j_users_db_pass')
         )
-        
+
+        print("---------------------------------------------")
+        print(int(os.environ.get('neo4j_activities_db_port')))
+        print("---------------------------------------------")
+
         # Neo4j activity database connector
         neo4j_activities_db_connector = GraphDBConnector(
-            host="host.docker.internal" if os.environ.get('IS_DOCKER') else os.environ.get('neo4j_activities_db_host'),
+            host="host.docker.internal" if os.environ.get(
+                'IS_DOCKER') else os.environ.get('neo4j_activities_db_host'),
             port=int(os.environ.get('neo4j_activities_db_port')),
             user=os.environ.get('neo4j_activities_db_user'),
             password=os.environ.get('neo4j_activities_db_pass')
@@ -302,6 +309,7 @@ def topic_detection_model():
     if data_format == 'json':
         return jsonify(result)
     return render_template("topic_detection_model.html", result=result)
-    
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0')

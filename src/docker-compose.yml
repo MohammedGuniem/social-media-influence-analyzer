@@ -17,8 +17,6 @@ services:
   neo4j-user-graph:
     image: neo4j:${neo4j_users_db_version}
     restart: unless-stopped
-    depends_on:
-      - mongo-db
     ports:
       - "${neo4j_users_http_port}:7474"
       - "${neo4j_users_db_port}:7687"
@@ -31,7 +29,7 @@ services:
       - ./services/neo4j-users/plugins:/services/plugins
     environment:
       - NEO4J_dbms_security_procedures_unrestricted=gds.*
-      - NEO4J_dbms_security_procedures_whitelist=gds.*
+      - NEO4J_dbms_security_procedures_allowlist=gds.*
       - NEO4J_apoc_import_file_enabled=true
       - NEO4J_dbms_shell_enabled=true
       - NEO4JLABS_PLUGINS=["graph-data-science"]
@@ -43,12 +41,9 @@ services:
   neo4j-activity-graph:
     image: neo4j:${neo4j_activities_db_version}
     restart: unless-stopped
-    depends_on:
-      - mongo-db
-      - neo4j-user-graph
     ports:
-      - "${neo4j_activities_http_port}:7475"
-      - "${neo4j_activities_db_port}:7688"
+      - "${neo4j_activities_http_port}:7474"
+      - "${neo4j_activities_db_port}:7687"
     container_name: neo4j-activity-graph
     volumes:
       - ./services/neo4j-activities/conf:/services/conf
@@ -58,7 +53,7 @@ services:
       - ./services/neo4j-activities/plugins:/services/plugins
     environment:
       - NEO4J_dbms_security_procedures_unrestricted=gds.*
-      - NEO4J_dbms_security_procedures_whitelist=gds.*
+      - NEO4J_dbms_security_procedures_allowlist=gds.*
       - NEO4J_apoc_import_file_enabled=true
       - NEO4J_dbms_shell_enabled=true
       - NEO4JLABS_PLUGINS=["graph-data-science"]
