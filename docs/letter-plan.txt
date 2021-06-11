@@ -1,0 +1,44 @@
+Motivation
+--------------------------------------------------------------------------------------------
+I.		INTRODUCTION 																 - (DONE)
+--------------------------------------------------------------------------------------------
+II.		RELATED WORKS
+		A.	Detecting and measuring user influence in social media  				 - (DONE)
+		B.	Data-driven Influence Learning  										 - (DONE)
+		C.	Gathering data and Crawling alternatives  								 - (DONE)
+		D.  Classification of topics in social media platforms						 - (DONE)
+		E.	Choosing a study case social media platform								 - (DONE)
+--------------------------------------------------------------------------------------------
+III.	CHOSSING A CASE STUDY SOCIAL MEDIA PLATFORM TO CRAWL FOR TEST AND EVALUATION - (DONE)
+--------------------------------------------------------------------------------------------
+IV.		DEFINIING A GROUND DATA STRUCTURE											 - (DONE)
+--------------------------------------------------------------------------------------------
+V.		THE ACTIVITY THREAD															 - (DONE)
+--------------------------------------------------------------------------------------------
+VI.		SCORING INFLUENCE															 - (DONE)
+--------------------------------------------------------------------------------------------
+VII.	INFLUENCE SCORE IN THE USER INFLUENCE GRAPH									 - (DONE)
+--------------------------------------------------------------------------------------------
+VIII. 	TESTING OF SCORING TECHNIQUES IN THE USER INFLUENCE GRAPH
+--------------------------------------------------------------------------------------------
+IX.		EVALUATION OF SCORING TECHNIQUES IN THE USER INFLUENCE GRAPH
+--------------------------------------------------------------------------------------------
+X.		DETECTING AND CLASSIFYING THE FIELD OF INFLUENCE
+--------------------------------------------------------------------------------------------
+XI.		FIELD OF INFLUENCE IN THE USER INFLUENCE GRAPH
+--------------------------------------------------------------------------------------------
+XII. 	TESTING  OF INFLUENCE FIELD DETECTION IN THE USER INFLUENCE GRAPH
+--------------------------------------------------------------------------------------------
+XIII.	EVALUATION OF INFLUENCE FIELD DETECTION IN THE USER INFLUENCE GRAPH
+--------------------------------------------------------------------------------------------
+XIV. 	FUTURE IMPROVMENTS OF INFLUENCE GRAPH MODEL 
+--------------------------------------------------------------------------------------------
+XV. 	THE TECHNICAL SOLUTION
+--------------------------------------------------------------------------------------------
+XVI.	TEST AND EVALUATION OF THE TECHNICAL SOLUTION
+--------------------------------------------------------------------------------------------
+XVII. 	FUTURE IMPROVMENTS OF THE TECHNICAL SOLUTION
+--------------------------------------------------------------------------------------------
+CONCLUSION 
+--------------------------------------------------------------------------------------------
+REFERENCES
