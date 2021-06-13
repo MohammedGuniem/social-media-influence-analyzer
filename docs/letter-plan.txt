@@ -19,9 +19,9 @@ VI.		SCORING INFLUENCE															 - (DONE)
 --------------------------------------------------------------------------------------------
 VII.	INFLUENCE SCORE IN THE USER INFLUENCE GRAPH									 - (DONE)
 --------------------------------------------------------------------------------------------
-VIII. 	TESTING OF SCORING TECHNIQUES IN THE USER INFLUENCE GRAPH
+VIII. 	TESTING OF INFLUENCE SCORING TECHNIQUES										 - (DONE)
 --------------------------------------------------------------------------------------------
-IX.		EVALUATION OF SCORING TECHNIQUES IN THE USER INFLUENCE GRAPH
+IX.		EVALUATION OF INFLUENCE SCORING TECHNIQUES		
 --------------------------------------------------------------------------------------------
 X.		DETECTING AND CLASSIFYING THE FIELD OF INFLUENCE
 --------------------------------------------------------------------------------------------
