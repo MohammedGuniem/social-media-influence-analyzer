@@ -21,7 +21,7 @@ VII.	INFLUENCE SCORE IN THE USER INFLUENCE GRAPH									 - (DONE)
 --------------------------------------------------------------------------------------------
 VIII. 	TESTING OF INFLUENCE SCORING TECHNIQUES										 - (DONE)
 --------------------------------------------------------------------------------------------
-IX.		EVALUATION OF INFLUENCE SCORING TECHNIQUES		
+IX.		EVALUATION OF INFLUENCE SCORING TECHNIQUES		 							 - (DONE)
 --------------------------------------------------------------------------------------------
 X.		DETECTING AND CLASSIFYING THE FIELD OF INFLUENCE
 --------------------------------------------------------------------------------------------
@@ -31,13 +31,17 @@ XII. 	TESTING  OF INFLUENCE FIELD DETECTION IN THE USER INFLUENCE GRAPH
 --------------------------------------------------------------------------------------------
 XIII.	EVALUATION OF INFLUENCE FIELD DETECTION IN THE USER INFLUENCE GRAPH
 --------------------------------------------------------------------------------------------
-XIV. 	FUTURE IMPROVMENTS OF INFLUENCE GRAPH MODEL 
+XIV. 	INTRODUCING CENTRALITY MEASURES 
 --------------------------------------------------------------------------------------------
-XV. 	THE TECHNICAL SOLUTION
+XV.		CENTRALITY MEASURES VS. EDGE SCORE
 --------------------------------------------------------------------------------------------
-XVI.	TEST AND EVALUATION OF THE TECHNICAL SOLUTION
+XVI. 	FUTURE IMPROVMENTS OF INFLUENCE GRAPH MODEL 
 --------------------------------------------------------------------------------------------
-XVII. 	FUTURE IMPROVMENTS OF THE TECHNICAL SOLUTION
+XVII. 	THE TECHNICAL SOLUTION
+--------------------------------------------------------------------------------------------
+XVIII	TEST AND EVALUATION OF THE TECHNICAL SOLUTION
+--------------------------------------------------------------------------------------------
+XIX 	FUTURE IMPROVMENTS OF THE TECHNICAL SOLUTION
 --------------------------------------------------------------------------------------------
 CONCLUSION 
 --------------------------------------------------------------------------------------------
