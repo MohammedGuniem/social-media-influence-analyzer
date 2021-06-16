@@ -136,20 +136,18 @@ class TextClassifier:
             ('tfidf', TfidfTransformer(use_idf=True)),
             ('clf', SGDClassifier(alpha=0.001, random_state=self.random_state)),
         ])
-        """
-        ('clf', MultinomialNB()),
-        """
         training_percentage = 0.8
         testing_percentage = 0.2
         X_train, X_test = list(features[:int(training_percentage*len(features))]
-                               ), list(features[int(testing_percentage*len(features)):])
+                               ), list(features[-int(testing_percentage*len(features)):])
         y_train, y_test = list(labels[:int(training_percentage*len(features))]
-                               ), list(labels[int(testing_percentage*len(features)):])
+                               ), list(labels[-int(testing_percentage*len(features)):])
+
         text_clf.fit(X_train, y_train)
         y_pred = text_clf.predict(X_test)
         labels = list(set(labels))
         class_report = classification_report(
-            y_test, y_pred, target_names=labels, output_dict=True)
+            y_test, y_pred, target_names=labels, output_dict=True, labels=labels)
         conf_matrix = confusion_matrix(y_test, y_pred, labels=labels)
 
         return class_report, conf_matrix, labels

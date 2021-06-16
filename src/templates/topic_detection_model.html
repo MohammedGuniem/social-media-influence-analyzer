@@ -115,13 +115,6 @@
                 <td></td><td></td><td></td><td></td><td></td>
             </tr>
             <tr>
-                <td>Accuracy</td>
-                <td></td>
-                <td></td>
-                <td>{{ result.classification_report.accuracy | round(3, 'floor') }}</td>
-                <td></td>
-            </tr>
-            <tr>
                 <td>Weighted Average</td>
                 <td>{{ result.classification_report['weighted avg'].precision | round(3, 'floor') }}</td>
                 <td>{{ result.classification_report['weighted avg'].recall | round(3, 'floor') }}</td>
