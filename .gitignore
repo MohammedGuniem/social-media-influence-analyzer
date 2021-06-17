@@ -11,8 +11,8 @@
 *.pyc
 
 ## logs
-smia/Logs/*
+src/Logs/*
 
 ## plots
-smia/statistics_plots/*
+src/statistics_plots/*
 

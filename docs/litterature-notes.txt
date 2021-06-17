@@ -1,0 +1,75 @@
+-> referenced documents:
+
+[1] Social Network Influence Analysis
+https://ieeexplore-ieee-org.ezproxy.uis.no/document/9045797
+[1]	Y. Guo, J. Cao and W. Lin, "Social Network Influence Analysis," 2019 6th International Conference on Dependable Systems and Their Applications (DSA), 2020, pp. 517-518, doi: 10.1109/DSA.2019.00093. J. Clerk Maxwell, A Treatise on Electricity and Magnetism, 3rd ed., vol. 2. Oxford: Clarendon, 1892, pp.68–73.
+
+[2] Data-Driven Influence Learning in Social Networks
+https://ieeexplore-ieee-org.ezproxy.uis.no/document/8367407
+[2]	F. Wang, W. Jiang, G. Wang and D. Xie, "Data-Driven Influence Learning in Social Networks," 2017 IEEE International Symposium on Parallel and Distributed Processing with Applications and 2017 IEEE International Conference on Ubiquitous Computing and Communications (ISPA/IUCC), 2017, pp. 1179-1185, doi: 10.1109/ISPA/IUCC.2017.00177.
+
+[3]	The Pushshift Reddit Dataset
+https://www.researchgate.net/publication/338789455_The_Pushshift_Reddit_Dataset/link/60185b96299bf1b33e404413/download
+[3]	Baumgartner, Jason & Zannettou, Savvas & Keegan, Brian & Squire, Megan & Blackburn, Jeremy. (2020). The Pushshift Reddit Dataset. 
+
+
+[4]	Annotating and detecting topics in social media forum and modelling the annotation to derive directions-a case study
+https://apps-webofknowledge-com.ezproxy.uis.no/full_record.do?product=WOS&search_mode=GeneralSearch&qid=4&SID=C3JfK1jOeKB73IQRVS1&page=1&doc=2&cacheurlFromRightClick=no
+[4]	Balakrishnan, Athira & Jones, Josette & Idicula, Sumam & Kulanthaivel, Anand & Zhang, Enming. (2021). Annotating and detecting topics in social media forum and modelling the annotation to derive directions-a case study. Journal of Big Data. 8. 10.1186/s40537-021-00429-7.
+
+[5]	Analysis of User Attention on Reddit
+https://diglib.tugraz.at/download.php?id=576a77f167aca&location=browse
+[5]	T. Steinbaur, ‘‘Information and social analysis of Reddit,’’ inProc.TROYSTEINBAUER CS. UCSB. EDU, 2012, pp. 1–12. [Online]. Available:http://snap.stanford.edu/class/cs224w-2011/proj/tbower_Finalwriteup_v1.pdf
+
+
+
+---------------------------------------------------------------------------------------------------------------
+-> documents to be referenced:
+
+[] about reddit
+https://no.wikipedia.org/wiki/Reddit
+
+[] Python Reddit API Wrapper
+https://praw.readthedocs.io/en/latest/#getting-started
+
+[] limitation of annoymous crawling of reddit
+https://www.jcchouinard.com/documentation-on-reddit-apis-json/
+
+[] FAIR data
+https://en.wikipedia.org/wiki/FAIR_data
+https://en.wikipedia.org/wiki/Findability
+https://en.wikipedia.org/wiki/Accessibility
+https://en.wikipedia.org/wiki/Interoperability
+https://en.wikipedia.org/wiki/Reusability
+
+[] Statistics about most popular social media platforms
+https://gs.statcounter.com/social-media-stats#monthly-201101-202012
+
+---------------------------------------------------------------------------------------------------------------
+-> Søkeord for master litteratur
+- Processes and techniques
+crawling techniques 
+Machine learning
+Detecting and Scoring social influences
+
+- General themes
+importance of social media in modern societies
+Influence of social media
+Influence between users in social media
+Importance of graphs in visualization and modeling.
+
+- Tools
+Pros. And cons of mongo db and neo4j
+Security and reliability of mongo db and neo4j
+Pros and cons of python programming language
+
+usefull
+short
+summarized
+straight to the point
+relevant
+refelective
+from different sources
+
+
+installere nettleseren libraryaccess.

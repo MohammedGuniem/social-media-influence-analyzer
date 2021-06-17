@@ -1,0 +1,79 @@
+version: "3.9"
+
+services:
+  mongo-db:
+    image: mongo:${mongo_db_version}
+    restart: unless-stopped
+    ports:
+      - "${mongo_db_port}:27017"
+    container_name: mongo-db
+    volumes:
+      - ./services/mongodb/db/data/db:/services/mongodb/db/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${mongo_db_user}
+      - MONGO_INITDB_ROOT_PASSWORD=${mongo_db_pass}
+    command: [--auth]
+
+  neo4j-user-graph:
+    image: neo4j:${neo4j_users_db_version}
+    restart: unless-stopped
+    ports:
+      - "${neo4j_users_http_port}:7474"
+      - "${neo4j_users_db_port}:7687"
+    container_name: neo4j-user-graph
+    volumes:
+      - ./services/neo4j-users/conf:/services/conf
+      - ./services/neo4j-users/data:/services/data
+      - ./services/neo4j-users/import:/services/import
+      - ./services/neo4j-users/logs:/services/logs
+      - ./services/neo4j-users/plugins:/services/plugins
+    environment:
+      - NEO4J_dbms_security_procedures_unrestricted=gds.*
+      - NEO4J_dbms_security_procedures_allowlist=gds.*
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_dbms_shell_enabled=true
+      - NEO4JLABS_PLUGINS=["graph-data-science"]
+      - NEO4J_dbms_memory_pagecache_size=1G
+      - NEO4J_dbms.memory.heap.initial_size=1G
+      - NEO4J_dbms_memory_heap_max__size=1G
+      - NEO4J_AUTH=${neo4j_users_db_user}/${neo4j_users_db_pass}
+
+  neo4j-activity-graph:
+    image: neo4j:${neo4j_activities_db_version}
+    restart: unless-stopped
+    ports:
+      - "${neo4j_activities_http_port}:7474"
+      - "${neo4j_activities_db_port}:7687"
+    container_name: neo4j-activity-graph
+    volumes:
+      - ./services/neo4j-activities/conf:/services/conf
+      - ./services/neo4j-activities/data:/services/data
+      - ./services/neo4j-activities/import:/services/import
+      - ./services/neo4j-activities/logs:/services/logs
+      - ./services/neo4j-activities/plugins:/services/plugins
+    environment:
+      - NEO4J_dbms_security_procedures_unrestricted=gds.*
+      - NEO4J_dbms_security_procedures_allowlist=gds.*
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_dbms_shell_enabled=true
+      - NEO4JLABS_PLUGINS=["graph-data-science"]
+      - NEO4J_dbms_memory_pagecache_size=1G
+      - NEO4J_dbms.memory.heap.initial_size=1G
+      - NEO4J_dbms_memory_heap_max__size=1G
+      - NEO4J_AUTH=${neo4j_activities_db_user}/${neo4j_activities_db_pass}
+
+  user-interface:
+    image: smia/ui:1.0.0
+    container_name: user-interface
+    restart: unless-stopped
+    build: .
+    depends_on:
+      - mongo-db
+      - neo4j-user-graph
+      - neo4j-activity-graph
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/code
+    environment:
+      FLASK_ENV: ${FLASK_ENV}

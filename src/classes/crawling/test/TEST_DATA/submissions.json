@@ -1,0 +1,38 @@
+[
+  {
+    "id": "S_1",
+    "author_id": "U_1",
+    "author_name": "User A",
+    "num_comments": 4,
+    "group_id": "Test_2",
+    "body": "Tech giant invests 30 billions in renewable energy",
+    "upvotes": 10
+  },
+  {
+    "id": "S_2",
+    "author_id": "U_2",
+    "author_name": "User B",
+    "num_comments": 3,
+    "group_id": "Test_1",
+    "body": "If only America could have short election cycles like near everywhere else",
+    "upvotes": 3
+  },
+  {
+    "id": "S_3",
+    "author_id": "U_3",
+    "author_name": "User C",
+    "num_comments": 5,
+    "group_id": "Test_2",
+    "body": "100 days to go until Tokyo 2021",
+    "upvotes": 10
+  },
+  {
+    "id": "S_4",
+    "author_id": "U_3",
+    "author_name": "User C",
+    "num_comments": 1,
+    "group_id": "Test_1",
+    "body": "Bitcoin reaches its maximum value ever",
+    "upvotes": 7
+  }
+]
