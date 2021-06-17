@@ -25,7 +25,7 @@ IX.		EVALUATION OF INFLUENCE SCORING TECHNIQUES		 							 - (DONE)
 --------------------------------------------------------------------------------------------
 X.		DETECTING AND CLASSIFYING THE FIELD OF INFLUENCE 							 - (DONE)
 --------------------------------------------------------------------------------------------
-XI. 	TESTING  OF INFLUENCE FIELD DETECTION IN THE USER INFLUENCE GRAPH
+XI. 	TESTING  OF INFLUENCE FIELD DETECTION IN THE USER INFLUENCE GRAPH            - (DONE)
 --------------------------------------------------------------------------------------------
 XII.	EVALUATION OF INFLUENCE FIELD DETECTION IN THE USER INFLUENCE GRAPH
 --------------------------------------------------------------------------------------------
