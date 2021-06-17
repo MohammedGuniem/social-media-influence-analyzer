@@ -1,25 +1,21 @@
 # Social Media Influence Analyzer
 
-This is a project in social media influence analysis using Computer Science to detect and classify influences between users of social media. The project is carried out by Mohammed Z. Guniem to acheive the objective of his master thesis in producing a secure and reliable system for detecting and classifying influences between users on social media platforms.
-
+This is a project about social media influence analysis using Computer Science to detect and classify influences between users of social media. The project is carried out by Mohammed Z. Guniem to acheive the objective of his master thesis in producing a reliable and secure system for detecting and classifying influences between users on social media platforms.
 This repository contains all project code, documents and other related files and folders.
 
-To set up the project on your preffered enviornment, please follow the steps below
-
----
+## To set up the project on your preffered enviornment, please follow the steps below:
 
 > I. Importing project source code
 
-Please follow the step below before precessing into setting up any development or production environments
-
 #### I-A. Clone or download the project code of this repository to your favorite location on your machine
 
-- If cloning: Download and install the Git tool using this link https://git-scm.com/downloads
-- If downloading directly: unzip the project files in your favorite location
+- If cloning: Download and install the Git tool using this link https://git-scm.com/downloads.
+- If downloading directly: unzip the project files in your desired location on the filesystem you are using.
 
 #### I-B. Add necessary environment variables
 
 - Rename the file .env.example to .env
+- If you wish to crawl reddit, please register your crawling account and obtain credentials by following the instructions on this link https://praw.readthedocs.io/en/latest/getting_started/authentication.html
 - Fill in the following necessary environment variables
 
 | Variable                    | default value | possible values                                                                                                            |
@@ -52,9 +48,9 @@ Please follow the step below before precessing into setting up any development o
 | neo4j_activities_db_user    | -             | The username of administrating Neo4j DB instance host for activity graphs with full write and read access                  |
 | neo4j_activities_db_pass    | -             | The password of administrating Neo4j DB instance host for activity graphs with full write and read access                  |
 
----
+<br />
 
-> II. Setting up the development environment (Using Docker)
+> II. Setting up the development or production environment (Using Docker)
 
 #### II-A. Download Docker Desktop
 
@@ -66,41 +62,41 @@ Please follow the step below before precessing into setting up any development o
 #### II-B. Set up a dockerized development environment
 
 - Open a command line window on you machine as an administrator, preferably git bash
-- Navigate to your location in step A above <br />
+- Navigate to your location in step A above <br  />
   `cd {your_location}`
-- Now, navigate to your src code folder <br />
+- Now, navigate to your src code folder <br  />
   `cd src`
-- Spin up all configured containers in the docker-compose.yml file process using attached mode <br />
+- Spin up all configured containers in the docker-compose.yml file process using attached mode <br  />
   `docker-compose up -d`
+
 - Docker will now pull images for mongodb and neo4j and then set up the required services for this project.
 - Docker will also build a user-interface image and run this project as a container with Python and its required packages installed.
 - This might take a couple of minutes at the first time since pulling images is a little time-consuming
-- Please wait for a couple of minutes depending on the capabilities of your system until the mongoDB and neo4j database services are up and running
-- Then, go to localhost:5000 or host.docker.internal:5000 on your browser with javascript enabled.
+- Please wait for a couple of minutes depending on the capabilities of your system until the mongoDB and neo4j database services are up and running and able to receive connections.
+- Then, go to 127.0.0.1:5000, localhost:5000 or host.docker.internal:5000 on your browser with javascript enabled.
 - You should now be able to access the GUI interface of the project.
 
 #### II-C. Importing datasets and generating user and activity graphs, and statistics plots
 
-- In your command line, access smia CLI using the command below or version of it depanding on your command line <br />
+- In your command line, access smia CLI using the command below or version of it depanding on your command line <br  />
   `docker exec -t -i user-interface bash`
 
-#### II-C-1. Importing the small dummy test dataset
+##### II-C-1. Importing the small dummy test dataset
 
-- Run test driver <br />
+- Run test driver <br  />
   `python test_driver.py`
+  Note! You might get a couple of warnings when building the user- and activity user graph, this is because the dummy dataset is very small and there is not enough labels in the training dataset for topic classification. The warnings can be ignored as this is just a dummy dataset for development and testing purposes.
 
-Note! You might get a couple of warnings when building the user- and activity user graph, this is because the dummy dataset is very small and there is not enough labels in the training dataset for topic classification. The warnings can be ignored as this is just a dummy dataset for development and testing purposes.
+##### II-C-2. Importing a real-life dataset from crawling Reddit
 
-#### II-C-2. Importing a real-life dataset from crawling Reddit
-
-- Run reddit driver <br />
+- Run reddit driver <br  />
   `python reddit_driver.py`
 
-- exit the CLI <br />
+- exit the CLI <br  />
   `exit`
 
----
-
+<br />
+  
 > III. Setting up the production environment (Using Windows IIS)
 
 Follow the steps below to set up a production envirnoment using Windows IIS:
@@ -127,7 +123,7 @@ Follow the steps below to set up a production envirnoment using Windows IIS:
   `use admin`
   `db.createUser({user: "<username>" , pwd: "<password>", roles: [ "userAdminAnyDatabase","readWriteAnyDatabase" ]})`
 - Note down the the username and password for later use.
-- Open `<Mongo_Installation_Folder>/.../bin/mongod.conf` and enable authentication by adding the following configuration
+- Open `{Your_Mongo_Installation_Folder}/.../bin/mongod.conf` and enable authentication by adding the following configuration
   `security:`
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`authorization: "disabled"`
 - Open PowerShell as admin. and restart the mongodb service using this command
@@ -144,25 +140,24 @@ Follow the steps below to set up a production envirnoment using Windows IIS:
   `dbms.connector.bolt.tls_level=DISABLED`
   `dbms.connector.bolt.listen_address=:7687`
   `dbms.connector.bolt.advertised_address=:7687`
-
+  <br />
   `# HTTP Connector. There can be zero or one HTTP connectors.`
   `dbms.connector.http.enabled=true`
   `dbms.connector.http.listen_address=:7474`
   `dbms.connector.http.advertised_address=:7474`
-
+  <br />
   `# Name of the service`
   `dbms.windows_service_name=neo4j_users`
-
+  <br />
   `# A comma separated list of procedures and user defined functions that are allowed`
   `# full access to the database through unsupported/insecure internal APIs.`
   `#dbms.security.procedures.unrestricted=my.extensions.example,my.procedures.*`
   `dbms.security.procedures.unrestricted=gds.*`
-
+  <br />
   `# A comma separated list of procedures to be loaded by default.`
   `# Leaving this unconfigured will load all procedures found.`
   `#dbms.security.procedures.allowlist=apoc.coll.*,apoc.load.*,gds.*`
   `dbms.security.procedures.whitelist=gds.*`
-
 - Open PowerShell or CMD as administrator
 - Navigate to your installation folder at path `{your_target_locations}/neo4j_users/bin`
 - Set initial passowrd to be "secret" for default username "neo4j"
@@ -174,7 +169,7 @@ Follow the steps below to set up a production envirnoment using Windows IIS:
 - Now go to http://localhost:7474/browser/ at your browser, set a password and note it down
 - At the end, you can go to http://localhost:7474/browser/ at your browser, set a password and note it down
 
-#### III-B. Install Neo4j Activity Graph Database Server
+#### III-D. Install Neo4j Activity Graph Database Server
 
 - Download and install Neo4j server using this link https://neo4j.com/download-center/#community
 - Unzip the downloaded zip folder to `{your_target_locations}/neo4j_activities`
@@ -185,20 +180,20 @@ Follow the steps below to set up a production envirnoment using Windows IIS:
   `dbms.connector.bolt.tls_level=DISABLED`
   `dbms.connector.bolt.listen_address=:7688`
   `dbms.connector.bolt.advertised_address=:7688`
-
+  <br />
   `# HTTP Connector. There can be zero or one HTTP connectors.`
   `dbms.connector.http.enabled=true`
   `dbms.connector.http.listen_address=:7475`
   `dbms.connector.http.advertised_address=:7475`
-
+  <br />
   `# Name of the service`
   `dbms.windows_service_name=neo4j_activities`
-
+  <br />
   `# A comma separated list of procedures and user defined functions that are allowed`
   `# full access to the database through unsupported/insecure internal APIs.`
   `#dbms.security.procedures.unrestricted=my.extensions.example,my.procedures.*`
   `dbms.security.procedures.unrestricted=gds.*`
-
+  <br />
   `# A comma separated list of procedures to be loaded by default.`
   `# Leaving this unconfigured will load all procedures found.`
   `#dbms.security.procedures.allowlist=apoc.coll.*,apoc.load.*,gds.*`
@@ -215,7 +210,7 @@ Follow the steps below to set up a production envirnoment using Windows IIS:
 - Now go to http://localhost:7475/browser/ at your browser, set a password and note it down
 - At the end, you can go to http://localhost:7475/browser/ at your browser, set a password and note it down
 
-#### III-D. Install User Interface Web Server using IIS.
+#### III-E. Install the web server for the user interface using IIS.
 
 - Open cmd as administrator and type.
   `wfastcgi-enable`
@@ -234,29 +229,34 @@ Follow the steps below to set up a production envirnoment using Windows IIS:
 - Set the following paths and parameters:
 
 1. PYTHONPATH (Your local python-flask repository path).
-2. WSGI_HANDLER (_.app) where _ equals the name of the flask application file, often it is called app.py or main.py and located in PYTHONPATH.
+2. WSGI*HANDLER (*.app) where \_ equals the name of the flask application file, often it is called app.py or main.py and located in PYTHONPATH.
 3. If your application is expected to process requests from clients in extended period of time, you can change the Activity Timeout parameter to 3600 seconds for example.
+   <br />
 
 - Remember to
 
 1. Install all packages that your flask application needs before you start your webserver.
 2. Add any required environment variables by your application
 3. Add the needed permissions to folders and physical path.
+   <br />
 
-- Redirect HTTP traffic to HTTPS
-- Install the URL Rewrite extension, https://www.iis.net/downloads/microsoft/url-rewrite
-- You might have to close the Server Manager and IIS, then open them again to see the URL Rewrite extension module on your Features View Pane.
-- Open IIS and enter URL Rewrite.
-- Go to Add Rule(s), then choose Blank rule.
-- add the following values
+- Redirect HTTP traffic to HTTPS:
 
-1. Requested URL -> Matches the Pattern
-2. Using -> Regular Expressions
-3. Pattern -> (.\*)
-4. ignore case -> (checked)
-5. Action type -> Redirect
-6. Redirect URL -> (https://{HTTP_HOST}{REQUEST_URL})
-7. Append query string -> (uncecked)
-8. Reditect type -> Permanent (301)
+1. Install the URL Rewrite extension, https://www.iis.net/downloads/microsoft/url-rewrite
+2. You might have to close the Server Manager and IIS, then open them again to see the URL Rewrite extension module on your Features View Pane.
+3. Open IIS and enter URL Rewrite:
+4. Go to Add Rule(s), then choose Blank rule.
+5. Add the following values
+   Requested URL -> Matches the Pattern
+   Using -> Regular Expressions
+   Pattern -> (.\*)
+   ignore case -> (checked)
+   Action type -> Redirect
+   Redirect URL -> (https://{HTTP_HOST}{REQUEST_URL})
+   Append query string -> (uncecked)
+   Reditect type -> Permanent (301)
 
 - Click on apply to the right put the redirect rule into effect.
+- Now, you can go to localhost:5000 to view the user interface
+- To crawl the test dummpy data, run the script "test_driver.py" located in the src folder of the project
+- Or if you wish to use the implemented reddit crawler, then run the script "reddit_driver.py" also located in the src folder.

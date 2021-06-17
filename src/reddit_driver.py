@@ -26,6 +26,11 @@ try:
 
     today_date = date.today()
 
+    def get_host(target):
+        if os.environ.get('IS_DOCKER') == "True":
+            return "host.docker.internal"
+        return os.environ.get(target)
+
     for run_id, config in exec_plan.items():
 
         # Name of social network to be crawled
@@ -46,8 +51,7 @@ try:
 
         # Mongo db database connector
         mongo_db_connector = MongoDBConnector(
-            host="host.docker.internal" if os.environ.get(
-                'IS_DOCKER') else os.environ.get('mongo_db_host'),
+            host=get_host('mongo_db_host'),
             port=int(os.environ.get('mongo_db_port')),
             user=os.environ.get('mongo_db_user'),
             passowrd=os.environ.get('mongo_db_pass')
@@ -126,8 +130,7 @@ try:
         if "users_modelling" in stages:
             # Neo4j users database connector
             neo4j_db_users_connector = GraphDBConnector(
-                host="host.docker.internal" if os.environ.get(
-                    'IS_DOCKER') else os.environ.get('neo4j_users_db_host'),
+                host=get_host('neo4j_users_db_host'),
                 port=int(os.environ.get('neo4j_users_db_port')),
                 user=os.environ.get('neo4j_users_db_user'),
                 password=os.environ.get('neo4j_users_db_pass'),
@@ -154,8 +157,7 @@ try:
         if "activities_modelling" in stages:
             # Neo4j activities database connector
             neo4j_db_activities_cconnector = GraphDBConnector(
-                host="host.docker.internal" if os.environ.get(
-                    'IS_DOCKER') else os.environ.get('neo4j_activities_db_host'),
+                host=get_host('neo4j_activities_db_host'),
                 port=int(os.environ.get('neo4j_activities_db_port')),
                 user=os.environ.get('neo4j_activities_db_user'),
                 password=os.environ.get('neo4j_activities_db_pass'),
