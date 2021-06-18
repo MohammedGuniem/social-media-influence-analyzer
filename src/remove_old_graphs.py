@@ -12,8 +12,8 @@ import logging
 import os
 
 try:
-    network_name = "Reddit"
-    submissions_type = "Rising"
+    network_name = "Test"
+    submissions_type = "New"
     today_date = date.today()
     delete_older_than_date = today_date - timedelta(30)
     print(
