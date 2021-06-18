@@ -15,7 +15,7 @@ try:
     network_name = "Reddit"
     submissions_type = "Rising"
     today_date = date.today()
-    delete_older_than_date = today_date + timedelta(30)
+    delete_older_than_date = today_date - timedelta(30)
     print(
         F"deleting all Neo4j graphs older than {str(delete_older_than_date)}")
     print(
