@@ -333,21 +333,27 @@ class GraphDBConnector:
 
     """ Deleting methods """
 
-    def delete_graph(self, network_name, submissions_type, date):
+    def delete_graph(self, network_name, submissions_type, from_date, to_date):
         with self.driver.session() as session:
             query = (
                 "MATCH (n {"
                 F"network: '{network_name}', "
                 F"submissions_type: '{submissions_type}' "
                 "})"
-                F"WHERE n.date < '{date}'"
+                F"WHERE n.date >= '{from_date}' AND n.date <= '{to_date}' "
                 "DETACH DELETE n"
             )
+
             result = session.write_transaction(
                 self._delete_graph, query)
-            return result
+            nodes_deleted = result.consume().counters.nodes_deleted
+            relationships_deleted = result.consume().counters.relationships_deleted
+            return nodes_deleted, relationships_deleted
 
     @staticmethod
     def _delete_graph(tx, query):
         result = tx.run(query)
+        for r in result:
+            for r1 in r:
+                print(r1)
         return result

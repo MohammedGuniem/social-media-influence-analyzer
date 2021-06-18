@@ -1,4 +1,6 @@
 import pymongo
+from pymongo import database
+from pymongo import results
 
 
 class MongoDBConnector:
@@ -62,7 +64,13 @@ class MongoDBConnector:
     """ Removal and cleaning methods """
 
     def remove_collection(self, database_name, collection_name):
-        self.client[database_name].drop_collection(collection_name)
+        result = self.client[database_name].drop_collection(collection_name)
+        return result['ok']
+
+    def remove_crawling_runtime(self, network_name, submissions_type, from_timestamp, to_timestamp):
+        result = self.client["admin"]["crawling_runtime_register"].delete_many(
+            {"timestamp": {"$gte": from_timestamp, "$lte": to_timestamp}})
+        return result.deleted_count
 
     """ Data Accessors """
 
