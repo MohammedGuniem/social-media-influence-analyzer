@@ -12,21 +12,25 @@ import logging
 import os
 
 try:
-    network_name = "Test"
-    submissions_type = "New"
+    network_name = "Reddit"
+    submissions_type = "Rising"
     today_date = date.today()
-    delete_older_than_date = today_date - timedelta(30)
+    delete_older_than_date = today_date + timedelta(30)
     print(
         F"deleting all Neo4j graphs older than {str(delete_older_than_date)}")
     print(
         F"having network_name: {network_name} and submissions type = {submissions_type}")
 
-    load_dotenv("prod.env")
+    load_dotenv()
+
+    def get_host(target):
+        if os.environ.get('IS_DOCKER') == "True":
+            return "host.docker.internal"
+        return os.environ.get(target)
 
     # Mongo db database connector
     mongo_db_connector = MongoDBConnector(
-        host="host.docker.internal" if not os.environ.get(
-            'IS_DOCKER') else os.environ.get('mongo_db_host'),
+        host=get_host('mongo_db_host'),
         port=int(os.environ.get('mongo_db_port')),
         user=os.environ.get('mongo_db_user'),
         passowrd=os.environ.get('mongo_db_pass')
@@ -53,7 +57,7 @@ try:
 
     # Neo4j users database connector
     neo4j_db_users_connector = GraphDBConnector(
-        host=os.environ.get('neo4j_users_db_host'),
+        host=get_host('neo4j_users_db_host'),
         port=int(os.environ.get('neo4j_users_db_port')),
         user=os.environ.get('neo4j_users_db_user'),
         password=os.environ.get('neo4j_users_db_pass'),
@@ -67,7 +71,7 @@ try:
 
     # Neo4j activities database connector
     neo4j_db_activities_cconnector = GraphDBConnector(
-        host=os.environ.get('neo4j_activities_db_host'),
+        host=get_host('neo4j_activities_db_host'),
         port=int(os.environ.get('neo4j_activities_db_port')),
         user=os.environ.get('neo4j_activities_db_user'),
         password=os.environ.get('neo4j_activities_db_pass'),
