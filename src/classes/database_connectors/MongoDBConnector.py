@@ -1,6 +1,4 @@
 import pymongo
-from pymongo import database
-from pymongo import results
 
 
 class MongoDBConnector:
@@ -68,8 +66,11 @@ class MongoDBConnector:
         return result['ok']
 
     def remove_crawling_runtime(self, network_name, submissions_type, from_timestamp, to_timestamp):
-        result = self.client["admin"]["crawling_runtime_register"].delete_many(
-            {"timestamp": {"$gte": from_timestamp, "$lte": to_timestamp}})
+        result = self.client["admin"]["crawling_runtime_register"].delete_many({
+            "network_name": network_name,
+            "submissions_type": submissions_type,
+            "timestamp": {"$gte": from_timestamp, "$lte": to_timestamp+86399}
+        })
         return result.deleted_count
 
     """ Data Accessors """

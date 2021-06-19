@@ -12,14 +12,21 @@
   <body>
     <div class="container">
         <h1>Topic Detection Model</h1>
+        <p>At first the crawled training and testing data are shuffled using random state 99,
+          then the following processes are performed to test the reliability and quality of crawled training data
+        </p>
     </div>
 
     <div class="container">
-        <h2>Evaluation</h2>
-        <p>The training data is randomly shuffled using random state 99, splitted in 5 splits, 
-            where each split contain 80% training data and 20% test data
-            then the mean value of measured accuracies, precisions, recalls and F1 scores is calculated.
-        </p>            
+        <h2>Evaluation - (Before Tuning)</h2>
+        <p>We start by testing the initial performance capability that can be obtained by training a non-tuned text classification model with the crawled dataset.</p>
+        <p>
+          The training data is splitted in 5 chunks or splits, with 80% training data and 20% test data in each split.
+        </p>
+        <p>
+          A text classification model is trained and tested on each of the 5 chunks of data, 
+          then the mean value of measured accuracies, precisions, recalls and F1 scores is calculated
+        </p>     
         <table class="table table-bordered">
           <thead>
             <tr>
@@ -51,11 +58,22 @@
     <div class="container">
         <h2>Tuning</h2>
         <p>
-            Here, we are trying to find the best parameters to run our model with. <br />
-            we run a cross validation automated test using the following paramters:
-            'vect__ngram_range': [(1, 1), (1, 2)], 'tfidf__use_idf': (True, False), and 'clf__alpha': (1e-2, 1e-3) <br />
-            Then we find which combination of these parameters are the ultimate paramters for our dataset and topic detection model 
-            which are given in the table below.
+          In this process, we are trying to find the best parameters to run our text classification model with. <br />
+        </p>
+        <p>
+          - we run a cross validation automated test using the following paramters:<br />
+            -> 'vect__ngram_range': [(1, 1), (1, 2), (1, 3), (1, 4), (1, 5)], (whether to use words of unigrams, bigrams, trigrams, 4-gram-sequence or 5-gram-sequence in vectorization) <br />
+            -> 'tfidf__use_idf': (True, False), (whether to use Term Frequency-Inverse Document Frequency or not) <br />
+            -> 'clf__alpha': (1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10) (penalty parameter in the classifier)<br />
+          - Using every posssible combination in the range of tunning paramaters demands 5*2*10=100 trials<br />
+            And using 5 equal sized chunks results in fitting the model 5 times for every parameter combination above, 
+            this guarantee that every record will be a part of the training and testing dataset at least one time, this step demands 5 trials<br />
+          - The total number of tuning trials would then be 5*100= 500 model training trial under tuning <br />
+        </p>
+        <p>
+          - The optimal parameters after tuning are given in the table below.
+        </p>
+          
         </p>            
         <table class="table table-bordered">
           <thead>
@@ -86,10 +104,10 @@
     </div>
 
     <div class="container">
-        <h2>Classification Report</h2>
+        <h2>Classification Report - (After Tuning)</h2>
         <p>
             This report contains detailed metrics measurements for each and every category, 
-            plus some additional information based on these measurements.
+            plus their weighted and macro averages.
         </p>            
         <table class="table table-bordered">
           <thead>

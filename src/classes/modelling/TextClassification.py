@@ -23,8 +23,6 @@ class TextClassifier:
             single=True
         )
         self.random_state = 99
-
-    def prepare_model(self):
         if not self.data:
             return "data not found"
         del self.data["_id"]
@@ -32,6 +30,7 @@ class TextClassifier:
         random.seed(self.random_state)
         random.shuffle(self.data)
 
+    def prepare_model(self):
         training_df = pd.DataFrame(self.data)
         features = (training_df["title"]).to_numpy()
         labels = (training_df["label"]).to_numpy()
@@ -43,45 +42,10 @@ class TextClassifier:
         self.text_clf = Pipeline([
             ('vect', CountVectorizer(ngram_range=ngram_range)),
             ('tfidf', TfidfTransformer(use_idf=use_idf)),
-            ('clf', SGDClassifier(alpha=alpha, random_state=self.random_state)),
+            ('clf', SGDClassifier(alpha=alpha)),
         ])
         self.text_clf.fit(features, labels)
         return "model is fitted and ready for use"
-
-    def tune_model(self):
-        df = pd.DataFrame(self.data)
-        features = (df["title"]).to_numpy()
-        labels = (df["label"]).to_numpy()
-
-        text_clf = Pipeline([
-            ('vect', CountVectorizer()),
-            ('tfidf', TfidfTransformer()),
-            ('clf', SGDClassifier(random_state=self.random_state)),
-        ])
-
-        training_percentage = 0.8
-        testing_percentage = 0.2
-        X_train, X_test = list(features[:int(training_percentage*len(features))]
-                               ), list(features[:int(testing_percentage*len(features))])
-        y_train, y_test = list(labels[:int(training_percentage*len(features))]
-                               ), list(labels[:int(testing_percentage*len(features))])
-
-        parameters = {
-            'vect__ngram_range': [(1, 1), (1, 2)],
-            'tfidf__use_idf': (True, False),
-            'clf__alpha': (1e-2, 1e-3),
-        }
-        gs_clf = GridSearchCV(text_clf, parameters, cv=8, n_jobs=-1)
-
-        gs_clf.fit(X_train, y_train)
-
-        y_pred = gs_clf.predict(X_test)
-
-        tunning_results = {
-            "best_score": gs_clf.best_score_,
-            "best_parameters": gs_clf.best_params_
-        }
-        return tunning_results
 
     def evaluate_model(self):
         df = pd.DataFrame(self.data)
@@ -92,14 +56,11 @@ class TextClassifier:
             ('tfidf', TfidfTransformer()),
             ('clf', SGDClassifier()),
         ])
-        """
-        ('clf', MultinomialNB()),
-        """
         accuracy_scores = []
         precision_scores = []
         recall_scores = []
         f1_scores = []
-        kf = KFold(n_splits=5, shuffle=True, random_state=self.random_state)
+        kf = KFold(n_splits=5)
         for train_index, test_index in kf.split(features):
             X_train, X_test = list(features[train_index]), list(
                 features[test_index])
@@ -127,14 +88,57 @@ class TextClassifier:
         }
         return evaluation_result
 
+    def tune_model(self):
+        df = pd.DataFrame(self.data)
+        features = (df["title"]).to_numpy()
+        labels = (df["label"]).to_numpy()
+
+        text_clf = Pipeline([
+            ('vect', CountVectorizer()),
+            ('tfidf', TfidfTransformer()),
+            ('clf', SGDClassifier(random_state=self.random_state)),
+        ])
+
+        parameters = {
+            # either words, bigrams, trigrams, ...
+            'vect__ngram_range': [(1, 1), (1, 2), (1, 3), (1, 4), (1, 5)],
+            # with or without idf
+            'tfidf__use_idf': (True, False),
+            # penalty parameter
+            'clf__alpha': (1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10),
+        }
+
+        # Using every posssible combination in the range of tunning paramaters, 5*2*10=100 trials
+
+        # Using cv=5 the data is splitted into 5 equal sized chunks
+        # In every tunning trial, the model is fitted cv=5 times by using every possible split 4 chunks in training and 1 chunk in testing
+        # this guarantee that every record will be a part of the training and test set at least one time, 5 trials
+
+        # The total number the model is trained under tuning is 5*100= 500 model training trial under tuning
+        gs_clf = GridSearchCV(text_clf, parameters, cv=5, n_jobs=-1)
+
+        gs_clf.fit(features, labels)
+
+        tunning_results = {
+            "best_score": gs_clf.best_score_,
+            "best_parameters": gs_clf.best_params_
+        }
+        return tunning_results
+
     def get_report(self):
         df = pd.DataFrame(self.data)
         features = (df["title"]).to_numpy()
         labels = (df["label"]).to_numpy()
+
+        tuned_paramters = self.tune_model()
+        alpha = tuned_paramters['best_parameters']['clf__alpha']
+        use_idf = tuned_paramters['best_parameters']['tfidf__use_idf']
+        ngram_range = tuned_paramters['best_parameters']['vect__ngram_range']
+
         text_clf = Pipeline([
-            ('vect', CountVectorizer(ngram_range=(1, 2))),
-            ('tfidf', TfidfTransformer(use_idf=True)),
-            ('clf', SGDClassifier(alpha=0.001, random_state=self.random_state)),
+            ('vect', CountVectorizer(ngram_range=ngram_range)),
+            ('tfidf', TfidfTransformer(use_idf=use_idf)),
+            ('clf', SGDClassifier(alpha=alpha)),
         ])
         training_percentage = 0.8
         testing_percentage = 0.2
