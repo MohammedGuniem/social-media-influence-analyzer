@@ -19,14 +19,20 @@
 
     <div class="container">
         <h2>Evaluation - (Before Tuning)</h2>
-        <p>We start by testing the initial performance capability that can be obtained by training a non-tuned text classification model with the crawled dataset.</p>
         <p>
-          The training data is splitted in 5 chunks or splits, with 80% training data and 20% test data in each split.
+          We start by testing the initial performance capability that can be obtained by using the crawled training dataset to build a non-tuned text classifier with its default key parameters. 
+          The training data is then partitioned into 5 chunks of data.
         </p>
         <p>
-          A text classification model is trained and tested on each of the 5 chunks of data, 
-          then the mean value of measured accuracies, precisions, recalls and F1 scores is calculated
-        </p>     
+          A text classifier is then trained and tested N-times where N is equal to the number of data chunks, 
+          and 80% or 4 chunks of data are used for training the classifier, 
+          while 20% or 1 chunk of data is used for testing the performance of the classifier. 
+          The chunk of dataset that is meant for testing will be different every time a new model is trained, 
+          this guarantees that each record in the dataset will participate at least once in the testing process and 4 times in the training process, 
+          which increase the representation of every individual dataset record in the results that is calculated as 
+          the mean values of measured accuracies, precisions, recalls and F1 scores 
+          in the N=5 times the text classifier has been trained and tested which is represented in the table below.
+        </p> 
         <table class="table table-bordered">
           <thead>
             <tr>
