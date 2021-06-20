@@ -4,14 +4,11 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import GridSearchCV
 from sklearn.linear_model import SGDClassifier
-from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import KFold
 from sklearn.pipeline import Pipeline
-from dotenv import load_dotenv
 import pandas as pd
 import numpy as np
 import random
-import os
 
 
 class TextClassifier:
@@ -42,7 +39,7 @@ class TextClassifier:
         self.text_clf = Pipeline([
             ('vect', CountVectorizer(ngram_range=ngram_range)),
             ('tfidf', TfidfTransformer(use_idf=use_idf)),
-            ('clf', SGDClassifier(alpha=alpha)),
+            ('clf', SGDClassifier(random_state=self.random_state, alpha=alpha)),
         ])
         self.text_clf.fit(features, labels)
         return "model is fitted and ready for use"
@@ -54,13 +51,13 @@ class TextClassifier:
         text_clf = Pipeline([
             ('vect', CountVectorizer()),
             ('tfidf', TfidfTransformer()),
-            ('clf', SGDClassifier()),
+            ('clf', SGDClassifier(random_state=self.random_state)),
         ])
         accuracy_scores = []
         precision_scores = []
         recall_scores = []
         f1_scores = []
-        kf = KFold(n_splits=5)
+        kf = KFold(n_splits=5, shuffle=True, random_state=self.random_state)
         for train_index, test_index in kf.split(features):
             X_train, X_test = list(features[train_index]), list(
                 features[test_index])
@@ -138,7 +135,7 @@ class TextClassifier:
         text_clf = Pipeline([
             ('vect', CountVectorizer(ngram_range=ngram_range)),
             ('tfidf', TfidfTransformer(use_idf=use_idf)),
-            ('clf', SGDClassifier(alpha=alpha)),
+            ('clf', SGDClassifier(random_state=self.random_state, alpha=alpha)),
         ])
         training_percentage = 0.8
         testing_percentage = 0.2
