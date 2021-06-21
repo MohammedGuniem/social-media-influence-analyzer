@@ -27,7 +27,7 @@ X.		DETECTING AND CLASSIFYING THE FIELD OF INFLUENCE 							 - (DONE)
 ----------------------------------------------------------------------------------------------
 XI. 	TESTING  OF INFLUENCE FIELD DETECTION                                        - (DONE)
 ----------------------------------------------------------------------------------------------
-XII.	EVALUATION OF INFLUENCE FIELD DETECTION IN THE USER INFLUENCE GRAPH
+XII.	EVALUATION OF INFLUENCE FIELD DETECTION IN THE USER INFLUENCE GRAPH          - (DONE)
 ----------------------------------------------------------------------------------------------
 XIII. 	INTRODUCING CENTRALITY MEASURES 
 ----------------------------------------------------------------------------------------------
