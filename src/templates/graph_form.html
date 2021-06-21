@@ -5,7 +5,7 @@
       <select name="graph" class="form-control" id="graph" required>
         {% for graph in graphs %}
           <option 
-          value="{{ graph.network }}_{{ graph.date }}_{{ graph.submissions_type }}"
+          value="{{ graph.network }},{{ graph.submissions_type }},{{ graph.date }}"
           {% if loop.last %}
               selected
           {% endif %}

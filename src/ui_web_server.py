@@ -119,8 +119,8 @@ def user_graph():
     data_format = request.args.get('format', None)
     score_type = request.args.get('score_type', 'total')
     centrality = request.args.get('centrality', 'degree')
-    graph = request.args.get('graph', None).split("_")
-    network_name, date, submissions_type = graph[0], graph[1], graph[2]
+    graph = request.args.get('graph', None).split(",")
+    network_name, submissions_type, date = graph[0], graph[1], graph[2]
     neo4j_graph, centralities_max = neo4j_users_db_connector.get_graph(
         network_name=network_name, submissions_type=submissions_type, date=date, relation_type="Influences")
 
@@ -141,8 +141,8 @@ def user_graph():
 @ app.route('/path')
 def path():
     data_format = request.args.get('format')
-    graph = request.args.get('graph', None).split("_")
-    network_name, date, submissions_type = graph[0], graph[1], graph[2]
+    graph = request.args.get('graph', None).split(",")
+    network_name, submissions_type, date = graph[0], graph[1], graph[2]
     centrality = request.args.get('centrality', 'degree')
     score_type = request.args.get('score_type', 'total')
     source_name = request.args.get('source_name', '')
@@ -173,8 +173,8 @@ def path():
 @ app.route('/score', methods=['GET'])
 def score():
     data_format = request.args.get('format')
-    graph = request.args.get('graph', None).split("_")
-    network_name, date, submissions_type = graph[0], graph[1], graph[2]
+    graph = request.args.get('graph', None).split(",")
+    network_name, submissions_type, date = graph[0], graph[1], graph[2]
     min_score = int(request.args.get('min_score', 0))
     max_score = int(request.args.get('max_score', 0))
     score_type = request.args.get('score_type', 'total')
@@ -205,8 +205,8 @@ def score():
 
 @ app.route('/influence_area', methods=['GET'])
 def influence_area():
-    graph = request.args.get('graph', None).split("_")
-    network_name, date, submissions_type = graph[0], graph[1], graph[2]
+    graph = request.args.get('graph', None).split(",")
+    network_name, submissions_type, date = graph[0], graph[1], graph[2]
     score_type = request.args.get('score_type', 'total')
     influence_areas = request.args.to_dict(flat=False)
 
@@ -240,8 +240,8 @@ def influence_area():
 
 @app.route('/activity_graph')
 def activity_graph():
-    graph = request.args.get('graph', None).split("_")
-    network_name, date, submissions_type = graph[0], graph[1], graph[2]
+    graph = request.args.get('graph', None).split(",")
+    network_name, submissions_type, date = graph[0], graph[1], graph[2]
     score_type = request.args.get('score_type', "total")
     data_format = request.args.get('format', None)
 
@@ -265,8 +265,8 @@ def activity_graph():
 @app.route('/statistics')
 def statistics():
     statistic_measure = request.args.get('statistic_measure', None)
-    graph = request.args.get('graph', None).split("_")
-    network_name, date, submissions_type = graph[0], graph[1], graph[2]
+    graph = request.args.get('graph', None).split(",")
+    network_name, submissions_type, date = graph[0], graph[1], graph[2]
     score_type = request.args.get('score_type', "total")
 
     plt_img_path = F"statistics_plots/{statistic_measure}/{network_name}/{date}/{submissions_type}/"
@@ -287,9 +287,9 @@ def statistics():
 
 @app.route('/topic_detection_model')
 def topic_detection_model():
-    graph = request.args.get('graph', None).split("_")
+    graph = request.args.get('graph', None).split(",")
     data_format = request.args.get('format', None)
-    network_name, date, submissions_type = graph[0], graph[1], graph[2]
+    network_name, submissions_type, date = graph[0], graph[1], graph[2]
 
     text_classifier = TextClassifier(
         mongo_db_connector, network_name, submissions_type, date)

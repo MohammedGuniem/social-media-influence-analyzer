@@ -14,7 +14,7 @@
         <select name="graph" class="form-control" id="graph" required>
         {% for graph in graphs %}
             <option 
-            value="{{ graph.network }}_{{ graph.date }}_{{ graph.submissions_type }}"
+            value="{{ graph.network }},{{ graph.submissions_type }},{{ graph.date }}"
             {% if loop.last %}
                 selected
             {% endif %}
@@ -26,6 +26,8 @@
         <label for="score_type">Score Type</label>
         <select name="score_type" class="form-control" id="score_type" required>
             <option value="all_scores">All scores</option>
+            <option value="single_scores">All signle scores</option>
+            <option value="dobble_scores">All dobble scores</option>
             <option value="total" selected>Total</option>
             <option value="activity">Activity</option>
             <option value="interaction">Interaction</option>

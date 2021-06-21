@@ -5,14 +5,14 @@ import praw
 
 class RedditCrawler:
 
-    def __init__(self, client_id, client_secret, user_agent, username, password):
+    def __init__(self, client_id, client_secret, user_agent, username, password, network_name="Reddit"):
         self.redditCrawler = praw.Reddit(client_id=client_id,
                                          client_secret=client_secret,
                                          user_agent=user_agent,
                                          username=username,
                                          password=password)
 
-        self.runtime_register = RuntimeRegister("Reddit")
+        self.runtime_register = RuntimeRegister(network_name)
 
     # Method to fetch the top (subreddit_limit?) popular subreddits
     def getGroups(self, top_n_subreddits):

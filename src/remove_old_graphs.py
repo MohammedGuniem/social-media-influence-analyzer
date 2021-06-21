@@ -14,22 +14,36 @@ try:
         "deletion_1": {
             "network_name": "Test",
             "submissions_type": "New",
-            "delete_from_date": "2021-06-19",
-            "delete_to_date": "2021-06-20",
+            "delete_from_date": "2021-06-15",
+            "delete_to_date": "2021-06-25",
             "delete_on": ["mongo_db_archive", "runtime_register", "statistics_plots", "neo4j_users_graph", "neo4j_activities_graph"]
         },
         "deletion_2": {
             "network_name": "Reddit",
             "submissions_type": "New",
             "delete_from_date": "2021-06-15",
-            "delete_to_date": "2021-06-20",
+            "delete_to_date": "2021-06-25",
             "delete_on": ["mongo_db_archive", "runtime_register", "statistics_plots", "neo4j_users_graph", "neo4j_activities_graph"]
         },
         "deletion_3": {
             "network_name": "Reddit",
             "submissions_type": "Rising",
-            "delete_from_date": "2021-06-18",
-            "delete_to_date": "2021-06-19",
+            "delete_from_date": "2021-06-15",
+            "delete_to_date": "2021-06-25",
+            "delete_on": ["mongo_db_archive", "runtime_register", "statistics_plots", "neo4j_users_graph", "neo4j_activities_graph"]
+        },
+        "deletion_4": {
+            "network_name": "Selective_Reddit",
+            "submissions_type": "New",
+            "delete_from_date": "2021-06-15",
+            "delete_to_date": "2021-06-25",
+            "delete_on": ["mongo_db_archive", "runtime_register", "statistics_plots", "neo4j_users_graph", "neo4j_activities_graph"]
+        },
+        "deletion_5": {
+            "network_name": "Selective_Reddit",
+            "submissions_type": "Rising",
+            "delete_from_date": "2021-06-15",
+            "delete_to_date": "2021-06-25",
             "delete_on": ["mongo_db_archive", "runtime_register", "statistics_plots", "neo4j_users_graph", "neo4j_activities_graph"]
         }
     }

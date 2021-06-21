@@ -133,16 +133,22 @@ class Statistics:
         else:
             request_score_type = "all_scores"
 
-        if score_type:
+        if score_type == "single_scores":
+            score_types = ["interaction", "activity", "upvotes"]
+        elif score_type == "dobble_scores":
+            score_types = ["interaction_and_activity",
+                           "activity_and_upvotes", "interaction_and_upvotes"]
+        elif score_type:
             score_types = [score_type]
-            fig, axes = plt.subplots(2, 1)
-            fig.suptitle(F"Influence Scores Distribution using {score_type}")
+            #fig, axes = plt.subplots(2, 1)
+            #fig.suptitle(F"Influence Scores Distribution using {score_type}")
         else:
             score_types = ["interaction", "activity", "upvotes", "interaction_and_activity",
                            "activity_and_upvotes", "interaction_and_upvotes", "total"]
-            fig, axes = plt.subplots(2, 7, figsize=(24, 10))
-            fig.tight_layout(pad=4.0)
-            fig.suptitle("Influence Scores Distribution")
+
+        fig, axes = plt.subplots(2, len(score_types), figsize=(24, 10))
+        fig.tight_layout(pad=4.0)
+        fig.suptitle("Influence Scores Distribution")
 
         axes = axes.ravel()
 
@@ -158,7 +164,7 @@ class Statistics:
             links_df[F"{score_type}"].plot(
                 kind="box",
                 ax=axes[score_types.index(score_type)],
-                title=F"{score_type} score",
+                title=F"{score_type.replace('_', ' ')}",
                 vert=False
             )
             y_axis = axes[score_types.index(score_type)].axes.get_yaxis()
@@ -168,7 +174,7 @@ class Statistics:
                 kind="hist",
                 bins=links_df[F"{score_type}"].nunique(),
                 ax=axes[score_types.index(score_type)+len(score_types)],
-                title=F"{score_type} score",
+                title=F"{score_type.replace('_', ' ')}",
                 xticks=links_df[F"{score_type}"],
                 rot=90
             )
@@ -180,6 +186,7 @@ class Statistics:
         fig.set_size_inches(15, 10)
         plt.savefig(
             F"{path}{plot_img_name}", format="jpg", dpi=500)
+        plt.close('all')
 
     def create_directory_if_not_found(self, path):
         if not os.path.exists(path):

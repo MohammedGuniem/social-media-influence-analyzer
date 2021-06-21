@@ -13,12 +13,12 @@ import os
 try:
     exec_plan = {
         "run_1": {
-            "network_name": "Reddit",
+            "network_name": "Selective_Reddit",
             "submissions_type": "New",
             "stages": ["crawling", "users_modelling", "activities_modelling", "statistics"]
         },
         "run_2": {
-            "network_name": "Reddit",
+            "network_name": "Selective_Reddit",
             "submissions_type": "Rising",
             "stages": ["crawling", "users_modelling", "activities_modelling", "statistics"]
         }
@@ -68,11 +68,29 @@ try:
                 client_secret=os.environ.get('reddit_client_secret'),
                 user_agent=os.environ.get('reddit_user_agent'),
                 username=os.environ.get('reddit_username'),
-                password=os.environ.get('reddit_password')
+                password=os.environ.get('reddit_password'),
+                network_name=network_name
             )
 
             # Crawling groups
-            groups = crawler.getGroups(top_n_subreddits=3)
+            groups = [
+                {
+                    'id': '2qh13',
+                    'display_name': 'worldnews'
+                }, {
+                    'id': '2qhfj',
+                    'display_name': 'Finance'
+                }, {
+                    'id': '2qo4s',
+                    'display_name': 'NBA'
+                }, {
+                    'id': '2r4nf',
+                    'display_name': 'Cinema'
+                }, {
+                    'id': '2qng0',
+                    'display_name': 'research'
+                }
+            ]
 
             # Crawling submissions
             submissions = crawler.getSubmissions(

@@ -186,6 +186,10 @@ try:
             for score_type in ["interaction", "activity", "upvotes", "interaction_and_activity", "activity_and_upvotes", "interaction_and_upvotes", "total"]:
                 stat.getInfluenceScore(score_type=score_type)
 
+            stat.getInfluenceScore(score_type="single_scores")
+
+            stat.getInfluenceScore(score_type="dobble_scores")
+
             stat.getInfluenceScore(score_type=None)
         else:
             print("Jumped over stage 4 as it is not in the stage configuration array.")
