@@ -17,7 +17,7 @@
           {% if loop.last %}
             selected
           {% endif %}
-          >{{ graph.network }} - {{ graph.date }} - {{ graph.submissions_type }} Submissions</option>
+          >{{ graph.network|replace("_", " ") }} - {{ graph.date }} - {{ graph.submissions_type }} Submissions</option>
       {% endfor %}
     </select>
   </div>

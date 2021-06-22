@@ -5,7 +5,7 @@ import praw
 
 class RedditCrawler:
 
-    def __init__(self, client_id, client_secret, user_agent, username, password, network_name="Reddit"):
+    def __init__(self, client_id, client_secret, user_agent, username, password, network_name):
         self.redditCrawler = praw.Reddit(client_id=client_id,
                                          client_secret=client_secret,
                                          user_agent=user_agent,

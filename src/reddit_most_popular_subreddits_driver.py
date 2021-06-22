@@ -13,15 +13,15 @@ import os
 try:
     exec_plan = {
         "run_1": {
-            "network_name": "Selective_Reddit",
+            "network_name": "Reddit_Most_Popular_Subreddits",
             "submissions_type": "New",
             "stages": ["crawling", "users_modelling", "activities_modelling", "statistics"]
         },
-        "run_2": {
-            "network_name": "Selective_Reddit",
-            "submissions_type": "Rising",
-            "stages": ["crawling", "users_modelling", "activities_modelling", "statistics"]
-        }
+        # "run_2": {
+        #     "network_name": "Reddit_Most_Popular_Subreddits",
+        #     "submissions_type": "Rising",
+        #     "stages": ["crawling", "users_modelling", "activities_modelling", "statistics"]
+        # }
     }
 
     today_date = date.today()
@@ -73,24 +73,7 @@ try:
             )
 
             # Crawling groups
-            groups = [
-                {
-                    'id': '2qh13',
-                    'display_name': 'worldnews'
-                }, {
-                    'id': '2qhfj',
-                    'display_name': 'Finance'
-                }, {
-                    'id': '2qo4s',
-                    'display_name': 'NBA'
-                }, {
-                    'id': '2r4nf',
-                    'display_name': 'Cinema'
-                }, {
-                    'id': '2qng0',
-                    'display_name': 'research'
-                }
-            ]
+            groups = crawler.getGroups(top_n_subreddits=3)
 
             # Crawling submissions
             submissions = crawler.getSubmissions(
