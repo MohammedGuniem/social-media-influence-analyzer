@@ -92,7 +92,7 @@
                     document.getElementById("nodeInfo").innerHTML = 
                         `<code class="node_select_label">Username:</code> <span>${node.options.label}</span>, `
                         +`<code class="node_select_label">User ID:</code> <span>${node_id}</span>, `
-                        +`<code class="node_select_label">centrality:</code> <span>${node.options.value}</span>`
+                        +`<code class="node_select_label">centrality:</code> <span>${Number.isInteger(node.options.value) ? node.options.value: node.options.value.toPrecision(3)}</span>`
                 } else if ('{{ graph_type }}' == 'activity_graph') {
                     var label = node.options.label
                     var type = (node.options.label.split("\n")[0]).replace("_"," ")
