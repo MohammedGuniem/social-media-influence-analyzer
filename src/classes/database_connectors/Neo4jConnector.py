@@ -291,10 +291,10 @@ class GraphDBConnector:
         result = tx.run(query)
         centralities_max = {}
         for record in result:
-            centralities_max["degree"] = record["max_degree"]
-            centralities_max["betweenness"] = record["max_betweenness"]
-            centralities_max["hits_hub"] = record["max_hits_hub"]
-            centralities_max["hits_auth"] = record["max_hits_auth"]
+            centralities_max["degree_centrality"] = record["max_degree"]
+            centralities_max["betweenness_centrality"] = record["max_betweenness"]
+            centralities_max["hits_centrality_hub"] = record["max_hits_hub"]
+            centralities_max["hits_centrality_auth"] = record["max_hits_auth"]
         return centralities_max
 
     @ staticmethod

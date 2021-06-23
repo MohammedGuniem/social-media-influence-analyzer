@@ -56,7 +56,7 @@ while (not stop_trying):
             stop_trying = True
 
 
-def constructJSGraph(neo4j_graph, graph_type, score_type, centrality_max):
+def constructJSGraph(neo4j_graph, graph_type, score_type, centrality_max, centrality):
     neo4j_nodes = neo4j_graph['nodes']
     neo4j_edges = neo4j_graph['links']
 
@@ -75,9 +75,9 @@ def constructJSGraph(neo4j_graph, graph_type, score_type, centrality_max):
             "id": node['id'],
         }
         if graph_type == "user_graph":
-            js_node["value"] = node['props']['degree_centrality']
+            js_node["value"] = node['props'][centrality]
             js_node["color"] = {
-                "background": F"rgba(240, 52, 52, {node['props']['degree_centrality']/centrality_max})"}
+                "background": F"rgba(240, 52, 52, {node['props'][centrality]/centrality_max})"}
         elif graph_type == "activity_graph":
             node_type = node['props']['type']
             js_node["label"] = F"{node_type}\\n{js_node['label']}"
@@ -133,7 +133,8 @@ def user_graph():
             neo4j_graph=neo4j_graph,
             graph_type="user_graph",
             score_type=score_type,
-            centrality_max=centralities_max[centrality]
+            centrality_max=centralities_max[centrality],
+            centrality=centrality
         )
     return render_template("graph.html", data=js_graph, graph_type="user_graph")
 
@@ -165,7 +166,8 @@ def path():
             neo4j_graph=neo4j_graph,
             graph_type="user_graph",
             score_type=score_type,
-            centrality_max=centralities_max[centrality]
+            centrality_max=centralities_max[centrality],
+            centrality=centrality
         )
     return render_template("graph.html", data=js_graph, graph_type="user_graph")
 
@@ -198,7 +200,8 @@ def score():
             neo4j_graph=neo4j_graph,
             graph_type="user_graph",
             score_type=score_type,
-            centrality_max=centralities_max[centrality]
+            centrality_max=centralities_max[centrality],
+            centrality=centrality
         )
     return render_template("graph.html", data=js_graph, graph_type="user_graph")
 
@@ -233,7 +236,8 @@ def influence_area():
             neo4j_graph=neo4j_graph,
             graph_type="user_graph",
             score_type=score_type,
-            centrality_max=centralities_max[centrality]
+            centrality_max=centralities_max[centrality],
+            centrality=centrality
         )
     return render_template("graph.html", data=js_graph, graph_type="user_graph")
 
@@ -257,7 +261,8 @@ def activity_graph():
             neo4j_graph=neo4j_graph,
             graph_type="activity_graph",
             score_type=score_type,
-            centrality_max=None
+            centrality_max=None,
+            centrality=None
         )
     return render_template("graph.html", data=js_graph, graph_type="activity_graph")
 
