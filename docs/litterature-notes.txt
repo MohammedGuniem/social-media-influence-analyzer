@@ -45,6 +45,12 @@ https://en.wikipedia.org/wiki/Reusability
 [] Statistics about most popular social media platforms
 https://gs.statcounter.com/social-media-stats#monthly-201101-202012
 
+
+https://en.wikipedia.org/wiki/Centrality
+https://en.wikipedia.org/wiki/Centrality#Degree_centrality
+https://en.wikipedia.org/wiki/Betweenness_centrality
+https://en.wikipedia.org/wiki/HITS_algorithm#Hub_update_rule
+
 ---------------------------------------------------------------------------------------------------------------
 -> Søkeord for master litteratur
 - Processes and techniques

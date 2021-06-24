@@ -29,7 +29,7 @@ XI. 	TESTING  OF INFLUENCE FIELD DETECTION                                      
 ----------------------------------------------------------------------------------------------
 XII.	EVALUATION OF INFLUENCE FIELD DETECTION IN THE USER INFLUENCE GRAPH          - (DONE)
 ----------------------------------------------------------------------------------------------
-XIII. 	INTRODUCING CENTRALITY MEASURES 
+XIII. 	INTRODUCING CENTRALITY MEASURES 											 - (DONE)
 ----------------------------------------------------------------------------------------------
 XIV.	CENTRALITY MEASURES VS. EDGE SCORE
 ----------------------------------------------------------------------------------------------
