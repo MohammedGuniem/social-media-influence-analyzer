@@ -1,3 +1,8 @@
+from flask_cachecontrol import (
+    FlaskCacheControl,
+    cache,
+    cache_for,
+    dont_cache)
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
 from flask import Flask, jsonify, render_template, request, send_file
@@ -7,6 +12,9 @@ import time
 import os
 
 app = Flask(__name__)
+
+flask_cache_control = FlaskCacheControl()
+flask_cache_control.init_app(app)
 
 load_dotenv()
 
@@ -291,6 +299,7 @@ def statistics():
 
 
 @app.route('/topic_detection_model')
+@cache(max_age=86400, public=True)  # caching for up to 1 hour
 def topic_detection_model():
     graph = request.args.get('graph', None).split(",")
     data_format = request.args.get('format', None)

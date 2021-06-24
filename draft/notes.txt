@@ -78,3 +78,6 @@ https://www.jcchouinard.com/python-automation-using-task-scheduler/
 
 ### Docker
 https://itnext.io/a-beginners-guide-to-deploying-a-docker-application-to-production-using-docker-compose-de1feccd2893
+
+# caching
+https://pypi.org/project/Flask-CacheControl/
