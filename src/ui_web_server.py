@@ -1,30 +1,39 @@
-from flask_cachecontrol import (
-    FlaskCacheControl,
-    cache,
-    cache_for,
-    dont_cache)
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
 from flask import Flask, jsonify, render_template, request, send_file
 from classes.modelling.TextClassification import TextClassifier
+from flask_caching import Cache
 from dotenv import load_dotenv
 import time
 import os
 
+config = {
+    "DEBUG": True,          # some Flask specific configs
+    "CACHE_TYPE": "SimpleCache",  # Flask-Caching related configs
+    "CACHE_DEFAULT_TIMEOUT": 300
+}
 app = Flask(__name__)
 
-flask_cache_control = FlaskCacheControl()
-flask_cache_control.init_app(app)
+# tell Flask to use the above defined config
+app.config.from_mapping(config)
+cache = Cache(app)
 
 load_dotenv()
 
 
 def get_host(target):
+    """ Gets the hostname based on the configured environment. """
     if os.environ.get('IS_DOCKER') == "True":
         return "host.docker.internal"
     return os.environ.get(target)
 
 
+def make_cache_key():
+    """Output a cache key equal to the full path of the request with GET parameters included"""
+    return request.full_path
+
+
+""" Check of all required services is up an running before running this web server application, or wait """
 number_of_connection_tries = 0
 stop_trying = False  # Are all database services up and running?
 while (not stop_trying):
@@ -299,7 +308,7 @@ def statistics():
 
 
 @app.route('/topic_detection_model')
-@cache(max_age=86400, public=True)  # caching for up to 1 hour
+@cache.cached(timeout=86400, query_string=True, key_prefix=make_cache_key)
 def topic_detection_model():
     graph = request.args.get('graph', None).split(",")
     data_format = request.args.get('format', None)
@@ -323,6 +332,20 @@ def topic_detection_model():
     if data_format == 'json':
         return jsonify(result)
     return render_template("topic_detection_model.html", result=result)
+
+
+@app.route('/clear_cache')
+def clear_cache():
+    method = "/topic_detection_model"
+    no_cache = request.args.get('no_cache', None)
+
+    if no_cache == "True":
+        print("deleting cache")
+        cache.delete(request.full_path)
+        print("cache deleted")
+
+    cache.clear()
+    return "cache cleared successfully"
 
 
 if __name__ == '__main__':

@@ -31,7 +31,7 @@ XII.	EVALUATION OF INFLUENCE FIELD DETECTION IN THE USER INFLUENCE GRAPH        
 ----------------------------------------------------------------------------------------------
 XIII. 	INTRODUCING CENTRALITY MEASURES 											 - (DONE)
 ----------------------------------------------------------------------------------------------
-XIV.	CENTRALITY MEASURES VS. EDGE SCORE
+XIV.	CENTRALITY MEASURES VS. EDGE SCORE											 - (DONE)
 ----------------------------------------------------------------------------------------------
 XV. 	FUTURE IMPROVMENTS OF INFLUENCE GRAPH MODEL 
 ----------------------------------------------------------------------------------------------
