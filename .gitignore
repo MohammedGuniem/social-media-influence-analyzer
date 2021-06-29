@@ -12,6 +12,7 @@
 
 ## logs
 src/Logs/*
+src/cache/*
 
 ## plots
 src/statistics_plots/*

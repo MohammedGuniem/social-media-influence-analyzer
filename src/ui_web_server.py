@@ -1,3 +1,4 @@
+from numpy.core.numeric import full
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
 from flask import Flask, jsonify, render_template, request, send_file
@@ -7,9 +8,10 @@ from dotenv import load_dotenv
 import time
 import os
 
+
 config = {
-    "DEBUG": True,          # some Flask specific configs
-    "CACHE_TYPE": "SimpleCache",  # Flask-Caching related configs
+    'CACHE_TYPE': 'filesystem',
+    'CACHE_DIR': 'cache',
     "CACHE_DEFAULT_TIMEOUT": 300
 }
 app = Flask(__name__)
@@ -26,11 +28,6 @@ def get_host(target):
     if os.environ.get('IS_DOCKER') == "True":
         return "host.docker.internal"
     return os.environ.get(target)
-
-
-def make_cache_key():
-    """Output a cache key equal to the full path of the request with GET parameters included"""
-    return request.full_path
 
 
 """ Check of all required services is up an running before running this web server application, or wait """
@@ -119,6 +116,7 @@ def constructJSGraph(neo4j_graph, graph_type, score_type, centrality_max, centra
 
 
 @app.route('/')
+@cache.cached(timeout=86400, query_string=True)
 def index():
     user_graphs = neo4j_users_db_connector.get_graphs()
     activity_graphs = neo4j_activities_db_connector.get_graphs()
@@ -132,6 +130,7 @@ def index():
 
 
 @app.route('/user_graph')
+@cache.cached(timeout=86400, query_string=True)
 def user_graph():
     data_format = request.args.get('format', None)
     score_type = request.args.get('score_type', 'total')
@@ -260,6 +259,7 @@ def influence_area():
 
 
 @app.route('/activity_graph')
+@cache.cached(timeout=86400, query_string=True)
 def activity_graph():
     graph = request.args.get('graph', None).split(",")
     network_name, submissions_type, date = graph[0], graph[1], graph[2]
@@ -308,7 +308,7 @@ def statistics():
 
 
 @app.route('/topic_detection_model')
-@cache.cached(timeout=86400, query_string=True, key_prefix=make_cache_key)
+@cache.cached(timeout=86400, query_string=True)
 def topic_detection_model():
     graph = request.args.get('graph', None).split(",")
     data_format = request.args.get('format', None)
@@ -336,16 +336,13 @@ def topic_detection_model():
 
 @app.route('/clear_cache')
 def clear_cache():
-    method = "/topic_detection_model"
-    no_cache = request.args.get('no_cache', None)
+    cache.init_app(app, config=config)
 
-    if no_cache == "True":
-        print("deleting cache")
-        cache.delete(request.full_path)
-        print("cache deleted")
-
-    cache.clear()
-    return "cache cleared successfully"
+    with app.app_context():
+        result = cache.clear()
+    if result:
+        return "Deleted cache"
+    return "Not able to clear cache"
 
 
 if __name__ == '__main__':

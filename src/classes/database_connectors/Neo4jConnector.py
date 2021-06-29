@@ -10,7 +10,8 @@ class GraphDBConnector:
         self.database = "neo4j"
 
     def __del__(self):
-        self.driver.close()
+        if self.driver is not None:
+            self.driver.close()
 
     """ Writing methods """
 
