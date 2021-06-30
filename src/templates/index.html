@@ -33,6 +33,9 @@
             <a data-toggle="tab" href="#statistics">Statistics</a>
           </li>
           <li>
+            <a data-toggle="tab" href="#centrality_report">Centrality</a>
+          </li>
+          <li>
             <a data-toggle="tab" href="#topic_detection_model">Topic Detection Model</a>
           </li>
         </ul>
@@ -54,6 +57,9 @@
           </div>
           <div id="statistics" class="tab-pane fade">
             {% include 'statistics_form.html' %}
+          </div>
+          <div id="centrality_report" class="tab-pane fade">
+            {% include 'centrality_report_form.html' %}
           </div>
           <div id="topic_detection_model" class="tab-pane fade">
             {% include 'topic_detection_model_form.html' %}

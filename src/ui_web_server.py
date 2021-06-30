@@ -307,6 +307,49 @@ def statistics():
         return "Statistics from this network and date is not available, make sure you are using the correct network, submission type, date and score"
 
 
+@app.route('/centrality_report')
+def centrality_report():
+    graph = request.args.get('graph', None).split(",")
+    data_format = request.args.get('format', None)
+    network_name, submissions_type, date = graph[0], graph[1], graph[2]
+
+    neo4j_graph, centralities_max = neo4j_users_db_connector.get_graph(
+        network_name=network_name, submissions_type=submissions_type, date=date, relation_type="Influences")
+
+    if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
+        return "Activities Graph not found, make sure you use the correct network name and crawling date in the 'graph' url parameter"
+
+    user_centrality_report = {
+        "degree_centrality": {},
+        "betweenness_centrality": {},
+        "hits_centrality_auth":  {},
+        "hits_centrality_hub":  {}
+    }
+
+    measured_centralities = {
+        "degree_centrality": [],
+        "betweenness_centrality": [],
+        "hits_centrality_auth":  [],
+        "hits_centrality_hub":  []
+    }
+
+    for measure, _ in user_centrality_report.items():
+        for user_node in neo4j_graph["nodes"]:
+            user_centrality_report[measure][user_node["props"]
+                                            ["name"]] = user_node["props"][measure]
+        measured_centralities[measure] = list(
+            set(user_centrality_report[measure].values()))
+
+    return jsonify(measured_centralities)
+    for measure, _ in user_centrality_report.items():
+        user_centrality_report[measure] = sorted(
+            user_centrality_report[measure].items(), key=lambda n: n[1], reverse=True)
+
+    if data_format == 'json':
+        return jsonify(user_centrality_report)
+    return render_template("centrality_report.html", user_centrality_report=user_centrality_report)
+
+
 @app.route('/topic_detection_model')
 @cache.cached(timeout=86400, query_string=True)
 def topic_detection_model():
