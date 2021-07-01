@@ -27,13 +27,13 @@
             <a data-toggle="tab" href="#field">Field</a>
           </li>
           <li>
+            <a data-toggle="tab" href="#centrality_report">Centrality</a>
+          </li>
+          <li>
             <a data-toggle="tab" href="#activity_graph">Activity Graph</a>
           </li>
           <li>
             <a data-toggle="tab" href="#statistics">Statistics</a>
-          </li>
-          <li>
-            <a data-toggle="tab" href="#centrality_report">Centrality</a>
           </li>
           <li>
             <a data-toggle="tab" href="#topic_detection_model">Topic Detection Model</a>
@@ -52,14 +52,14 @@
           <div id="field" class="tab-pane fade">
             {% include 'area_filter_form.html' %}
           </div>
+          <div id="centrality_report" class="tab-pane fade">
+            {% include 'centrality_report_form.html' %}
+          </div>
           <div id="activity_graph" class="tab-pane fade">
             {% include 'activity_form.html' %}
           </div>
           <div id="statistics" class="tab-pane fade">
             {% include 'statistics_form.html' %}
-          </div>
-          <div id="centrality_report" class="tab-pane fade">
-            {% include 'centrality_report_form.html' %}
           </div>
           <div id="topic_detection_model" class="tab-pane fade">
             {% include 'topic_detection_model_form.html' %}

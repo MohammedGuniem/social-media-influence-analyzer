@@ -8,111 +8,73 @@
     <link rel="stylesheet" href="../static/scripts/bootstrap.min.css">
     <script src="../static/scripts/jquery.min.js"></script>
     <script src="../static/scripts/bootstrap.min.js"></script>
+    <style>
+      .first_place {
+        background-color: greenyellow;
+      }
+
+      .second_place {
+        background-color: lightblue;
+      }
+
+      .third_place {
+        background-color: yellow;
+      }
+
+      .other_place {
+        background-color: lightcoral;
+      }
+    </style>
   </head>
   <body>
     <div class="container">
-      <h1>Centrality Report</h1>
+      <h2>Centrality Report</h2>
+      <p>
+        This report shows the scores and rankings of each user in the influence graph according to a variety of implemented centrality measures 
+        such as outdegree-, betweenness-, and HITS Centrality.
+      </p>
+      <p>
+        The green colored cells shows the top ranked users, blue colored cells shows those users in the second rank, and third rank users are marked with a yellow color, 
+        while all lower/other rankings are marked with red color.
+      </p>
       <div class="row">
-        <div class="col-sm-3">
-          <table class="table table-bordered">
-            <thead>
-              <tr>
-                <th colspan="3">Outdegree</th>
-              </tr>
-              <tr>
-                <th>Username</th>
-                <th>Rank</th>
-                <th>Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for user_node in user_centrality_report.degree_centrality %}
+
+        {% for centrality_measure, values in centrality.user_centrality_report.items() %}
+          <div class="col-sm-3">
+            <table class="table table-bordered">
+              <thead>
                 <tr>
-                  <td>{{ user_node[0] }}</td>
-                  <td>{{ loop.index }}</td>
-                  <td>{{ user_node[1] }}</td>
+                  <th colspan="3">{{ centrality_measure }}</th>
                 </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        <div class="col-sm-3">
-          <table class="table table-bordered" >
-            <thead>
-              <tr>
-                <th colspan="3">betweenness</th>
-              </tr>
-              <tr>
-                <th>Username</th>
-                <th>Rank</th>
-                <th>Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for user_node in user_centrality_report.betweenness_centrality %}
                 <tr>
-                  <td>{{ user_node[0] }}</td>
-                  <td>{{ loop.index }}</td>
-                  <td>{{ user_node[1] }}</td>
+                  <th>Username</th>
+                  <th>Rank</th>
+                  <th>Score</th>
                 </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        <div class="col-sm-3">
-          <table class="table table-bordered">
-            <thead>
-              <tr>
-                <th colspan="3"> HITS Auth</th>
-              </tr>
-              <tr>
-                <th>Username</th>
-                <th>Rank</th>
-                <th>Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for user_node in user_centrality_report.hits_centrality_auth %}
-                <tr>
-                  <td>{{ user_node[0] }}</td>
-                  <td>{{ loop.index }}</td>
-                  <td>{{ user_node[1] |round(3, 'floor') }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        <div class="col-sm-3">
-          <table class="table table-bordered" >
-            <thead>
-              <tr>
-                <th colspan="3">HITS Hub</th>
-              </tr>
-              <tr>
-                <th>Username</th>
-                <th>Rank</th>
-                <th>score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for user_node in user_centrality_report.hits_centrality_hub %}
-                <tr>
-                  <td>{{ user_node[0] }}</td>
-                  <td>{{ loop.index }}</td>
-                  <td>{{ user_node[1] |round(3, 'floor') }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {% for user_node in values %}
+                  <tr
+                  {% if centrality.measured_centralities[centrality_measure].index(user_node[1])+1 == 1 %}
+                    class="first_place"
+                  {% elif centrality.measured_centralities[centrality_measure].index(user_node[1])+1 == 2 %}
+                    class="second_place"
+                  {% elif centrality.measured_centralities[centrality_measure].index(user_node[1])+1 == 3 %}
+                    class="third_place"
+                  {% else %}
+                    class="other_place"
+                  {% endif %}
+                >
+                    <td>{{ user_node[0] }}</td>
+                    <td>{{ centrality.measured_centralities[centrality_measure].index(user_node[1]) +1 }}</td>
+                    <td>{{ user_node[1] |round(3, 'ceil') }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endfor %}
       </div>
     </div>
   </body>
 </html>
-
-<!--
-
-              <th colspan="3">Betweeness</th>
-            <th colspan="3">HITS Auth</th>
-            <th colspan="3">HITS Hub</th>
--->

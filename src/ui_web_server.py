@@ -337,17 +337,21 @@ def centrality_report():
         for user_node in neo4j_graph["nodes"]:
             user_centrality_report[measure][user_node["props"]
                                             ["name"]] = user_node["props"][measure]
-        measured_centralities[measure] = list(
-            set(user_centrality_report[measure].values()))
+        measured_centralities[measure] = sorted(list(
+            set(user_centrality_report[measure].values())), reverse=True)
 
-    return jsonify(measured_centralities)
     for measure, _ in user_centrality_report.items():
         user_centrality_report[measure] = sorted(
             user_centrality_report[measure].items(), key=lambda n: n[1], reverse=True)
 
+    centrality = {
+        "user_centrality_report": user_centrality_report,
+        "measured_centralities": measured_centralities
+    }
+
     if data_format == 'json':
-        return jsonify(user_centrality_report)
-    return render_template("centrality_report.html", user_centrality_report=user_centrality_report)
+        return jsonify(centrality)
+    return render_template("centrality_report.html", centrality=centrality)
 
 
 @app.route('/topic_detection_model')
