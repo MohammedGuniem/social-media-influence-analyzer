@@ -25,6 +25,10 @@ This repository contains all project code, documents and other related files and
 |                             |               | development (for testing and development enviorments)                                                                      |
 | IS_DOCKER                   | True          | True (if using Docker)                                                                                                     |
 |                             |               | False (if not using Docker)                                                                                                |
+| CACHE_ON                    | False         | True (With UI caching)                                                                                                     |
+|                             |               | False (Without UI caching)                                                                                                 |
+| CACHE_TIMEOUT               | 86400         | 0 (creates a cache that does not expire)                                                                                   |
+|                             |               | number of seconds to cache expire after creation (example: default is set to 1 day or 86400 seconds)                       |
 | reddit_username             | -             | The username of administrating reddit account                                                                              |
 | reddit_password             | -             | The password of administrating reddit account                                                                              |
 | reddit_client_id            | -             | The client id for crawling reddit                                                                                          |

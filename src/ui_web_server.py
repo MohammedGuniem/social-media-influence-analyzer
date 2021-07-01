@@ -8,19 +8,24 @@ from dotenv import load_dotenv
 import time
 import os
 
+load_dotenv()
 
-config = {
-    'CACHE_TYPE': 'filesystem',
-    'CACHE_DIR': 'cache',
-    "CACHE_DEFAULT_TIMEOUT": 300
-}
 app = Flask(__name__)
 
+if os.environ.get('CACHE_ON') == "True":
+    cache_type = 'FileSystemCache'
+else:
+    cache_type = 'NullCache'
+
+cache_timeout = int(os.environ.get('CACHE_TIMEOUT'))
+config = {
+    'CACHE_TYPE': cache_type,
+    'CACHE_DIR': 'cache',
+    "CACHE_DEFAULT_TIMEOUT": cache_timeout
+}
 # tell Flask to use the above defined config
 app.config.from_mapping(config)
 cache = Cache(app)
-
-load_dotenv()
 
 
 def get_host(target):
@@ -116,7 +121,7 @@ def constructJSGraph(neo4j_graph, graph_type, score_type, centrality_max, centra
 
 
 @app.route('/')
-@cache.cached(timeout=86400, query_string=True)
+@cache.cached(timeout=cache_timeout)
 def index():
     user_graphs = neo4j_users_db_connector.get_graphs()
     activity_graphs = neo4j_activities_db_connector.get_graphs()
@@ -130,7 +135,7 @@ def index():
 
 
 @app.route('/user_graph')
-@cache.cached(timeout=86400, query_string=True)
+@cache.cached(timeout=cache_timeout, query_string=True)
 def user_graph():
     data_format = request.args.get('format', None)
     score_type = request.args.get('score_type', 'total')
@@ -259,7 +264,7 @@ def influence_area():
 
 
 @app.route('/activity_graph')
-@cache.cached(timeout=86400, query_string=True)
+@cache.cached(timeout=cache_timeout, query_string=True)
 def activity_graph():
     graph = request.args.get('graph', None).split(",")
     network_name, submissions_type, date = graph[0], graph[1], graph[2]
@@ -308,6 +313,7 @@ def statistics():
 
 
 @app.route('/centrality_report')
+@cache.cached(timeout=cache_timeout, query_string=True)
 def centrality_report():
     graph = request.args.get('graph', None).split(",")
     data_format = request.args.get('format', None)
@@ -355,7 +361,7 @@ def centrality_report():
 
 
 @app.route('/topic_detection_model')
-@cache.cached(timeout=86400, query_string=True)
+@cache.cached(timeout=cache_timeout, query_string=True)
 def topic_detection_model():
     graph = request.args.get('graph', None).split(",")
     data_format = request.args.get('format', None)
