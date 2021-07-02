@@ -1,8 +1,8 @@
-from numpy.core.numeric import full
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
 from flask import Flask, jsonify, render_template, request, send_file
 from classes.modelling.TextClassification import TextClassifier
+from classes.caching.CacheHandler import CacheHandler
 from flask_caching import Cache
 from dotenv import load_dotenv
 import time
@@ -389,13 +389,47 @@ def topic_detection_model():
 
 @app.route('/clear_cache')
 def clear_cache():
-    cache.init_app(app, config=config)
+    secret_key = request.args.get('key', None)
 
-    with app.app_context():
-        result = cache.clear()
-    if result:
-        return "Deleted cache"
-    return "Not able to clear cache"
+    if secret_key == os.environ.get('CACHE_SECRET_PASSWORD'):
+        cache.init_app(app, config=config)
+
+        with app.app_context():
+            result = cache.clear()
+
+        if result:
+            return "Cache successfully cleared."
+        return "Not able to clear cache."
+    else:
+        return "Access denied."
+
+
+@app.route('/clear_and_refresh_cache')
+def clear_and_refresh_cache():
+    secret_key = request.args.get('key', None)
+
+    if secret_key == os.environ.get('CACHE_SECRET_PASSWORD'):
+        domain_name = "http://localhost:5000"
+        cache_directory_path = "cache"
+
+        cache_handler = CacheHandler(domain_name, cache_directory_path,
+                                     neo4j_users_db_connector, neo4j_activities_db_connector)
+
+        cache_handler.clear_cache()
+
+        cache_handler.fetchIndexPage()
+
+        cache_handler.fetchUserGraphs()
+
+        cache_handler.fetchActivityGraphs()
+
+        cache_handler.fetchCentralityReports()
+
+        cache_handler.fetchTopicDetectionModel()
+
+        return "Cache successfully refreshed."
+    else:
+        return "Access denied."
 
 
 if __name__ == '__main__':

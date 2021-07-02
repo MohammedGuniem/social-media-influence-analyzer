@@ -83,3 +83,7 @@ https://itnext.io/a-beginners-guide-to-deploying-a-docker-application-to-product
 https://flask-caching.readthedocs.io/en/latest/
 https://stackoverflow.com/questions/9413566/flask-cache-memoize-url-query-string-parameters-as-well
 https://github.com/thadeusb/flask-cache/issues/104
+
+# working with files and folders in python
+https://mkyong.com/python/python-how-to-delete-a-file-or-folder/
+https://www.geeksforgeeks.org/create-a-directory-in-python/
