@@ -89,8 +89,6 @@ class RedditCrawler:
 
         return all_submissions
 
-        # Method to crawl submissions from a certain subreddit
-
     # Method to crawl comments from a certain submission
     def getComments(self, submissions, submissions_type):
         start = time.time()
