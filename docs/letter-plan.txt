@@ -36,7 +36,7 @@ XIII. 	INTRODUCING CENTRALITY MEASURES 											 - (DONE)
 ----------------------------------------------------------------------------------------------
 XIV.	CENTRALITY MEASURES VS. EDGE SCORE											 - (DONE)
 ----------------------------------------------------------------------------------------------
-XV. 	FUTURE IMPROVMENTS OF INFLUENCE GRAPH MODEL 
+XV. 	FUTURE IMPROVMENTS OF INFLUENCE GRAPH MODEL 							     - (DONE)
 ----------------------------------------------------------------------------------------------
 XVI. 	THE TECHNICAL SOLUTION														 - (DONE)
 ----------------------------------------------------------------------------------------------
