@@ -3,16 +3,16 @@
 This is a project about social media influence analysis using Computer Science to detect and classify influences between users of social media. The project is carried out by Mohammed Z. Guniem to acheive the objective of his master thesis in producing a reliable and secure system for detecting and classifying influences between users on social media platforms.
 This repository contains all project code, documents and other related files and folders.
 
-## To set up the project on your preffered enviornment, please follow the steps below:
+To set up the project on your preffered enviornment, please follow the steps below:
 
-> I. Importing project source code
+# I - Importing the source code of this project
 
-#### I-A. Clone or download the project code of this repository to your favorite location on your machine
+#### I-A: Clone or download the project code of this repository to your favorite location on your machine
 
 - If cloning: Download and install the Git tool using this link https://git-scm.com/downloads.
 - If downloading directly: unzip the project files in your desired location on the filesystem you are using.
 
-#### I-B. Add necessary environment variables
+#### I-B: Add necessary environment variables
 
 - Rename the file .env.example to .env
 - If you wish to crawl reddit, please register your crawling account and obtain credentials by following the instructions on this link https://praw.readthedocs.io/en/latest/getting_started/authentication.html
@@ -21,6 +21,9 @@ This repository contains all project code, documents and other related files and
 | Variable                    | default value | possible values                                                                                                            |
 | --------------------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | COMPOSE_PROJECT_NAME        | smia          | any project name of your choice                                                                                            |
+| DOMAIN_NAME                 | -             | the public domain name if any, examples: smia.uis.no or http://localhost:5000                                              |
+| HOST_IPv4                   | 127.0.0.1     | The IPv4 address of the webserver for user interface                                                                       |
+| PORT                        | 5000          | The port number of the webserver for user interface                                                                        |
 | FLASK_ENV                   | development   | production (for production enviorments)                                                                                    |
 |                             |               | development (for testing and development enviorments)                                                                      |
 | IS_DOCKER                   | True          | True (if using Docker)                                                                                                     |
@@ -29,6 +32,11 @@ This repository contains all project code, documents and other related files and
 |                             |               | False (Without UI caching)                                                                                                 |
 | CACHE_TIMEOUT               | 86400         | 0 (creates a cache that does not expire)                                                                                   |
 |                             |               | number of seconds to cache expire after creation (example: default is set to 1 day or 86400 seconds)                       |
+| CACHE_DIR_PATH              |               | Where to store cache records on file sytem                                                                                 |
+| ADMIN_USERNAMES             | -             | usernames of Site/Project Administrators used for HTTPS Basic authentication                                               |
+| ADMIN_PASSWORDS             | -             | passwords of Site/Project Administrators used for HTTPS Basic authentication                                               |
+|                             |               | Add usernames divided by "," and corresponsing password in the same position divided by ","                                |
+|                             |               | Only secure if using HTTPS/SSL or on local machine, Do not use with HTTP in production                                     |
 | reddit_username             | -             | The username of administrating reddit account                                                                              |
 | reddit_password             | -             | The password of administrating reddit account                                                                              |
 | reddit_client_id            | -             | The client id for crawling reddit                                                                                          |
@@ -54,16 +62,16 @@ This repository contains all project code, documents and other related files and
 
 <br />
 
-> II. Setting up the development or production environment (Using Docker)
+# II - Setting up the development or production environment (Using Docker)
 
-#### II-A. Download Docker Desktop
+#### II-A: Download Docker Desktop
 
 - Download and install Docker Desktop using this link https://www.docker.com/products/docker-desktop
 - Open Docker Desktop
 - Go to Settings -> Resources -> File Sharing
 - Share the src in the project directory file by adding its path on your machine to the list
 
-#### II-B. Set up a dockerized development environment
+#### II-B: Set up a dockerized development environment
 
 - Open a command line window on you machine as an administrator, preferably git bash
 - Navigate to your location in step A above <br  />
@@ -80,46 +88,40 @@ This repository contains all project code, documents and other related files and
 - Then, go to 127.0.0.1:5000, localhost:5000 or host.docker.internal:5000 on your browser with javascript enabled.
 - You should now be able to access the GUI interface of the project.
 
-#### II-C. Importing datasets and generating user and activity graphs, and statistics plots
+#### II-C: Access the docker command line interface
 
 - In your command line, access smia CLI using the command below or version of it depanding on your command line <br  />
   `docker exec -t -i user-interface bash`
 
-##### II-C-1. Importing the small dummy test dataset
+#### II-D: Importing the small dummy test dataset
 
 - Run test driver <br  />
   `python test_driver.py`
   Note! You might get a couple of warnings when building the user- and activity user graph, this is because the dummy dataset is very small and there is not enough labels in the training dataset for topic classification. The warnings can be ignored as this is just a dummy dataset for development and testing purposes.
 
-##### II-C-2. Importing a real-life dataset from crawling Reddit
+#### II-E: Importing real-life datasets from crawling Reddit
 
-- Run reddit driver <br  />
-  `python reddit_driver.py`
-
+- Run reddit driver to crawl the 3 newest submissions from the top 3 most popular subreddits <br  />
+  `python reddit_most_popular_subreddits_driver.py`
+- Run reddit driver to crawl the 3 newest submissions from the worldnews, Fianance, NBA, Cinema, and research subreddits <br  />
+  `python reddit_selected_subreddits_driver.py`
 - exit the CLI <br  />
   `exit`
 
 <br />
   
-> III. Setting up the production environment (Using Windows IIS)
+# III - Setting up the production environment (Using Windows IIS)
 
 Follow the steps below to set up a production envirnoment using Windows IIS:
 
-#### III-A. Install Python
+#### III-A: Install Python
 
 - Download and install Python using from the official python site, https://www.python.org/downloads/
-- Åpen a command line on your machine, and install the needed python packages for this project
-  `pip install pymongo`
-  `pip install neo4j`
-  `pip install sklearn`
-  `pip install python-dotenv`
-  `pip install pandas`
-  `pip install praw`
-  `pip install matplotlib`
-  `pip install flask`
-  `pip install wfastcgi`
+- Åpen a command line on your machine, navigate to the root directory of source code
+- install the needed python packages for this project
+  `pip install -r requirements.txt`
 
-#### III-B. Install MongoDB Archive Database Server
+#### III-B: Install MongoDB Archive Database Server
 
 - Install Mongo DB and create user credentials
 - After installation, Open MongoDB Compass and connect to DB
@@ -133,7 +135,7 @@ Follow the steps below to set up a production envirnoment using Windows IIS:
 - Open PowerShell as admin. and restart the mongodb service using this command
 - `Restart-Service -Name "mongodb"`
 
-#### III-C. Install Neo4j User Graph Database Server
+#### III-C: Install Neo4j User Graph Database Server
 
 - Download and install Neo4j server using this link https://neo4j.com/download-center/#community
 - Unzip the downloaded zip folder to `{your_target_locations}/neo4j_users`
@@ -173,7 +175,7 @@ Follow the steps below to set up a production envirnoment using Windows IIS:
 - Now go to http://localhost:7474/browser/ at your browser, set a password and note it down
 - At the end, you can go to http://localhost:7474/browser/ at your browser, set a password and note it down
 
-#### III-D. Install Neo4j Activity Graph Database Server
+#### III-D: Install Neo4j Activity Graph Database Server
 
 - Download and install Neo4j server using this link https://neo4j.com/download-center/#community
 - Unzip the downloaded zip folder to `{your_target_locations}/neo4j_activities`
@@ -214,7 +216,7 @@ Follow the steps below to set up a production envirnoment using Windows IIS:
 - Now go to http://localhost:7475/browser/ at your browser, set a password and note it down
 - At the end, you can go to http://localhost:7475/browser/ at your browser, set a password and note it down
 
-#### III-E. Install the web server for the user interface using IIS.
+#### III-E: Install the web server for the user interface using IIS.
 
 - Open cmd as administrator and type.
   `wfastcgi-enable`

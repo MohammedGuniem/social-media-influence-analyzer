@@ -1,5 +1,6 @@
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
+from classes.caching.CacheHandler import CacheHandler
 from datetime import date, timedelta
 from dotenv import load_dotenv
 from time import time, ctime
@@ -14,22 +15,22 @@ try:
         "deletion_1": {
             "network_name": "Test",
             "submissions_type": "New",
-            "delete_from_date": "2021-06-15",
-            "delete_to_date": "2021-06-25",
+            "delete_from_date": "2021-06-01",
+            "delete_to_date": "2021-07-30",
             "delete_on": ["mongo_db_archive", "runtime_register", "statistics_plots", "neo4j_users_graph", "neo4j_activities_graph"]
         },
         "deletion_2": {
             "network_name": "Reddit_Most_Popular_Subreddits",
             "submissions_type": "New",
-            "delete_from_date": "2021-06-15",
-            "delete_to_date": "2021-06-25",
+            "delete_from_date": "2021-06-01",
+            "delete_to_date": "2021-07-30",
             "delete_on": ["mongo_db_archive", "runtime_register", "statistics_plots", "neo4j_users_graph", "neo4j_activities_graph"]
         },
         "deletion_3": {
             "network_name": "Reddit_Selected_Subreddits",
             "submissions_type": "New",
-            "delete_from_date": "2021-06-15",
-            "delete_to_date": "2021-06-25",
+            "delete_from_date": "2021-06-01",
+            "delete_to_date": "2021-07-30",
             "delete_on": ["mongo_db_archive", "runtime_register", "statistics_plots", "neo4j_users_graph", "neo4j_activities_graph"]
         },
         # "deletion_4": {
@@ -161,6 +162,20 @@ try:
                 print(
                     F"Deleted activity graph: {nodes_deleted} nodes, {relationships_deleted} relationships\nfrom network: {network_name}, submissions type: {submissions_type} \n from {from_date} to {to_date}")
                 print()
+
+    IS_CACHE_ON = os.environ.get('CACHE_ON')
+    if IS_CACHE_ON:
+        print("\nRefreshing system cache records...")
+        cache_handler = CacheHandler(
+            domain_name=os.environ.get('DOMAIN_NAME'),
+            cache_directory_path=os.environ.get('CACHE_DIR_PATH'),
+            neo4j_db_users_connector=neo4j_db_users_connector,
+            neo4j_db_activities_connector=neo4j_db_activities_connector
+        )
+        cache_handler.refresh_system_cache(output_msg=False)
+        print("Cache successfully refreshed.")
+    else:
+        print("\nCaching not enabled")
 
 except Exception as e:
     today_date = date.today()

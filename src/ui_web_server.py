@@ -1,8 +1,10 @@
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
+from werkzeug.security import generate_password_hash, check_password_hash
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
 from flask import Flask, jsonify, render_template, request, send_file
 from classes.modelling.TextClassification import TextClassifier
 from classes.caching.CacheHandler import CacheHandler
+from flask_httpauth import HTTPBasicAuth
 from flask_caching import Cache
 from dotenv import load_dotenv
 import time
@@ -12,20 +14,35 @@ load_dotenv()
 
 app = Flask(__name__)
 
+# Setting up caching
 if os.environ.get('CACHE_ON') == "True":
-    cache_type = 'FileSystemCache'
+    cache_type = 'FileSystemCache'  # cache records stored on file system
 else:
-    cache_type = 'NullCache'
+    cache_type = 'NullCache'  # no cache
 
 cache_timeout = int(os.environ.get('CACHE_TIMEOUT'))
 config = {
     'CACHE_TYPE': cache_type,
-    'CACHE_DIR': 'cache',
+    'CACHE_DIR': os.environ.get('CACHE_DIR_PATH'),
     "CACHE_DEFAULT_TIMEOUT": cache_timeout
 }
-# tell Flask to use the above defined config
 app.config.from_mapping(config)
 cache = Cache(app)
+
+# Setting up HTTP Basic Auth
+auth = HTTPBasicAuth()
+usernames = os.environ.get('ADMIN_USERNAMES').split(",")
+passwords = os.environ.get('ADMIN_PASSWORDS').split(",")
+if len(usernames) == len(passwords):
+    users = {}
+    for user in usernames:
+        users[user] = generate_password_hash(passwords[usernames.index(user)])
+
+
+@auth.verify_password
+def verify_password(username, password):
+    if username in users and check_password_hash(users.get(username), password):
+        return username
 
 
 def get_host(target):
@@ -45,11 +62,12 @@ while (not stop_trying):
             host=get_host('mongo_db_host'),
             port=int(os.environ.get('mongo_db_port')),
             user=os.environ.get('mongo_db_user'),
-            passowrd=os.environ.get('mongo_db_pass')
+            passowrd=os.environ.get('mongo_db_pass'),
+            access_mode="ReadOnly"
         )
 
         # Neo4j users database connector
-        neo4j_users_db_connector = GraphDBConnector(
+        neo4j_db_users_connector = GraphDBConnector(
             host=get_host('neo4j_users_db_host'),
             port=int(os.environ.get('neo4j_users_db_port')),
             user=os.environ.get('neo4j_users_db_user'),
@@ -57,7 +75,7 @@ while (not stop_trying):
         )
 
         # Neo4j activity database connector
-        neo4j_activities_db_connector = GraphDBConnector(
+        neo4j_db_activities_connector = GraphDBConnector(
             host=get_host('neo4j_activities_db_host'),
             port=int(os.environ.get('neo4j_activities_db_port')),
             user=os.environ.get('neo4j_activities_db_user'),
@@ -123,8 +141,8 @@ def constructJSGraph(neo4j_graph, graph_type, score_type, centrality_max, centra
 @app.route('/')
 @cache.cached(timeout=cache_timeout)
 def index():
-    user_graphs = neo4j_users_db_connector.get_graphs()
-    activity_graphs = neo4j_activities_db_connector.get_graphs()
+    user_graphs = neo4j_db_users_connector.get_graphs()
+    activity_graphs = neo4j_db_activities_connector.get_graphs()
     valid_graphs = []
     for graph in user_graphs:
         if graph in activity_graphs:
@@ -142,7 +160,7 @@ def user_graph():
     centrality = request.args.get('centrality', 'degree')
     graph = request.args.get('graph', None).split(",")
     network_name, submissions_type, date = graph[0], graph[1], graph[2]
-    neo4j_graph, centralities_max = neo4j_users_db_connector.get_graph(
+    neo4j_graph, centralities_max = neo4j_db_users_connector.get_graph(
         network_name=network_name, submissions_type=submissions_type, date=date, relation_type="Influences")
 
     if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
@@ -170,7 +188,7 @@ def path():
     source_name = request.args.get('source_name', '')
     target_name = request.args.get('target_name', '')
 
-    neo4j_graph, centralities_max = neo4j_users_db_connector.get_path(
+    neo4j_graph, centralities_max = neo4j_db_users_connector.get_path(
         network_name=network_name,
         submissions_type=submissions_type,
         date=date,
@@ -203,7 +221,7 @@ def score():
     score_type = request.args.get('score_type', 'total')
     centrality = request.args.get('centrality', 'degree')
 
-    neo4j_graph, centralities_max = neo4j_users_db_connector.filter_by_score(
+    neo4j_graph, centralities_max = neo4j_db_users_connector.filter_by_score(
         network_name=network_name,
         submissions_type=submissions_type,
         date=date,
@@ -240,7 +258,7 @@ def influence_area():
     centrality = request.args.get('centrality', 'degree')
     data_format = request.args.get('format')
 
-    neo4j_graph, centralities_max = neo4j_users_db_connector.filter_by_influence_area(
+    neo4j_graph, centralities_max = neo4j_db_users_connector.filter_by_influence_area(
         network_name=network_name,
         submissions_type=submissions_type,
         date=date,
@@ -271,7 +289,7 @@ def activity_graph():
     score_type = request.args.get('score_type', "total")
     data_format = request.args.get('format', None)
 
-    neo4j_graph, centralities_max = neo4j_activities_db_connector.get_graph(
+    neo4j_graph, centralities_max = neo4j_db_activities_connector.get_graph(
         network_name=network_name, submissions_type=submissions_type, date=date, relation_type="Has")
 
     if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
@@ -319,7 +337,7 @@ def centrality_report():
     data_format = request.args.get('format', None)
     network_name, submissions_type, date = graph[0], graph[1], graph[2]
 
-    neo4j_graph, centralities_max = neo4j_users_db_connector.get_graph(
+    neo4j_graph, centralities_max = neo4j_db_users_connector.get_graph(
         network_name=network_name, submissions_type=submissions_type, date=date, relation_type="Influences")
 
     if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
@@ -388,49 +406,28 @@ def topic_detection_model():
 
 
 @app.route('/clear_cache')
+@auth.login_required
 def clear_cache():
-    secret_key = request.args.get('key', None)
-
-    if secret_key == os.environ.get('CACHE_SECRET_PASSWORD'):
-        cache.init_app(app, config=config)
-
-        with app.app_context():
-            result = cache.clear()
-
-        if result:
-            return "Cache successfully cleared."
-        return "Not able to clear cache."
-    else:
-        return "Access denied."
+    cache.init_app(app, config=config)
+    with app.app_context():
+        result = cache.clear()
+    if result:
+        return "Cache successfully cleared."
+    return "Not able to clear cache."
 
 
-@app.route('/clear_and_refresh_cache')
-def clear_and_refresh_cache():
-    secret_key = request.args.get('key', None)
-
-    if secret_key == os.environ.get('CACHE_SECRET_PASSWORD'):
-        domain_name = "http://localhost:5000"
-        cache_directory_path = "cache"
-
-        cache_handler = CacheHandler(domain_name, cache_directory_path,
-                                     neo4j_users_db_connector, neo4j_activities_db_connector)
-
-        cache_handler.clear_cache()
-
-        cache_handler.fetchIndexPage()
-
-        cache_handler.fetchUserGraphs()
-
-        cache_handler.fetchActivityGraphs()
-
-        cache_handler.fetchCentralityReports()
-
-        cache_handler.fetchTopicDetectionModel()
-
-        return "Cache successfully refreshed."
-    else:
-        return "Access denied."
+@app.route('/refresh_cache')
+@auth.login_required
+def refresh_cache():
+    cache_handler = CacheHandler(
+        domain_name=os.environ.get('DOMAIN_NAME'),
+        cache_directory_path=os.environ.get('CACHE_DIR_PATH'),
+        neo4j_db_users_connector=neo4j_db_users_connector,
+        neo4j_db_activities_connector=neo4j_db_activities_connector
+    )
+    cache_handler.refresh_system_cache(output_msg=False)
+    return "Cache successfully refreshed."
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host=os.environ.get("HOST_IPv4"), port=int(os.environ.get("PORT")))

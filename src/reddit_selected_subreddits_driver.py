@@ -1,8 +1,9 @@
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
 from classes.modelling.ActivityGraphModelling import ActivityGraph
-from classes.modelling.UserGraphModelling import UserGraph
 from classes.crawling.RedditCrawlClass import RedditCrawler
+from classes.modelling.UserGraphModelling import UserGraph
+from classes.caching.CacheHandler import CacheHandler
 from classes.statistics.Statistics import Statistics
 from dotenv import load_dotenv
 from time import time, ctime
@@ -174,7 +175,7 @@ try:
         print("\nStage 3 - Building Activities Influence model...")
         if "activities_modelling" in stages:
             # Neo4j activities database connector
-            neo4j_db_activities_cconnector = GraphDBConnector(
+            neo4j_db_activities_connector = GraphDBConnector(
                 host=get_host('neo4j_activities_db_host'),
                 port=int(os.environ.get('neo4j_activities_db_port')),
                 user=os.environ.get('neo4j_activities_db_user'),
@@ -183,7 +184,7 @@ try:
 
             activity_model = ActivityGraph(
                 mongo_db_connector=mongo_db_connector,
-                neo4j_db_connector=neo4j_db_activities_cconnector,
+                neo4j_db_connector=neo4j_db_activities_connector,
                 network_name=network_name,
                 submissions_type=submissions_type,
                 date=date
@@ -222,6 +223,20 @@ try:
             stat.getInfluenceScore(score_type=None)
         else:
             print("Jumped over stage 4 as it is not in the stage configuration array.")
+
+    IS_CACHE_ON = os.environ.get('CACHE_ON')
+    if IS_CACHE_ON:
+        print("\nRefreshing system cache records...")
+        cache_handler = CacheHandler(
+            domain_name=os.environ.get('DOMAIN_NAME'),
+            cache_directory_path=os.environ.get('CACHE_DIR_PATH'),
+            neo4j_db_users_connector=neo4j_db_users_connector,
+            neo4j_db_activities_connector=neo4j_db_activities_connector
+        )
+        cache_handler.refresh_system_cache(output_msg=False)
+        print("Cache successfully refreshed.")
+    else:
+        print("\nCaching not enabled")
 
 except Exception as e:
     log_path = F"Logs/{date}/{network_name}/{submissions_type}/"

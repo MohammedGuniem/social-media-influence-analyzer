@@ -4,13 +4,23 @@ import pymongo
 class MongoDBConnector:
     """ Connection initializer """
 
-    def __init__(self, host, port, user, passowrd):
+    def __init__(self, host, port, user, passowrd, access_mode="Full"):
+        self.access_mode = access_mode
         with pymongo.MongoClient(host=host, port=port, username=user, password=passowrd, authSource='admin', authMechanism='SCRAM-SHA-256') as self.client:
             pass
+
+    def check_access(self, operation_to_perform):
+        if (operation_to_perform == "Read" and self.access_mode in ["Full", "ReadOnly"]) or (operation_to_perform == "Write" and self.access_mode in ["Full"]):
+            return True
+        else:
+            raise Exception(
+                F"{operation_to_perform} access denied, specified access mode {self.access_mode} is insufficient for this database writing operation")
 
     """ Collection validator """
 
     def getCollectionsOfDatabase(self, database_name):
+        self.check_access(operation_to_perform="Read")
+
         collections = set(self.client[database_name].collection_names())
         collections = sorted(collections, reverse=True)
 
@@ -19,6 +29,8 @@ class MongoDBConnector:
         return "no valid collection!"
 
     def getMostRecentValidCollection(self, database_name):
+        self.check_access(operation_to_perform="Read")
+
         collections = set(self.client[database_name].collection_names())
         collections = sorted(collections, reverse=True)
 
@@ -29,6 +41,8 @@ class MongoDBConnector:
     """ Writing and reading methods """
 
     def writeToDB(self, database_name, collection_name, data):
+        self.check_access(operation_to_perform="Write")
+
         if not collection_name:
             collection_name = self.getMostRecentValidCollection(database_name)
 
@@ -48,6 +62,8 @@ class MongoDBConnector:
                 collection.bulk_write(requests)
 
     def readFromDB(self, database_name, query={}, single=False, collection_name=None):
+        self.check_access(operation_to_perform="Read")
+
         if not collection_name:
             collection_name = self.getMostRecentValidCollection(database_name)
 
@@ -62,10 +78,14 @@ class MongoDBConnector:
     """ Removal and cleaning methods """
 
     def remove_collection(self, database_name, collection_name):
+        self.check_access(operation_to_perform="Write")
+
         result = self.client[database_name].drop_collection(collection_name)
         return result['ok']
 
     def remove_crawling_runtime(self, network_name, submissions_type, from_timestamp, to_timestamp):
+        self.check_access(operation_to_perform="Write")
+
         result = self.client["admin"]["crawling_runtime_register"].delete_many({
             "network_name": network_name,
             "submissions_type": submissions_type,
@@ -135,6 +155,8 @@ class MongoDBConnector:
         return score
 
     def getCrawlingRuntimes(self, network_name, submissions_type, from_date):
+        self.check_access(operation_to_perform="Read")
+
         query = {
             "network_name": network_name,
             "timestamp": {"$gte": from_date}
