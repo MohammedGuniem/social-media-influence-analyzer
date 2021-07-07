@@ -149,11 +149,16 @@ def index():
             valid_graphs.append(graph)
     valid_graphs = sorted(valid_graphs, key=lambda graph: (
         graph['network'], graph['date']))
+
+    print("-------------------------------------")
+    print(valid_graphs)
+    print("-------------------------------------")
+
     return render_template("index.html", graphs=valid_graphs)
 
 
-@app.route('/user_graph')
-@cache.cached(timeout=cache_timeout, query_string=True)
+@ app.route('/user_graph')
+@ cache.cached(timeout=cache_timeout, query_string=True)
 def user_graph():
     data_format = request.args.get('format', None)
     score_type = request.args.get('score_type', 'total')
@@ -281,8 +286,8 @@ def influence_area():
     return render_template("graph.html", data=js_graph, graph_type="user_graph")
 
 
-@app.route('/activity_graph')
-@cache.cached(timeout=cache_timeout, query_string=True)
+@ app.route('/activity_graph')
+@ cache.cached(timeout=cache_timeout, query_string=True)
 def activity_graph():
     graph = request.args.get('graph', None).split(",")
     network_name, submissions_type, date = graph[0], graph[1], graph[2]
@@ -307,7 +312,7 @@ def activity_graph():
     return render_template("graph.html", data=js_graph, graph_type="activity_graph")
 
 
-@app.route('/statistics')
+@ app.route('/statistics')
 def statistics():
     statistic_measure = request.args.get('statistic_measure', None)
     graph = request.args.get('graph', None).split(",")
@@ -330,8 +335,8 @@ def statistics():
         return "Statistics from this network and date is not available, make sure you are using the correct network, submission type, date and score"
 
 
-@app.route('/centrality_report')
-@cache.cached(timeout=cache_timeout, query_string=True)
+@ app.route('/centrality_report')
+@ cache.cached(timeout=cache_timeout, query_string=True)
 def centrality_report():
     graph = request.args.get('graph', None).split(",")
     data_format = request.args.get('format', None)
@@ -378,8 +383,8 @@ def centrality_report():
     return render_template("centrality_report.html", centrality=centrality)
 
 
-@app.route('/topic_detection_model')
-@cache.cached(timeout=cache_timeout, query_string=True)
+@ app.route('/topic_detection_model')
+@ cache.cached(timeout=cache_timeout, query_string=True)
 def topic_detection_model():
     graph = request.args.get('graph', None).split(",")
     data_format = request.args.get('format', None)
@@ -405,8 +410,8 @@ def topic_detection_model():
     return render_template("topic_detection_model.html", result=result)
 
 
-@app.route('/clear_cache')
-@auth.login_required
+@ app.route('/clear_cache')
+@ auth.login_required
 def clear_cache():
     cache.init_app(app, config=config)
     with app.app_context():
@@ -416,8 +421,8 @@ def clear_cache():
     return "Not able to clear cache."
 
 
-@app.route('/refresh_cache')
-@auth.login_required
+@ app.route('/refresh_cache')
+@ auth.login_required
 def refresh_cache():
     cache_handler = CacheHandler(
         domain_name=os.environ.get('DOMAIN_NAME'),

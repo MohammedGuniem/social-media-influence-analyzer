@@ -10,3 +10,5 @@ https://stackoverflow.com/questions/40416072/reading-file-using-relative-path-in
 https://thispointer.com/python-how-to-copy-a-dictionary-shallow-copy-vs-deep-copy/
 
 https://stackoverflow.com/questions/56741124/how-do-i-add-percentage-in-horizontal-bar-chart
+
+https://stackoverflow.com/questions/50291923/flask-jinja2-parse-json?rq=1

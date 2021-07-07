@@ -1,6 +1,11 @@
 <form id="request_form" action="/user_graph" target="_blank">
+  <script>
+    console.log("just testing --- 1 ....")
+    const graphs = JSON.parse('{{ graphs|tojson }}')
+    console.log(graphs)
+  </script>
   <h3>Full Graph View</h3>
-  <div class="form-group">
+  <!--div class="form-group">
       <label for="graph">Select a Graph:</label>
       <select name="graph" class="form-control" id="graph" required>
         {% for graph in graphs %}
@@ -12,7 +17,53 @@
           >{{ graph.network|replace("_", " ") }} - {{ graph.date }} - {{ graph.submissions_type }} Submissions</option>
         {% endfor %}
       </select>
+  </div-->
+
+  <div class="form-group">
+    <label for="network_name">Network Crawl Name:</label>
+    <select name="network_name" class="form-control" id="network_name" required>
+      {% for graph in graphs %}
+        <option value="{{ graph.network }}" 
+          {% if loop.last %}
+            selected
+          {% endif %}
+        >
+          {{ graph.network|replace("_", " ") }}
+        </option>
+      {% endfor %}
+    </select>
   </div>
+
+  <div class="form-group">
+    <label for=crawling_date">Crawling Date:</label>
+    <select name="crawling_date" class="form-control" id="crawling_date" required>
+      {% for graph in graphs %}
+        <option value="{{ graph.date }}" 
+          {% if loop.last %}
+            selected
+          {% endif %}
+        >
+          {{ graph.date }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="submissions_type">Network Crawl Name:</label>
+    <select name="submissions_type" class="form-control" id="submissions_type" required>
+      {% for graph in graphs %}
+        <option value="{{ graph.submissions_type }}" 
+          {% if loop.last %}
+            selected
+          {% endif %}
+        >
+          {{ graph.submissions_type|replace("_", " ") }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
   <div class="form-group">
       <label for="score_type">Score Type</label>
       <select name="score_type" class="form-control" id="score_type" required>

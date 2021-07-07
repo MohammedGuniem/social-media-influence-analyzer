@@ -52,13 +52,17 @@ XX.     DEPLOYMENT & RELESASE - USER WEB INTERFACE 									 - (DONE)
 ----------------------------------------------------------------------------------------------
 XXI.    BUILDING A DRIVER CODE TO SCHEDUALE A CRAWLING JOB                           - (DONE)
 ----------------------------------------------------------------------------------------------
-XXII.   SYSTEM SECURITY
+XXII.   LOGGING & ERROR HANDLING 													 - (DONE)
 ----------------------------------------------------------------------------------------------
-XXIII.  SYSTEM RELIABILITY & AVAILABILITY
+XXIII.  DATA PROTECTION
 ----------------------------------------------------------------------------------------------
-XXIV.   SUPPLEMENTARY TOOLS & FEATURES                                               - (DONE)
+XXIV.   CACHING
 ----------------------------------------------------------------------------------------------
-XXV.    FUTURE IMPROVMENTS OF THE TECHNICAL SOLUTION
+XXV.    BASIC HTTPS/SSL AUTHENTICATION
+----------------------------------------------------------------------------------------------
+XXVI.   SUPPLEMENTARY TOOLS & FEATURES                                               - (DONE)
+----------------------------------------------------------------------------------------------
+XXVII.  FUTURE IMPROVMENTS OF THE TECHNICAL SOLUTION
 ----------------------------------------------------------------------------------------------
 CONCLUSION 																			 - (DONE)
 ----------------------------------------------------------------------------------------------
