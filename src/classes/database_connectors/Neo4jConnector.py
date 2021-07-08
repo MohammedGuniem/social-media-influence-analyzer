@@ -4,10 +4,18 @@ import json
 
 class GraphDBConnector:
 
-    def __init__(self, host, port, user, password):
+    def __init__(self, host, port, user, password, access_mode="Full"):
+        self.access_mode = access_mode
         self.driver = GraphDatabase.driver(
             F"bolt://{host}:{port}", auth=(user, password))
         self.database = "neo4j"
+
+    def check_access(self, operation_to_perform):
+        if (operation_to_perform == "Read" and self.access_mode in ["Full", "ReadOnly"]) or (operation_to_perform == "Write" and self.access_mode in ["Full"]):
+            return True
+        else:
+            raise Exception(
+                F"Exception from Neo4j connector endpoint: {operation_to_perform} access denied, specified access mode {self.access_mode} is insufficient for this database writing operation")
 
     def __del__(self):
         if self.driver is not None:
@@ -31,6 +39,8 @@ class GraphDBConnector:
         return props_query
 
     def save_node(self, node_id, node_type, node_props, network_name, submissions_type, date):
+        self.check_access(operation_to_perform="Write")
+
         with self.driver.session(database=self.database) as session:
             # Preparing props for ON CREATE and On MATCH for update
             node_props = self.prepare_props(pointer="n", props=node_props)
@@ -38,6 +48,8 @@ class GraphDBConnector:
                 self._create_or_update_node, node_id, node_type, node_props, network_name, submissions_type, date)
 
     def save_edge(self, from_node, to_node, edge_type, edge_props, network_name, submissions_type, date):
+        self.check_access(operation_to_perform="Write")
+
         with self.driver.session(database=self.database) as session:
             # Preparing props for ON CREATE and On MATCH for update
             edge_props = self.prepare_props(
@@ -46,6 +58,8 @@ class GraphDBConnector:
                 self._create_or_update_edge, from_node, to_node, edge_type, edge_props, network_name, submissions_type, date)
 
     def calculate_centrality(self, network_name, date, submissions_type, centrality):
+        self.check_access(operation_to_perform="Write")
+
         with self.driver.session(database=self.database) as session:
             procedure_name = ""
             additional = ""
@@ -130,6 +144,8 @@ class GraphDBConnector:
     """ Reading methods """
 
     def get_centralitites_max(self, network_name, submissions_type, date):
+        self.check_access(operation_to_perform="Read")
+
         with self.driver.session(database=self.database) as session:
             """
             query = (
@@ -158,6 +174,8 @@ class GraphDBConnector:
             return centralities_max
 
     def get_graphs(self):
+        self.check_access(operation_to_perform="Read")
+
         with self.driver.session() as session:
             query = (
                 "MATCH(n) RETURN distinct (n.network) as network, (n.date) as date, (n.submissions_type) as submissions_type"
@@ -167,6 +185,8 @@ class GraphDBConnector:
             return result
 
     def get_graph(self, network_name, submissions_type, date, relation_type):
+        self.check_access(operation_to_perform="Read")
+
         with self.driver.session(database=self.database) as session:
             query = (
                 "MATCH (s { "
@@ -190,6 +210,8 @@ class GraphDBConnector:
             return graph, centralities_max
 
     def get_path(self, network_name, submissions_type, date, from_name, to_name):
+        self.check_access(operation_to_perform="Read")
+
         with self.driver.session(database=self.database) as session:
             query = (
                 "MATCH (n { "
@@ -215,6 +237,8 @@ class GraphDBConnector:
             return path_subgraph, centralities_max
 
     def filter_by_score(self, network_name, submissions_type, date, score_type, lower_score, upper_score):
+        self.check_access(operation_to_perform="Read")
+
         with self.driver.session(database=self.database) as session:
             lower, upper = "", ""
             if isinstance(lower_score, int):
@@ -244,6 +268,8 @@ class GraphDBConnector:
             return result, centralities_max
 
     def filter_by_influence_area(self, network_name, submissions_type, date, areas_array, operation):
+        self.check_access(operation_to_perform="Read")
+
         with self.driver.session(database=self.database) as session:
             if len(areas_array) > 0:
                 filters = []
@@ -335,6 +361,8 @@ class GraphDBConnector:
     """ Deleting methods """
 
     def delete_graph(self, network_name, submissions_type, from_date, to_date):
+        self.check_access(operation_to_perform="Write")
+
         with self.driver.session() as session:
             query = (
                 "MATCH (n {"

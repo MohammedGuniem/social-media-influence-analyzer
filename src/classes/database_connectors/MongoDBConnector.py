@@ -13,7 +13,7 @@ class MongoDBConnector:
         if (operation_to_perform == "Read" and self.access_mode in ["Full", "ReadOnly"]) or (operation_to_perform == "Write" and self.access_mode in ["Full"]):
             return True
         else:
-            raise BaseException.Exception(
+            raise Exception(
                 F"{operation_to_perform} access denied, specified access mode {self.access_mode} is insufficient for this database writing operation")
 
     """ Collection validator """

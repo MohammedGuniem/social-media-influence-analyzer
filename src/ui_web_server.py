@@ -71,7 +71,8 @@ while (not stop_trying):
             host=get_host('neo4j_users_db_host'),
             port=int(os.environ.get('neo4j_users_db_port')),
             user=os.environ.get('neo4j_users_db_user'),
-            password=os.environ.get('neo4j_users_db_pass')
+            password=os.environ.get('neo4j_users_db_pass'),
+            access_mode="ReadOnly"
         )
 
         # Neo4j activity database connector
@@ -79,7 +80,8 @@ while (not stop_trying):
             host=get_host('neo4j_activities_db_host'),
             port=int(os.environ.get('neo4j_activities_db_port')),
             user=os.environ.get('neo4j_activities_db_user'),
-            password=os.environ.get('neo4j_activities_db_pass')
+            password=os.environ.get('neo4j_activities_db_pass'),
+            access_mode="ReadOnly"
         )
 
         stop_trying = True
