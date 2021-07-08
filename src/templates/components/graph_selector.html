@@ -1,0 +1,51 @@
+<div class="col-sm-4">
+    <div class="form-group">
+        <label for="network_name">Network Crawl Name:</label>
+        <select name="network_name" class="form-control" id="network_name" required>
+          {% for network in networks|unique %}
+            <option value="{{ network }}" 
+              {% if loop.last %}
+                selected
+              {% endif %}
+            >
+              {{ network|replace("_", " ") }}
+            </option>
+          {% endfor %}
+        </select>
+    </div>
+</div>
+
+<div class="col-sm-4">
+    <div class="form-group">
+        <label for="submissions_type">Type of crawled submissions:</label>
+        <select name="submissions_type" class="form-control" id="submissions_type" required>
+            {% for submissions_type in submissions_types|unique %}
+                <option value="{{ submissions_type }}" 
+                {% if loop.last %}
+                    selected
+                {% endif %}
+                >
+                    {{ submissions_type }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+<div class="col-sm-4">
+    <div class="form-group">
+        <label for=crawling_date">Crawling Date:</label>
+        <select name="crawling_date" class="form-control" id="crawling_date" required>
+            {% for crawling_date in crawling_dates|unique %}
+                <option value="{{ crawling_date }}" 
+                {% if loop.last %}
+                    selected
+                {% endif %}
+                >
+                    {{ crawling_date }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>        
+</div>
+

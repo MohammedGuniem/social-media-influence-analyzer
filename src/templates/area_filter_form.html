@@ -1,57 +1,16 @@
 <form action="/influence_area" target="_blank">
   <h3>Filter by the desired predicted field of influence</h3>
-  <div class="form-group">
-    <label for="influence_areas_list">Field of Influence</label>
-    <p>(Hold down the Ctrl (windows) or Command (Mac) button to select multiple options)</p>
-    <select name="influence_areas" class="form-control" id="influence_areas_list" multiple required>
-        <option value="politic">Politic</option>
-        <option value="economy">Economy</option>
-        <option value="sport">Sport</option>
-        <option value="entertainment">Entertainment</option>
-        <option value="technology">Technology</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="operation">Operation</label>
-    <select name="operation" class="form-control" id="operation" required>
-      <option value="OR" selected>OR</option>  
-      <option value="AND">AND</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="graph">Select a Graph:</label>
-    <select name="graph" class="form-control" id="graph" required>
-      {% for graph in graphs %}
-          <option 
-          value="{{ graph.network }},{{ graph.submissions_type }},{{ graph.date }}"
-          {% if loop.last %}
-            selected
-          {% endif %}
-          >{{ graph.network|replace("_", " ") }} - {{ graph.date }} - {{ graph.submissions_type }} Submissions</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="score_type">Score Type</label>
-    <select name="score_type" class="form-control" id="score_type" required>
-        <option value="total" selected>Total</option>
-        <option value="activity">Activity</option>
-        <option value="interaction">Interaction</option>
-        <option value="upvotes">Upvotes</option>
-        <option value="activity_and_upvotes">Activity & Upvotes</option>
-        <option value="interaction_and_activity">Interaction & Activity</option>
-        <option value="interaction_and_upvotes">Interaction & Upvotes</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="centrality">Centrality Measure</label>
-      <select name="centrality" class="form-control" id="centrality" required>
-        <option value="degree_centrality" selected>Degree</option>
-        <option value="betweenness_centrality">Betweenness</option>
-        <option value="hits_centrality_hub">HITS hub</option>
-        <option value="hits_centrality_auth">HITS Auth</option>
-      </select>
-  </div>
+  
+  {% include 'components/influence_area_selector.html' %}
+
+  {% include 'components/operation_selector.html' %}
+  
+  {% include 'components/graph_selector.html' %}
+
+  {% include 'components/score_type_selector.html' %}
+
+  {% include 'components/centrality_selector.html' %}
+
   <div class="form-group">
     <button type="submit" class="form-control btn btn-success">Submit</button>
   </div>

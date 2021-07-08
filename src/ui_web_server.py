@@ -143,18 +143,13 @@ def constructJSGraph(neo4j_graph, graph_type, score_type, centrality_max, centra
 def index():
     user_graphs = neo4j_db_users_connector.get_graphs()
     activity_graphs = neo4j_db_activities_connector.get_graphs()
-    valid_graphs = []
+    networks, submissions_types, crawling_dates = [], [], []
     for graph in user_graphs:
-        if graph in activity_graphs:
-            valid_graphs.append(graph)
-    valid_graphs = sorted(valid_graphs, key=lambda graph: (
-        graph['network'], graph['date']))
-
-    print("-------------------------------------")
-    print(valid_graphs)
-    print("-------------------------------------")
-
-    return render_template("index.html", graphs=valid_graphs)
+        if graph in user_graphs and graph in activity_graphs:
+            networks.append(graph['network'])
+            submissions_types.append(graph['submissions_type'])
+            crawling_dates.append(graph['date'])
+    return render_template("index.html", networks=networks, submissions_types=submissions_types, crawling_dates=crawling_dates)
 
 
 @ app.route('/user_graph')
@@ -163,8 +158,10 @@ def user_graph():
     data_format = request.args.get('format', None)
     score_type = request.args.get('score_type', 'total')
     centrality = request.args.get('centrality', 'degree')
-    graph = request.args.get('graph', None).split(",")
-    network_name, submissions_type, date = graph[0], graph[1], graph[2]
+    network_name = request.args.get('network_name', None)
+    submissions_type = request.args.get('submissions_type', None)
+    date = request.args.get('crawling_date', None)
+
     neo4j_graph, centralities_max = neo4j_db_users_connector.get_graph(
         network_name=network_name, submissions_type=submissions_type, date=date, relation_type="Influences")
 
@@ -186,8 +183,9 @@ def user_graph():
 @ app.route('/path')
 def path():
     data_format = request.args.get('format')
-    graph = request.args.get('graph', None).split(",")
-    network_name, submissions_type, date = graph[0], graph[1], graph[2]
+    network_name = request.args.get('network_name', None)
+    submissions_type = request.args.get('submissions_type', None)
+    date = request.args.get('crawling_date', None)
     centrality = request.args.get('centrality', 'degree')
     score_type = request.args.get('score_type', 'total')
     source_name = request.args.get('source_name', '')
@@ -219,8 +217,9 @@ def path():
 @ app.route('/score', methods=['GET'])
 def score():
     data_format = request.args.get('format')
-    graph = request.args.get('graph', None).split(",")
-    network_name, submissions_type, date = graph[0], graph[1], graph[2]
+    network_name = request.args.get('network_name', None)
+    submissions_type = request.args.get('submissions_type', None)
+    date = request.args.get('crawling_date', None)
     min_score = int(request.args.get('min_score', 0))
     max_score = int(request.args.get('max_score', 0))
     score_type = request.args.get('score_type', 'total')
@@ -252,8 +251,9 @@ def score():
 
 @ app.route('/influence_area', methods=['GET'])
 def influence_area():
-    graph = request.args.get('graph', None).split(",")
-    network_name, submissions_type, date = graph[0], graph[1], graph[2]
+    network_name = request.args.get('network_name', None)
+    submissions_type = request.args.get('submissions_type', None)
+    date = request.args.get('crawling_date', None)
     score_type = request.args.get('score_type', 'total')
     influence_areas = request.args.to_dict(flat=False)
 
@@ -286,61 +286,13 @@ def influence_area():
     return render_template("graph.html", data=js_graph, graph_type="user_graph")
 
 
-@ app.route('/activity_graph')
-@ cache.cached(timeout=cache_timeout, query_string=True)
-def activity_graph():
-    graph = request.args.get('graph', None).split(",")
-    network_name, submissions_type, date = graph[0], graph[1], graph[2]
-    score_type = request.args.get('score_type', "total")
-    data_format = request.args.get('format', None)
-
-    neo4j_graph, centralities_max = neo4j_db_activities_connector.get_graph(
-        network_name=network_name, submissions_type=submissions_type, date=date, relation_type="Has")
-
-    if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
-        return "Activities Graph not found, make sure you use the correct network name and crawling date in the 'graph' url parameter"
-    elif data_format == 'json':
-        return jsonify(neo4j_graph)
-    else:
-        js_graph = constructJSGraph(
-            neo4j_graph=neo4j_graph,
-            graph_type="activity_graph",
-            score_type=score_type,
-            centrality_max=None,
-            centrality=None
-        )
-    return render_template("graph.html", data=js_graph, graph_type="activity_graph")
-
-
-@ app.route('/statistics')
-def statistics():
-    statistic_measure = request.args.get('statistic_measure', None)
-    graph = request.args.get('graph', None).split(",")
-    network_name, submissions_type, date = graph[0], graph[1], graph[2]
-    score_type = request.args.get('score_type', "total")
-
-    plt_img_path = F"statistics_plots/{statistic_measure}/{network_name}/{date}/{submissions_type}/"
-    if statistic_measure == "crawling":
-        plt_img_path += F"crawling_bar_plot.jpg"
-    elif statistic_measure == "influence_areas_and_subreddits":
-        plt_img_path += F"topics_and_subreddits_pie_plot.jpg"
-    elif statistic_measure == "influence_scores":
-        plt_img_path += F"scores_box_plot_{score_type}.jpg"
-    else:
-        return "Unknown type of statistics, parameters might be missing"
-
-    if os.path.isfile(plt_img_path):
-        return send_file(plt_img_path, mimetype="image/jpg")
-    else:
-        return "Statistics from this network and date is not available, make sure you are using the correct network, submission type, date and score"
-
-
 @ app.route('/centrality_report')
 @ cache.cached(timeout=cache_timeout, query_string=True)
 def centrality_report():
-    graph = request.args.get('graph', None).split(",")
     data_format = request.args.get('format', None)
-    network_name, submissions_type, date = graph[0], graph[1], graph[2]
+    network_name = request.args.get('network_name', None)
+    submissions_type = request.args.get('submissions_type', None)
+    date = request.args.get('crawling_date', None)
 
     neo4j_graph, centralities_max = neo4j_db_users_connector.get_graph(
         network_name=network_name, submissions_type=submissions_type, date=date, relation_type="Influences")
@@ -383,12 +335,64 @@ def centrality_report():
     return render_template("centrality_report.html", centrality=centrality)
 
 
+@ app.route('/activity_graph')
+@ cache.cached(timeout=cache_timeout, query_string=True)
+def activity_graph():
+    network_name = request.args.get('network_name', None)
+    submissions_type = request.args.get('submissions_type', None)
+    date = request.args.get('crawling_date', None)
+    score_type = request.args.get('score_type', "total")
+    data_format = request.args.get('format', None)
+
+    neo4j_graph, centralities_max = neo4j_db_activities_connector.get_graph(
+        network_name=network_name, submissions_type=submissions_type, date=date, relation_type="Has")
+
+    if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
+        return "Activities Graph not found, make sure you use the correct network name and crawling date in the 'graph' url parameter"
+    elif data_format == 'json':
+        return jsonify(neo4j_graph)
+    else:
+        js_graph = constructJSGraph(
+            neo4j_graph=neo4j_graph,
+            graph_type="activity_graph",
+            score_type=score_type,
+            centrality_max=None,
+            centrality=None
+        )
+    return render_template("graph.html", data=js_graph, graph_type="activity_graph")
+
+
+@ app.route('/statistics')
+def statistics():
+    statistic_measure = request.args.get('statistic_measure', None)
+    network_name = request.args.get('network_name', None)
+    submissions_type = request.args.get('submissions_type', None)
+    date = request.args.get('crawling_date', None)
+    score_type = request.args.get('score_type', "total")
+
+    plt_img_path = F"statistics_plots/{statistic_measure}/{network_name}/{date}/{submissions_type}/"
+    if statistic_measure == "crawling":
+        plt_img_path += F"crawling_bar_plot.jpg"
+    elif statistic_measure == "influence_areas_and_subreddits":
+        plt_img_path += F"topics_and_subreddits_pie_plot.jpg"
+    elif statistic_measure == "influence_scores":
+        plt_img_path += F"scores_box_plot_{score_type}.jpg"
+    else:
+        return "Unknown type of statistics, parameters might be missing"
+
+    if os.path.isfile(plt_img_path):
+        return send_file(plt_img_path, mimetype="image/jpg")
+    else:
+        return "Statistics from this network and date is not available, make sure you are using the correct network, submission type, date and score"
+
+
 @ app.route('/topic_detection_model')
 @ cache.cached(timeout=cache_timeout, query_string=True)
 def topic_detection_model():
-    graph = request.args.get('graph', None).split(",")
+    network_name = request.args.get('network_name', None)
+    submissions_type = request.args.get('submissions_type', None)
+    date = request.args.get('crawling_date', None)
     data_format = request.args.get('format', None)
-    network_name, submissions_type, date = graph[0], graph[1], graph[2]
 
     text_classifier = TextClassifier(
         mongo_db_connector, network_name, submissions_type, date)
