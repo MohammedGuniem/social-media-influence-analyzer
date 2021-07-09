@@ -90,3 +90,6 @@ https://www.geeksforgeeks.org/create-a-directory-in-python/
 
 # flask basic authentication
 https://flask-httpauth.readthedocs.io/en/latest/
+
+# flask error handling and logging
+https://flask.palletsprojects.com/en/1.1.x/patterns/errorpages/
