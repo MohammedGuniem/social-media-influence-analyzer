@@ -111,6 +111,12 @@ try:
                 data=comments
             )
 
+            # Remove old training set for topic classisification
+            mongo_db_connector.remove_collection(
+                database_name=F"{network_name}_{submissions_type}_Training_Data",
+                collection_name=collection_name
+            )
+
             # Writing training submission titles to determine influence area using machine learning
             mongo_db_connector.writeToDB(
                 database_name=F"{network_name}_{submissions_type}_Training_Data",

@@ -6,6 +6,10 @@ import os
 class CacheHandler:
 
     def __init__(self, domain_name, cache_directory_path, neo4j_db_users_connector, neo4j_db_activities_connector):
+        # create cache directory if not found
+        if not os.path.exists(cache_directory_path):
+            os.makedirs(cache_directory_path)
+
         self.domain_name = domain_name
         self.cache_directory_path = cache_directory_path
         self.neo4j_db_users_connector = neo4j_db_users_connector
@@ -58,7 +62,7 @@ class CacheHandler:
         for graph in user_influence_graphs:
             for score_type in self.score_types:
                 for centrality_measure in self.centrality_measures:
-                    url = F"{self.domain_name}/user_graph?graph={graph['network']},{graph['submissions_type']},{graph['date']}&score_type={score_type}&centrality={centrality_measure}"
+                    url = F"{self.domain_name}/user_graph?network_name={graph['network']}&submissions_type={graph['submissions_type']}&crawling_date={graph['date']}&score_type={score_type}&centrality={centrality_measure}"
                     response = requests.get(url, timeout=54000)
                     self.check_response(url, response)
 
@@ -68,9 +72,8 @@ class CacheHandler:
 
         activity_graphs = self.neo4j_db_activities_connector.get_graphs()
         for graph in activity_graphs:
-            url = F"/topic_detection_model?graph={graph['network']},{graph['submissions_type']},{graph['date']}"
             for score_type in self.score_types:
-                url = F"{self.domain_name}/activity_graph?graph={graph['network']},{graph['submissions_type']},{graph['date']}&score_type={score_type}"
+                url = F"{self.domain_name}/activity_graph?network_name={graph['network']}&submissions_type={graph['submissions_type']}&crawling_date={graph['date']}&score_type={score_type}"
                 response = requests.get(url, timeout=54000)
                 self.check_response(url, response)
 
@@ -81,7 +84,7 @@ class CacheHandler:
 
         user_influence_graphs = self.neo4j_db_users_connector.get_graphs()
         for graph in user_influence_graphs:
-            url = F"{self.domain_name}/centrality_report?graph={graph['network']},{graph['submissions_type']},{graph['date']}"
+            url = F"{self.domain_name}/centrality_report?network_name={graph['network']}&submissions_type={graph['submissions_type']}&crawling_date={graph['date']}"
             response = requests.get(url, timeout=54000)
             self.check_response(url, response)
 
@@ -91,7 +94,7 @@ class CacheHandler:
 
         user_influence_graphs = self.neo4j_db_users_connector.get_graphs()
         for graph in user_influence_graphs:
-            url = F"{self.domain_name}/topic_detection_model?graph={graph['network']},{graph['submissions_type']},{graph['date']}"
+            url = F"{self.domain_name}/topic_detection_model?network_name={graph['network']}&submissions_type={graph['submissions_type']}&crawling_date={graph['date']}"
             response = requests.get(url, timeout=54000)
             self.check_response(url, response)
 

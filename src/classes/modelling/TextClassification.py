@@ -20,14 +20,16 @@ class TextClassifier:
             single=True
         )
         self.random_state = 99
-        if not self.data:
-            return "data not found"
-        del self.data["_id"]
-        self.data = self.data["training_data"]
-        random.seed(self.random_state)
-        random.shuffle(self.data)
+        if self.data:
+            del self.data["_id"]
+            self.data = self.data["training_data"]
+            random.seed(self.random_state)
+            random.shuffle(self.data)
 
     def prepare_model(self):
+        if not self.data:
+            return "data not found"
+
         training_df = pd.DataFrame(self.data)
         features = (training_df["title"]).to_numpy()
         labels = (training_df["label"]).to_numpy()
