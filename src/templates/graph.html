@@ -7,10 +7,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script type="text/javascript" src="../static/scripts/vis-network.min.js"></script>
     <script src="../static/scripts/jquery.min.js"></script>
+    <link rel="stylesheet" href="../static/scripts/bootstrap.min.css">
+    <script src="../static/scripts/jquery.min.js"></script>
+    <script src="../static/scripts/bootstrap.min.js"></script>
     <style>
         #graphcanvas {
-            width: 98vw;
-            height: 80vh;
+            height: 70vh;
+            border: 1px solid black;
         }
         .node_select_label {
             color: red;
@@ -21,12 +24,30 @@
     </style>
 </head>
 <body>
-    <h4>Node Information:</h4>
-    <div id="nodeInfo"><p class="node_select_label">Select a node</p></div>
-    <h4>Edge Information:</h4>
-    <div id="edgeInfo"><p class="edge_select_label">Select an edge</p></div>
     <br />
-    <div id="graphcanvas"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-6 col-sm-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Node Information:</div>
+                    <div class="panel-body"><div id="nodeInfo"><p class="node_select_label">Select a node</p></div></div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Edge Information:</div>
+                    <div class="panel-body"><div id="edgeInfo"><p class="edge_select_label">Select an edge</p></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12 col-sm-12">
+                <div id="graphcanvas"></div>
+            </div>
+        </div>
+    </div>
+    
     <script>
         var graph = JSON.parse('{{ data|tojson|safe }}');
 
@@ -90,33 +111,26 @@
                 var node = this.body.nodes[node_id];
                 if ('{{ graph_type }}' == 'user_graph') {
                     document.getElementById("nodeInfo").innerHTML = 
-                        `<code class="node_select_label">Username:</code> <span>${node.options.label}</span>, `
-                        +`<code class="node_select_label">User ID:</code> <span>${node_id}</span>, `
+                        `<code class="node_select_label">Username:</code> <span>${node.options.label}</span>,<br /> `
+                        +`<code class="node_select_label">User ID:</code> <span>${node_id}</span>,<br /> `
                         +`<code class="node_select_label">centrality:</code> <span>${Number.isInteger(node.options.value) ? node.options.value: node.options.value.toPrecision(3)}</span>`
                 } else if ('{{ graph_type }}' == 'activity_graph') {
                     var label = node.options.label
                     var type = (node.options.label.split("\n")[0]).replace("_"," ")
                     var username = (node.options.label.split("\n")[1]).replace(`(${node_id})`,"")
                     document.getElementById("nodeInfo").innerHTML = 
-                        `<code class="node_select_label">Type:</code> <span>${type}</span>, `
-                        +`<code class="node_select_label">Username:</code> <span>${username}</span>, `
+                        `<code class="node_select_label">Type:</code> <span>${type}</span>,<br /> `
+                        +`<code class="node_select_label">Username:</code> <span>${username}</span>,<br /> `
                         +`<code class="node_select_label">User ID:</code> <span>${node_id}</span>`
                 }  
             } else if (edge_id) {
                 var edge = this.body.edges[edge_id];
-                if ('{{ graph_type }}' == 'user_graph') {
-                    document.getElementById("edgeInfo").innerHTML = 
-                        `<code class="edge_select_label">From:</code> <span>${edge.options.from}</span>, `
-                        +`<code class="edge_select_label">To:</code> <span>${edge.options.to}</span>, `
-                        +`<code class="edge_select_label">Score:</code> <span>${edge.options.value}</span>, `
-                        +`<code class="edge_select_label">Influence areas:</code> <span>${edge.options.label.split("\n")[1]}</span>`
-                } else if ('{{ graph_type }}' == 'activity_graph') {
-                    document.getElementById("edgeInfo").innerHTML = 
-                        `<code class="edge_select_label">From:</code> <span>${edge.options.from}</span>, `
-                        +`<code class="edge_select_label">To:</code> <span>${edge.options.to}</span>, `
-                        +`<code class="edge_select_label">Score:</code> <span>${edge.options.value}</span>, `
-                        +`<code class="edge_select_label">Influence areas:</code> <span>${edge.options.label.split("\n")[1]}</span>`
-                }
+                document.getElementById("edgeInfo").innerHTML = 
+                    `<code class="edge_select_label">From:</code> <span>${edge.options.from}</span>,<br /> `
+                    +`<code class="edge_select_label">To:</code> <span>${edge.options.to}</span>,<br /> `
+                    +`<code class="edge_select_label">Score:</code> <span>${edge.options.value}</span>,<br /> `
+                    +`<code class="edge_select_label">Influence areas:</code> <span>${edge.options.label.split("\n")[1]}</span>`
+              
             }
         });
     </script>

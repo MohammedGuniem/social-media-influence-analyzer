@@ -1,7 +1,7 @@
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from werkzeug.security import generate_password_hash, check_password_hash
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
-from flask import Flask, jsonify, render_template, request, send_file
+from flask import Flask, jsonify, abort, render_template, request, send_file
 from classes.modelling.TextClassification import TextClassifier
 from classes.caching.CacheHandler import CacheHandler
 from flask_httpauth import HTTPBasicAuth
@@ -9,6 +9,9 @@ from flask_caching import Cache
 from dotenv import load_dotenv
 import time
 import os
+
+from datetime import date
+from classes.logging.LoggHandler import LoggHandler
 
 load_dotenv()
 
@@ -140,304 +143,346 @@ def constructJSGraph(neo4j_graph, graph_type, score_type, centrality_max, centra
     return js_graph
 
 
+@app.errorhandler(404)
+def errorhandler(e):
+    today_date = date.today()
+    str_date = str(today_date)
+    logg_handler = LoggHandler(str_date)
+    logg_handler.logg_ui_error(e)
+    return F"This error has occured: <br /><br />{e}<br /><br />Contact your administrator to check the UI_Web_Server logging directory of this day {str_date}"
+
+
 @app.route('/')
 @cache.cached(timeout=cache_timeout)
 def index():
-    user_graphs = neo4j_db_users_connector.get_graphs()
-    activity_graphs = neo4j_db_activities_connector.get_graphs()
-    networks, submissions_types, crawling_dates = [], [], []
-    for graph in user_graphs:
-        if graph in user_graphs and graph in activity_graphs:
-            networks.append(graph['network'])
-            submissions_types.append(graph['submissions_type'])
-            crawling_dates.append(graph['date'])
-    return render_template("index.html", networks=networks, submissions_types=submissions_types, crawling_dates=crawling_dates)
+    try:
+        user_graphs = neo4j_db_users_connector.get_graphs()
+        activity_graphs = neo4j_db_activities_connector.get_graphs()
+        networks, submissions_types, crawling_dates = [], [], []
+        for graph in user_graphs:
+            if graph in user_graphs and graph in activity_graphs:
+                networks.append(graph['network'])
+                submissions_types.append(graph['submissions_type'])
+                crawling_dates.append(graph['date'])
+        return render_template("index.html", networks=sorted(networks, reverse=True), submissions_types=submissions_types, crawling_dates=sorted(crawling_dates))
+    except Exception as e:
+        abort(404, description=e)
 
 
 @ app.route('/user_graph')
 @ cache.cached(timeout=cache_timeout, query_string=True)
 def user_graph():
-    data_format = request.args.get('format', None)
-    score_type = request.args.get('score_type', 'total')
-    centrality = request.args.get('centrality', 'degree')
-    network_name = request.args.get('network_name', None)
-    submissions_type = request.args.get('submissions_type', None)
-    date = request.args.get('crawling_date', None)
+    try:
+        data_format = request.args.get('format', None)
+        score_type = request.args.get('score_type', 'total')
+        centrality = request.args.get('centrality', 'degree')
+        network_name = request.args.get('network_name', None)
+        submissions_type = request.args.get('submissions_type', None)
+        date = request.args.get('crawling_date', None)
 
-    neo4j_graph, centralities_max = neo4j_db_users_connector.get_graph(
-        network_name=network_name, submissions_type=submissions_type, date=date, relation_type="Influences")
+        neo4j_graph, centralities_max = neo4j_db_users_connector.get_graph(
+            network_name=network_name, submissions_type=submissions_type, date=date, relation_type="Influences")
 
-    if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
-        return F"Users Graph not found, make sure you use the correct network name and crawling date in the 'graph' url parameter"
-    elif data_format == 'json':
-        return jsonify(neo4j_graph)
-    else:
-        js_graph = constructJSGraph(
-            neo4j_graph=neo4j_graph,
-            graph_type="user_graph",
-            score_type=score_type,
-            centrality_max=centralities_max[centrality],
-            centrality=centrality
-        )
-    return render_template("graph.html", data=js_graph, graph_type="user_graph")
+        if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
+            return F"Users Graph not found, make sure you use the correct network name and crawling date in the 'graph' url parameter"
+        elif data_format == 'json':
+            return jsonify(neo4j_graph)
+        else:
+            js_graph = constructJSGraph(
+                neo4j_graph=neo4j_graph,
+                graph_type="user_graph",
+                score_type=score_type,
+                centrality_max=centralities_max[centrality],
+                centrality=centrality
+            )
+        return render_template("graph.html", data=js_graph, graph_type="user_graph")
+    except Exception as e:
+        abort(404, description=e)
 
 
 @ app.route('/path')
 def path():
-    data_format = request.args.get('format')
-    network_name = request.args.get('network_name', None)
-    submissions_type = request.args.get('submissions_type', None)
-    date = request.args.get('crawling_date', None)
-    centrality = request.args.get('centrality', 'degree')
-    score_type = request.args.get('score_type', 'total')
-    source_name = request.args.get('source_name', '')
-    target_name = request.args.get('target_name', '')
+    try:
+        data_format = request.args.get('format')
+        network_name = request.args.get('network_name', None)
+        submissions_type = request.args.get('submissions_type', None)
+        date = request.args.get('crawling_date', None)
+        centrality = request.args.get('centrality', 'degree')
+        score_type = request.args.get('score_type', 'total')
+        source_name = request.args.get('source_name', '')
+        target_name = request.args.get('target_name', '')
 
-    neo4j_graph, centralities_max = neo4j_db_users_connector.get_path(
-        network_name=network_name,
-        submissions_type=submissions_type,
-        date=date,
-        from_name=source_name,
-        to_name=target_name
-    )
-
-    if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
-        return F"No path is found between {source_name} and {target_name}"
-    elif data_format == 'json':
-        return jsonify(neo4j_graph)
-    else:
-        js_graph = constructJSGraph(
-            neo4j_graph=neo4j_graph,
-            graph_type="user_graph",
-            score_type=score_type,
-            centrality_max=centralities_max[centrality],
-            centrality=centrality
+        neo4j_graph, centralities_max = neo4j_db_users_connector.get_path(
+            network_name=network_name,
+            submissions_type=submissions_type,
+            date=date,
+            from_name=source_name,
+            to_name=target_name
         )
-    return render_template("graph.html", data=js_graph, graph_type="user_graph")
+
+        if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
+            return F"No path is found between {source_name} and {target_name}"
+        elif data_format == 'json':
+            return jsonify(neo4j_graph)
+        else:
+            js_graph = constructJSGraph(
+                neo4j_graph=neo4j_graph,
+                graph_type="user_graph",
+                score_type=score_type,
+                centrality_max=centralities_max[centrality],
+                centrality=centrality
+            )
+        return render_template("graph.html", data=js_graph, graph_type="user_graph")
+    except Exception as e:
+        abort(404, description=e)
 
 
 @ app.route('/score', methods=['GET'])
 def score():
-    data_format = request.args.get('format')
-    network_name = request.args.get('network_name', None)
-    submissions_type = request.args.get('submissions_type', None)
-    date = request.args.get('crawling_date', None)
-    min_score = int(request.args.get('min_score', 0))
-    max_score = int(request.args.get('max_score', 0))
-    score_type = request.args.get('score_type', 'total')
-    centrality = request.args.get('centrality', 'degree')
+    try:
+        data_format = request.args.get('format')
+        network_name = request.args.get('network_name', None)
+        submissions_type = request.args.get('submissions_type', None)
+        date = request.args.get('crawling_date', None)
+        min_score = int(request.args.get('min_score', 0))
+        max_score = int(request.args.get('max_score', 0))
+        score_type = request.args.get('score_type', 'total')
+        centrality = request.args.get('centrality', 'degree')
 
-    neo4j_graph, centralities_max = neo4j_db_users_connector.filter_by_score(
-        network_name=network_name,
-        submissions_type=submissions_type,
-        date=date,
-        score_type=score_type,
-        lower_score=min_score,
-        upper_score=max_score
-    )
-
-    if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
-        return F"No edges having the score between {min_score} and {max_score} was found"
-    elif data_format == 'json':
-        return jsonify(neo4j_graph)
-    else:
-        js_graph = constructJSGraph(
-            neo4j_graph=neo4j_graph,
-            graph_type="user_graph",
+        neo4j_graph, centralities_max = neo4j_db_users_connector.filter_by_score(
+            network_name=network_name,
+            submissions_type=submissions_type,
+            date=date,
             score_type=score_type,
-            centrality_max=centralities_max[centrality],
-            centrality=centrality
+            lower_score=min_score,
+            upper_score=max_score
         )
-    return render_template("graph.html", data=js_graph, graph_type="user_graph")
+
+        if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
+            return F"No edges having the score between {min_score} and {max_score} was found"
+        elif data_format == 'json':
+            return jsonify(neo4j_graph)
+        else:
+            js_graph = constructJSGraph(
+                neo4j_graph=neo4j_graph,
+                graph_type="user_graph",
+                score_type=score_type,
+                centrality_max=centralities_max[centrality],
+                centrality=centrality
+            )
+        return render_template("graph.html", data=js_graph, graph_type="user_graph")
+    except Exception as e:
+        abort(404, description=e)
 
 
 @ app.route('/influence_area', methods=['GET'])
 def influence_area():
-    network_name = request.args.get('network_name', None)
-    submissions_type = request.args.get('submissions_type', None)
-    date = request.args.get('crawling_date', None)
-    score_type = request.args.get('score_type', 'total')
-    influence_areas = request.args.to_dict(flat=False)
+    try:
+        network_name = request.args.get('network_name', None)
+        submissions_type = request.args.get('submissions_type', None)
+        date = request.args.get('crawling_date', None)
+        score_type = request.args.get('score_type', 'total')
+        influence_areas = request.args.to_dict(flat=False)
 
-    if 'influence_areas' in influence_areas:
-        influence_areas = influence_areas['influence_areas']
-    operation = request.args.get('operation', 'OR')
-    centrality = request.args.get('centrality', 'degree')
-    data_format = request.args.get('format')
+        if 'influence_areas' in influence_areas:
+            influence_areas = influence_areas['influence_areas']
+        operation = request.args.get('operation', 'OR')
+        centrality = request.args.get('centrality', 'degree')
+        data_format = request.args.get('format')
 
-    neo4j_graph, centralities_max = neo4j_db_users_connector.filter_by_influence_area(
-        network_name=network_name,
-        submissions_type=submissions_type,
-        date=date,
-        areas_array=influence_areas,
-        operation=operation
-    )
-
-    if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
-        return F"No edges having the influence area(s) {influence_areas} was found using {operation} operation"
-    elif data_format == 'json':
-        return jsonify(neo4j_graph)
-    else:
-        js_graph = constructJSGraph(
-            neo4j_graph=neo4j_graph,
-            graph_type="user_graph",
-            score_type=score_type,
-            centrality_max=centralities_max[centrality],
-            centrality=centrality
+        neo4j_graph, centralities_max = neo4j_db_users_connector.filter_by_influence_area(
+            network_name=network_name,
+            submissions_type=submissions_type,
+            date=date,
+            areas_array=influence_areas,
+            operation=operation
         )
-    return render_template("graph.html", data=js_graph, graph_type="user_graph")
+
+        if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
+            return F"No edges having the influence area(s) {influence_areas} was found using {operation} operation"
+        elif data_format == 'json':
+            return jsonify(neo4j_graph)
+        else:
+            js_graph = constructJSGraph(
+                neo4j_graph=neo4j_graph,
+                graph_type="user_graph",
+                score_type=score_type,
+                centrality_max=centralities_max[centrality],
+                centrality=centrality
+            )
+        return render_template("graph.html", data=js_graph, graph_type="user_graph")
+    except Exception as e:
+        abort(404, description=e)
 
 
 @ app.route('/centrality_report')
 @ cache.cached(timeout=cache_timeout, query_string=True)
 def centrality_report():
-    data_format = request.args.get('format', None)
-    network_name = request.args.get('network_name', None)
-    submissions_type = request.args.get('submissions_type', None)
-    date = request.args.get('crawling_date', None)
+    try:
+        data_format = request.args.get('format', None)
+        network_name = request.args.get('network_name', None)
+        submissions_type = request.args.get('submissions_type', None)
+        date = request.args.get('crawling_date', None)
 
-    neo4j_graph, centralities_max = neo4j_db_users_connector.get_graph(
-        network_name=network_name, submissions_type=submissions_type, date=date, relation_type="Influences")
+        neo4j_graph, centralities_max = neo4j_db_users_connector.get_graph(
+            network_name=network_name, submissions_type=submissions_type, date=date, relation_type="Influences")
 
-    if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
-        return "Activities Graph not found, make sure you use the correct network name and crawling date in the 'graph' url parameter"
+        if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
+            return "Activities Graph not found, make sure you use the correct network name and crawling date in the 'graph' url parameter"
 
-    user_centrality_report = {
-        "degree_centrality": {},
-        "betweenness_centrality": {},
-        "hits_centrality_auth":  {},
-        "hits_centrality_hub":  {}
-    }
+        user_centrality_report = {
+            "degree_centrality": {},
+            "betweenness_centrality": {},
+            "hits_centrality_auth":  {},
+            "hits_centrality_hub":  {}
+        }
 
-    measured_centralities = {
-        "degree_centrality": [],
-        "betweenness_centrality": [],
-        "hits_centrality_auth":  [],
-        "hits_centrality_hub":  []
-    }
+        measured_centralities = {
+            "degree_centrality": [],
+            "betweenness_centrality": [],
+            "hits_centrality_auth":  [],
+            "hits_centrality_hub":  []
+        }
 
-    for measure, _ in user_centrality_report.items():
-        for user_node in neo4j_graph["nodes"]:
-            user_centrality_report[measure][user_node["props"]
-                                            ["name"]] = user_node["props"][measure]
-        measured_centralities[measure] = sorted(list(
-            set(user_centrality_report[measure].values())), reverse=True)
+        for measure, _ in user_centrality_report.items():
+            for user_node in neo4j_graph["nodes"]:
+                user_centrality_report[measure][user_node["props"]
+                                                ["name"]] = user_node["props"][measure]
+            measured_centralities[measure] = sorted(list(
+                set(user_centrality_report[measure].values())), reverse=True)
 
-    for measure, _ in user_centrality_report.items():
-        user_centrality_report[measure] = sorted(
-            user_centrality_report[measure].items(), key=lambda n: n[1], reverse=True)
+        for measure, _ in user_centrality_report.items():
+            user_centrality_report[measure] = sorted(
+                user_centrality_report[measure].items(), key=lambda n: n[1], reverse=True)
 
-    centrality = {
-        "user_centrality_report": user_centrality_report,
-        "measured_centralities": measured_centralities
-    }
+        centrality = {
+            "user_centrality_report": user_centrality_report,
+            "measured_centralities": measured_centralities
+        }
 
-    if data_format == 'json':
-        return jsonify(centrality)
-    return render_template("centrality_report.html", centrality=centrality)
+        if data_format == 'json':
+            return jsonify(centrality)
+        return render_template("centrality_report.html", centrality=centrality)
+    except Exception as e:
+        abort(404, description=e)
 
 
 @ app.route('/activity_graph')
 @ cache.cached(timeout=cache_timeout, query_string=True)
 def activity_graph():
-    network_name = request.args.get('network_name', None)
-    submissions_type = request.args.get('submissions_type', None)
-    date = request.args.get('crawling_date', None)
-    score_type = request.args.get('score_type', "total")
-    data_format = request.args.get('format', None)
+    try:
+        network_name = request.args.get('network_name', None)
+        submissions_type = request.args.get('submissions_type', None)
+        date = request.args.get('crawling_date', None)
+        score_type = request.args.get('score_type', "total")
+        data_format = request.args.get('format', None)
 
-    neo4j_graph, centralities_max = neo4j_db_activities_connector.get_graph(
-        network_name=network_name, submissions_type=submissions_type, date=date, relation_type="Has")
+        neo4j_graph, centralities_max = neo4j_db_activities_connector.get_graph(
+            network_name=network_name, submissions_type=submissions_type, date=date, relation_type="Has")
 
-    if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
-        return "Activities Graph not found, make sure you use the correct network name and crawling date in the 'graph' url parameter"
-    elif data_format == 'json':
-        return jsonify(neo4j_graph)
-    else:
-        js_graph = constructJSGraph(
-            neo4j_graph=neo4j_graph,
-            graph_type="activity_graph",
-            score_type=score_type,
-            centrality_max=None,
-            centrality=None
-        )
-    return render_template("graph.html", data=js_graph, graph_type="activity_graph")
+        if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
+            return "Activities Graph not found, make sure you use the correct network name and crawling date in the 'graph' url parameter"
+        elif data_format == 'json':
+            return jsonify(neo4j_graph)
+        else:
+            js_graph = constructJSGraph(
+                neo4j_graph=neo4j_graph,
+                graph_type="activity_graph",
+                score_type=score_type,
+                centrality_max=None,
+                centrality=None
+            )
+        return render_template("graph.html", data=js_graph, graph_type="activity_graph")
+    except Exception as e:
+        abort(404, description=e)
 
 
 @ app.route('/statistics')
 def statistics():
-    statistic_measure = request.args.get('statistic_measure', None)
-    network_name = request.args.get('network_name', None)
-    submissions_type = request.args.get('submissions_type', None)
-    date = request.args.get('crawling_date', None)
-    score_type = request.args.get('score_type', "total")
+    try:
+        statistic_measure = request.args.get('statistic_measure', None)
+        network_name = request.args.get('network_name', None)
+        submissions_type = request.args.get('submissions_type', None)
+        date = request.args.get('crawling_date', None)
+        score_type = request.args.get('score_type', "total")
 
-    plt_img_path = F"statistics_plots/{statistic_measure}/{network_name}/{date}/{submissions_type}/"
-    if statistic_measure == "crawling":
-        plt_img_path += F"crawling_bar_plot.jpg"
-    elif statistic_measure == "influence_areas_and_subreddits":
-        plt_img_path += F"topics_and_subreddits_pie_plot.jpg"
-    elif statistic_measure == "influence_scores":
-        plt_img_path += F"scores_box_plot_{score_type}.jpg"
-    else:
-        return "Unknown type of statistics, parameters might be missing"
+        plt_img_path = F"statistics_plots/{statistic_measure}/{network_name}/{date}/{submissions_type}/"
+        if statistic_measure == "crawling":
+            plt_img_path += F"crawling_bar_plot.jpg"
+        elif statistic_measure == "influence_areas_and_subreddits":
+            plt_img_path += F"topics_and_subreddits_pie_plot.jpg"
+        elif statistic_measure == "influence_scores":
+            plt_img_path += F"scores_box_plot_{score_type}.jpg"
+        else:
+            return "Unknown type of statistics, parameters might be missing"
 
-    if os.path.isfile(plt_img_path):
-        return send_file(plt_img_path, mimetype="image/jpg")
-    else:
-        return "Statistics from this network and date is not available, make sure you are using the correct network, submission type, date and score"
+        if os.path.isfile(plt_img_path):
+            return send_file(plt_img_path, mimetype="image/jpg")
+        else:
+            return "Statistics from this network and date is not available, make sure you are using the correct network, submission type, date and score"
+    except Exception as e:
+        abort(404, description=e)
 
 
 @ app.route('/topic_detection_model')
 @ cache.cached(timeout=cache_timeout, query_string=True)
 def topic_detection_model():
-    network_name = request.args.get('network_name', None)
-    submissions_type = request.args.get('submissions_type', None)
-    date = request.args.get('crawling_date', None)
-    data_format = request.args.get('format', None)
+    try:
+        network_name = request.args.get('network_name', None)
+        submissions_type = request.args.get('submissions_type', None)
+        date = request.args.get('crawling_date', None)
+        data_format = request.args.get('format', None)
 
-    text_classifier = TextClassifier(
-        mongo_db_connector, network_name, submissions_type, date)
-    model_status = text_classifier.prepare_model()
-    if model_status == "data not found":
-        return F"data not found, the specified '{request.args.get('graph', None)}' graph is not found"
-    evaluation_result = text_classifier.evaluate_model()
-    classification_report, confusion_matrix, labels = text_classifier.get_report()
-    tunning_results = text_classifier.tune_model()
-    result = {
-        "labels": labels,
-        "evaluation": evaluation_result,
-        "classification_report": classification_report,
-        "confusion_matrix": confusion_matrix.tolist(),
-        "tunning": tunning_results
-    }
-    if data_format == 'json':
-        return jsonify(result)
-    return render_template("topic_detection_model.html", result=result)
+        text_classifier = TextClassifier(
+            mongo_db_connector, network_name, submissions_type, date)
+        model_status = text_classifier.prepare_model()
+        if model_status == "data not found":
+            return F"data not found, the specified '{request.args.get('graph', None)}' graph is not found"
+        evaluation_result = text_classifier.evaluate_model()
+        classification_report, confusion_matrix, labels = text_classifier.get_report()
+        tunning_results = text_classifier.tune_model()
+        result = {
+            "labels": labels,
+            "evaluation": evaluation_result,
+            "classification_report": classification_report,
+            "confusion_matrix": confusion_matrix.tolist(),
+            "tunning": tunning_results
+        }
+        if data_format == 'json':
+            return jsonify(result)
+        return render_template("topic_detection_model.html", result=result)
+    except Exception as e:
+        abort(404, description=e)
 
 
 @ app.route('/clear_cache')
 @ auth.login_required
 def clear_cache():
-    cache.init_app(app, config=config)
-    with app.app_context():
-        result = cache.clear()
-    if result:
-        return "Cache successfully cleared."
-    return "Not able to clear cache."
+    try:
+        cache.init_app(app, config=config)
+        with app.app_context():
+            result = cache.clear()
+        if result:
+            return "Cache successfully cleared."
+        return "Not able to clear cache."
+    except Exception as e:
+        abort(404, description=e)
 
 
 @ app.route('/refresh_cache')
 @ auth.login_required
 def refresh_cache():
-    cache_handler = CacheHandler(
-        domain_name=os.environ.get('DOMAIN_NAME'),
-        cache_directory_path=os.environ.get('CACHE_DIR_PATH'),
-        neo4j_db_users_connector=neo4j_db_users_connector,
-        neo4j_db_activities_connector=neo4j_db_activities_connector
-    )
-    cache_handler.refresh_system_cache(output_msg=False)
-    return "Cache successfully refreshed."
+    try:
+        cache_handler = CacheHandler(
+            domain_name=os.environ.get('DOMAIN_NAME'),
+            cache_directory_path=os.environ.get('CACHE_DIR_PATH'),
+            neo4j_db_users_connector=neo4j_db_users_connector,
+            neo4j_db_activities_connector=neo4j_db_activities_connector
+        )
+        cache_handler.refresh_system_cache(output_msg=False)
+        return "Cache successfully refreshed."
+    except Exception as e:
+        abort(404, description=e)
 
 
 if __name__ == '__main__':

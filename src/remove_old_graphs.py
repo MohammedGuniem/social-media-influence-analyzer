@@ -1,15 +1,16 @@
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
 from classes.caching.CacheHandler import CacheHandler
+from classes.logging.LoggHandler import LoggHandler
 from datetime import date, timedelta
 from dotenv import load_dotenv
-from time import time, ctime
 import datetime
-import logging
 import shutil
 import os
 
 try:
+    today_date = date.today()
+    str_date = str(today_date)
 
     exec_plan = {
         "deletion_1": {
@@ -164,7 +165,7 @@ try:
                 print()
 
     IS_CACHE_ON = os.environ.get('CACHE_ON')
-    if IS_CACHE_ON:
+    if IS_CACHE_ON == "True":
         print("\nRefreshing system cache records...")
         cache_handler = CacheHandler(
             domain_name=os.environ.get('DOMAIN_NAME'),
@@ -178,15 +179,5 @@ try:
         print("\nCaching not enabled")
 
 except Exception as e:
-    today_date = date.today()
-    log_path = F"Logs/{str(today_date)}/{network_name}/{submissions_type}/"
-
-    # create logs file if not found
-    if not os.path.exists(log_path):
-        os.makedirs(log_path)
-
-    # create error logger
-    logging.basicConfig(filename=F'{log_path}/errors.log', level=logging.INFO)
-
-    # log error
-    logging.error(F'\nError: {ctime(time())}\n{str(e)}\n', exc_info=True)
+    logg_handler = LoggHandler(str_date)
+    logg_handler.logg_driver_error(e, network_name, submissions_type)

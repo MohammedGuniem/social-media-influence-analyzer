@@ -5,13 +5,15 @@ from classes.crawling.RedditCrawlClass import RedditCrawler
 from classes.modelling.UserGraphModelling import UserGraph
 from classes.caching.CacheHandler import CacheHandler
 from classes.statistics.Statistics import Statistics
+from classes.logging.LoggHandler import LoggHandler
 from dotenv import load_dotenv
-from time import time, ctime
 from datetime import date
-import logging
 import os
 
 try:
+    today_date = date.today()
+    str_date = str(today_date)
+
     exec_plan = {
         "run_1": {
             "network_name": "Reddit_Selected_Subreddits",
@@ -42,13 +44,11 @@ try:
 
         stages = config["stages"]
 
-        date = str(today_date)
-
-        collection_name = date
+        collection_name = str_date
 
         load_dotenv()
 
-        print(F"Date: {date}, Run ID: {run_id}\n")
+        print(F"Date: {str_date}, Run ID: {run_id}\n")
 
         # Mongo db database connector
         mongo_db_connector = MongoDBConnector(
@@ -160,7 +160,7 @@ try:
                 neo4j_db_connector=neo4j_db_users_connector,
                 network_name=network_name,
                 submissions_type=submissions_type,
-                date=date
+                date=str_date
             )
 
             user_model.build()
@@ -187,7 +187,7 @@ try:
                 neo4j_db_connector=neo4j_db_activities_connector,
                 network_name=network_name,
                 submissions_type=submissions_type,
-                date=date
+                date=str_date
             )
 
             activity_model.build()
@@ -206,7 +206,7 @@ try:
                 neo4j_db_users_connector,
                 network_name,
                 submissions_type,
-                date
+                str_date
             )
 
             stat.getCrawlingRuntimes()
@@ -225,7 +225,7 @@ try:
             print("Jumped over stage 4 as it is not in the stage configuration array.")
 
     IS_CACHE_ON = os.environ.get('CACHE_ON')
-    if IS_CACHE_ON:
+    if IS_CACHE_ON == "True":
         print("\nRefreshing system cache records...")
         cache_handler = CacheHandler(
             domain_name=os.environ.get('DOMAIN_NAME'),
@@ -239,14 +239,5 @@ try:
         print("\nCaching not enabled")
 
 except Exception as e:
-    log_path = F"Logs/{date}/{network_name}/{submissions_type}/"
-
-    # create logs file if not found
-    if not os.path.exists(log_path):
-        os.makedirs(log_path)
-
-    # create error logger
-    logging.basicConfig(filename=F'{log_path}/errors.log', level=logging.INFO)
-
-    # log error
-    logging.error(F'\nError: {ctime(time())}\n{str(e)}\n', exc_info=True)
+    logg_handler = LoggHandler(str_date)
+    logg_handler.logg_driver_error(e, network_name, submissions_type)
