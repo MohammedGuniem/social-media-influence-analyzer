@@ -1,0 +1,4 @@
+Questions to lecturerer
+
+- Should i include the used technical technologies in the keywords of the report?
+examples mongo DB, neo4j etc,  Javascript, flask, jinija, bottstrap, vis.js, python ...

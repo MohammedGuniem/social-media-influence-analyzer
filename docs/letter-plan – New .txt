@@ -1,0 +1,53 @@
+----------------------------------------------------------------------------------------------
+Abstract 																			- (Done)
+----------------------------------------------------------------------------------------------
+Keywords 																			- (Done)
+----------------------------------------------------------------------------------------------
+Motivation																			- (Done)
+----------------------------------------------------------------------------------------------
+I.		INTRODUCTION 																- (Done)
+----------------------------------------------------------------------------------------------
+II.		RELATED WORKS																- (Done)
+		A.	MEASURING INFLUENCE BETWEEN USERS OF ONLINE SOCIAL MEDIA				- (Done)
+		B.	DATA-DRIVEN INFLUENCE LEARNING                                          - (Done)
+		C.	ALTERNATIVES OF INFORMATION GATHERING									- (Done)
+		D.	TOPIC DETECTION IN SOCIAL MEDIA PLATFORMS								- (Done)
+		E.	STUDY CASE ALTERNATIVES OF ONLINE SOCIAL MEDIA							- (Done)
+----------------------------------------------------------------------------------------------
+III.	REDDIT AS A CASE STUDY SOCIAL MEDIA                                         - (Done)
+----------------------------------------------------------------------------------------------
+IV.		GROUND DATA STRUCTURE														- (Done)
+----------------------------------------------------------------------------------------------
+V.		INFLUENCE GRAPH MODELLING
+		A.	THE ACTIVITY THREAD
+		B.	SCORING INFLUENCE
+		C.	THE INFLUENCE GRAPH
+		D.	TESTING OF INFLUENCE SCORING TECHNIQUES
+		E.	EVALUATION OF INFLUENCE SCORING TECHNIQUES
+		F.	INFLUENCE FIELD CLASSIFICATION
+		G.	TESTING  OF INFLUENCE FIELD CLASSIFICATION
+		H.	EVALUATION OF INFLUENCE FIELD CLASSIFICATION 
+		I.	INTRODUCING CENTRALITY MEASURES
+		J.	CENTRALITY MEASURES VS. INFLUENCE EDGE SCORE
+		K.	FUTURE IMPROVMENTS OF THE INFLUENCE GRAPH MODEL
+----------------------------------------------------------------------------------------------
+VI.		THE TECHNICAL IMPLEMENTATION
+		A.	SOLUTION ARCHITECTURE
+		B. 	CRAWLING & INFORMATION GATHERING
+		C.	INFLUNECE GRAPH MODELLING
+		D. 	MONITORING & STATISTICAL OVERVIEW
+		E.	DEPLOYMENT & RELESASE TO THE WEB INTERFACE 
+		F.	BUILDING A DRIVER CODE
+		G.	LOGGING & ERROR HANDLING
+		H.	DATA PROTECTION
+		I.	CACHING
+		J.	BASIC HTTPS/SSL AUTHENTICATION
+		K.	SUPPLEMENTARY TOOLS & FEATURES
+		L.	FUTURE IMPROVMENTS OF THE TECHNICAL SOLUTION
+----------------------------------------------------------------------------------------------
+CONCLUSION 																			
+----------------------------------------------------------------------------------------------
+ACKNOWLEDGMENT                                                                      
+----------------------------------------------------------------------------------------------
+REFERENCES
+----------------------------------------------------------------------------------------------
