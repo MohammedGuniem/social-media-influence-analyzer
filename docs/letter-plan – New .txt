@@ -32,18 +32,18 @@ V.		INFLUENCE GRAPH MODELLING
 		K.	FUTURE IMPROVMENTS OF THE INFLUENCE GRAPH MODEL							- (Done)
 ----------------------------------------------------------------------------------------------
 VI.		THE TECHNICAL IMPLEMENTATION
-		A.	SOLUTION ARCHITECTURE
-		B. 	CRAWLING & INFORMATION GATHERING
-		C.	INFLUNECE GRAPH MODELLING
+		A.	DESIGN ARCHITECTURE                                                      - (Done)
+		B. 	CRAWLING & DATA GATHERING                                                - (Done)
+		C.	IMPLEMENTATION of GRAPH MODELLING 										 - (Done)
 		D. 	MONITORING & STATISTICAL OVERVIEW
-		E.	DEPLOYMENT & RELESASE TO THE WEB INTERFACE 
-		F.	BUILDING A DRIVER CODE
+		E.	DEPLOYMENT & RELESASE TO THE USER WEB INTERFACE 
+		F.	BUILDING A DRIVER SCRIPT
 		G.	LOGGING & ERROR HANDLING
 		H.	DATA PROTECTION
 		I.	CACHING
-		J.	BASIC HTTPS/SSL AUTHENTICATION
+		J.	BASIC AUTHENTICATION OVER HTTPS/SSL 
 		K.	SUPPLEMENTARY TOOLS & FEATURES
-		L.	FUTURE IMPROVMENTS OF THE TECHNICAL SOLUTION
+		L.	FUTURE IMPROVMENTS OF THE TECHNICAL IMPLEMENTATION
 ----------------------------------------------------------------------------------------------
 CONCLUSION 																			
 ----------------------------------------------------------------------------------------------
