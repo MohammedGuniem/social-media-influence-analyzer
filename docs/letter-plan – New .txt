@@ -35,12 +35,12 @@ VI.		THE TECHNICAL IMPLEMENTATION
 		A.	DESIGN ARCHITECTURE                                                      - (Done)
 		B. 	CRAWLING & DATA GATHERING                                                - (Done)
 		C.	IMPLEMENTATION of GRAPH MODELLING 										 - (Done)
-		D. 	MONITORING & STATISTICAL OVERVIEW
-		E.	DEPLOYMENT & RELESASE TO THE USER WEB INTERFACE 
-		F.	BUILDING A DRIVER SCRIPT
-		G.	LOGGING & ERROR HANDLING
-		H.	DATA PROTECTION
-		I.	CACHING
+		D. 	MONITORING & STATISTICAL OVERVIEW 										 - (Done)
+		E.	DEPLOYMENT & RELESASE TO THE WEB INTERFACE 								 - (Done)
+		F.	BUILDING A DRIVER SCRIPT 												 - (Done)
+		G.	LOGGING & ERROR HANDLING 												 - (Done)
+		H.	DATA PROTECTION 														 - (Done)
+		I.	CACHING 																 - (Done)
 		J.	BASIC AUTHENTICATION OVER HTTPS/SSL 
 		K.	SUPPLEMENTARY TOOLS & FEATURES
 		L.	FUTURE IMPROVMENTS OF THE TECHNICAL IMPLEMENTATION
@@ -50,4 +50,10 @@ CONCLUSION
 ACKNOWLEDGMENT                                                                      
 ----------------------------------------------------------------------------------------------
 REFERENCES
+
+--- Add refrences to documentation of 
+flask, logging, flask-caching, HTTPBasicAuth, matplotlib, pandas, 
+vis.js, bootstrap, neo4j, mongo db, praw, json, sklearn, jquery, jinja
+docker, flask-httpauth, python-dotenv
+
 ----------------------------------------------------------------------------------------------
