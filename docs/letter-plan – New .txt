@@ -45,9 +45,9 @@ VI.		THE TECHNICAL IMPLEMENTATION
 		K.	SUPPLEMENTARY TOOLS & FEATURES											 - (Done)									 
 		L.	FUTURE IMPROVMENTS OF THE TECHNICAL IMPLEMENTATION 						 - (Done)
 ----------------------------------------------------------------------------------------------
-CONCLUSION 																			
+CONCLUSION 																			 - (Done)																
 ----------------------------------------------------------------------------------------------
-ACKNOWLEDGMENT                                                                      
+ACKNOWLEDGMENT      																 - (Done)                                                                
 ----------------------------------------------------------------------------------------------
 REFERENCES
 
