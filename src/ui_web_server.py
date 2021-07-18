@@ -1,21 +1,20 @@
 from classes.database_connectors.MongoDBConnector import MongoDBConnector
-from werkzeug.security import generate_password_hash, check_password_hash
 from classes.database_connectors.Neo4jConnector import GraphDBConnector
 from flask import Flask, jsonify, abort, render_template, request, send_file
 from classes.modelling.TextClassification import TextClassifier
 from classes.caching.CacheHandler import CacheHandler
-from flask_httpauth import HTTPBasicAuth
+from classes.logging.LoggHandler import LoggHandler
+from flask_httpauth import HTTPDigestAuth
 from flask_caching import Cache
 from dotenv import load_dotenv
+from datetime import date
 import time
 import os
-
-from datetime import date
-from classes.logging.LoggHandler import LoggHandler
 
 load_dotenv()
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
 # Setting up caching
 if os.environ.get('CACHE_ON') == "True":
@@ -32,20 +31,21 @@ config = {
 app.config.from_mapping(config)
 cache = Cache(app)
 
-# Setting up HTTP Basic Auth
-auth = HTTPBasicAuth()
+# Setting up HTTP Digest Auth
+auth = HTTPDigestAuth()
 usernames = os.environ.get('ADMIN_USERNAMES').split(",")
 passwords = os.environ.get('ADMIN_PASSWORDS').split(",")
+users = {}
 if len(usernames) == len(passwords):
-    users = {}
     for user in usernames:
-        users[user] = generate_password_hash(passwords[usernames.index(user)])
+        users[user] = passwords[usernames.index(user)]
 
 
-@auth.verify_password
-def verify_password(username, password):
-    if username in users and check_password_hash(users.get(username), password):
-        return username
+@auth.get_password
+def get_pw(username):
+    if username in users:
+        return users.get(username)
+    return None
 
 
 def get_host(target):

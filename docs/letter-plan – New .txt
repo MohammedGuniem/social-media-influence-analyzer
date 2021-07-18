@@ -41,7 +41,7 @@ VI.		THE TECHNICAL IMPLEMENTATION
 		G.	LOGGING & ERROR HANDLING 												 - (Done)
 		H.	DATA PROTECTION 														 - (Done)
 		I.	CACHING 																 - (Done)
-		J.	BASIC AUTHENTICATION OVER HTTPS/SSL 
+		J.	SECURING UI ROUTES WITH DIGEST AUTHENTICATION 							 - (Done)
 		K.	SUPPLEMENTARY TOOLS & FEATURES
 		L.	FUTURE IMPROVMENTS OF THE TECHNICAL IMPLEMENTATION
 ----------------------------------------------------------------------------------------------
@@ -56,4 +56,13 @@ flask, logging, flask-caching, HTTPBasicAuth, matplotlib, pandas,
 vis.js, bootstrap, neo4j, mongo db, praw, json, sklearn, jquery, jinja
 docker, flask-httpauth, python-dotenv
 
+--- Add stackoverflow credits
+
+--- Add reddit master thesis to chossing study case section
+
+--- Put first page for master thesis
+
+--- adjust layout before sending to supervisor
+
+--- send to "Håkon" to control references.
 ----------------------------------------------------------------------------------------------

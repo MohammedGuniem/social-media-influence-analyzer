@@ -33,6 +33,7 @@ To set up the project on your preffered enviornment, please follow the steps bel
 | CACHE_TIMEOUT               | 86400         | 0 (creates a cache that does not expire)                                                                                   |
 |                             |               | number of seconds to cache expire after creation (example: default is set to 1 day or 86400 seconds)                       |
 | CACHE_DIR_PATH              |               | Where to store cache records on file sytem                                                                                 |
+| SECRET_KEY                  | -             | a randomly generated string to serve as a secret encryption key in this application, used in HTTP digest authentication    |
 | ADMIN_USERNAMES             | -             | usernames of Site/Project Administrators used for HTTPS Basic authentication                                               |
 | ADMIN_PASSWORDS             | -             | passwords of Site/Project Administrators used for HTTPS Basic authentication                                               |
 |                             |               | Add usernames divided by "," and corresponsing password in the same position divided by ","                                |
