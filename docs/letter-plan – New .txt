@@ -42,8 +42,8 @@ VI.		THE TECHNICAL IMPLEMENTATION
 		H.	DATA PROTECTION 														 - (Done)
 		I.	CACHING 																 - (Done)
 		J.	SECURING UI ROUTES WITH DIGEST AUTHENTICATION 							 - (Done)
-		K.	SUPPLEMENTARY TOOLS & FEATURES
-		L.	FUTURE IMPROVMENTS OF THE TECHNICAL IMPLEMENTATION
+		K.	SUPPLEMENTARY TOOLS & FEATURES											 - (Done)									 
+		L.	FUTURE IMPROVMENTS OF THE TECHNICAL IMPLEMENTATION 						 - (Done)
 ----------------------------------------------------------------------------------------------
 CONCLUSION 																			
 ----------------------------------------------------------------------------------------------
