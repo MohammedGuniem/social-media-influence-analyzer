@@ -87,9 +87,11 @@ https://github.com/thadeusb/flask-cache/issues/104
 # working with files and folders in python
 https://mkyong.com/python/python-how-to-delete-a-file-or-folder/
 https://www.geeksforgeeks.org/create-a-directory-in-python/
+https://www.techiedelight.com/delete-all-files-directory-python/
 
 # flask basic authentication
 https://flask-httpauth.readthedocs.io/en/latest/
 
 # flask error handling and logging
 https://flask.palletsprojects.com/en/1.1.x/patterns/errorpages/
+

@@ -38,8 +38,11 @@ class CacheHandler:
             print("\n--> Clearing all cache records...")
 
         if os.path.exists(self.cache_directory_path):
-            shutil.rmtree(self.cache_directory_path)
-            os.mkdir(self.cache_directory_path)
+            # shutil.rmtree(self.cache_directory_path)
+            # os.mkdir(self.cache_directory_path)
+            for cache_record in os.listdir(self.cache_directory_path):
+                os.remove(os.path.join(
+                    self.cache_directory_path, cache_record))
             if output_msg:
                 print("--> All cache records cleared successfully")
         else:

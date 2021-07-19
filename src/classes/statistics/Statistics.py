@@ -140,8 +140,8 @@ class Statistics:
                            "activity_and_upvotes", "interaction_and_upvotes"]
         elif score_type:
             score_types = [score_type]
-            #fig, axes = plt.subplots(2, 1)
-            #fig.suptitle(F"Influence Scores Distribution using {score_type}")
+            # fig, axes = plt.subplots(2, 1)
+            # fig.suptitle(F"Influence Scores Distribution using {score_type}")
         else:
             score_types = ["interaction", "activity", "upvotes", "interaction_and_activity",
                            "activity_and_upvotes", "interaction_and_upvotes", "total"]
@@ -208,13 +208,11 @@ class Statistics:
         fig, axes = plt.subplots(
             2, len(centrality_types), figsize=(24, 10))
         fig.tight_layout(pad=4.0)
-        fig.suptitle("Influence Scores Distribution")
+        fig.suptitle("Centrality Distributions")
 
         axes = axes.ravel()
 
         centrality_df = pd.DataFrame(user_centrality_report)
-
-        print(centrality_df.head(7))
 
         for centrality_type in user_centrality_report.keys():
             centrality_df[F"{centrality_type}"].plot(
