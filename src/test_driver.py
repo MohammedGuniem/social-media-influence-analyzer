@@ -195,6 +195,9 @@ try:
             stat.getInfluenceScore(score_type="dobble_scores")
 
             stat.getInfluenceScore(score_type=None)
+
+            stat.getNodeCentrality()
+
         else:
             print("Jumped over stage 4 as it is not in the stage configuration array.")
 

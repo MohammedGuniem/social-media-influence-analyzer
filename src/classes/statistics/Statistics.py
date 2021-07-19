@@ -115,7 +115,7 @@ class Statistics:
         fig.suptitle(
             'Crawled Subreddits vs. Predicted Influence Area vs. Modelled Subreddits')
 
-        path = F"{os.getcwd()}/statistics_plots/influence_areas_and_subreddits/{self.network_name}/{self.date}/{self.submissions_type}/"
+        path = F"{os.getcwd()}/statistics_plots/influence_areas_and_groups/{self.network_name}/{self.date}/{self.submissions_type}/"
         self.create_directory_if_not_found(
             path=path)
         plot_img_name = F"topics_and_subreddits_pie_plot.jpg"
@@ -182,7 +182,65 @@ class Statistics:
         path = F"{os.getcwd()}/statistics_plots/influence_scores/{self.network_name}/{self.date}/{self.submissions_type}/"
         self.create_directory_if_not_found(
             path=path)
-        plot_img_name = F"scores_box_plot_{request_score_type}.jpg"
+        plot_img_name = F"scores_box_and_hist_plot_{request_score_type}.jpg"
+        fig.set_size_inches(15, 10)
+        plt.savefig(
+            F"{path}{plot_img_name}", format="jpg", dpi=500)
+        plt.close('all')
+
+    def getNodeCentrality(self):
+        neo4j_graph, centralities_max = self.neo4j_db_connector.get_graph(
+            network_name=self.network_name, submissions_type=self.submissions_type, date=self.date, relation_type="Influences")
+
+        user_centrality_report = {
+            "degree_centrality": [],
+            "betweenness_centrality": [],
+            "hits_centrality_auth": [],
+            "hits_centrality_hub": []
+        }
+
+        for measure, _ in user_centrality_report.items():
+            for user_node in neo4j_graph["nodes"]:
+                user_centrality_report[measure].append(
+                    user_node["props"][measure])
+
+        centrality_types = list(user_centrality_report.keys())
+        fig, axes = plt.subplots(
+            2, len(centrality_types), figsize=(24, 10))
+        fig.tight_layout(pad=4.0)
+        fig.suptitle("Influence Scores Distribution")
+
+        axes = axes.ravel()
+
+        centrality_df = pd.DataFrame(user_centrality_report)
+
+        print(centrality_df.head(7))
+
+        for centrality_type in user_centrality_report.keys():
+            centrality_df[F"{centrality_type}"].plot(
+                kind="box",
+                ax=axes[centrality_types.index(centrality_type)],
+                title=F"{centrality_type.replace('_', ' ')}",
+                vert=False
+            )
+            y_axis = axes[centrality_types.index(
+                centrality_type)].axes.get_yaxis()
+            y_axis.set_visible(False)
+
+            centrality_df[F"{centrality_type}"].plot(
+                kind="hist",
+                bins=centrality_df[F"{centrality_type}"].nunique(),
+                ax=axes[centrality_types.index(
+                    centrality_type)+len(centrality_types)],
+                title=F"{centrality_type.replace('_', ' ')}",
+                xticks=centrality_df[F"{centrality_type}"],
+                rot=90
+            )
+
+        path = F"{os.getcwd()}/statistics_plots/centrality/{self.network_name}/{self.date}/{self.submissions_type}/"
+        self.create_directory_if_not_found(
+            path=path)
+        plot_img_name = F"centralitys_box_and_hist_plot.jpg"
         fig.set_size_inches(15, 10)
         plt.savefig(
             F"{path}{plot_img_name}", format="jpg", dpi=500)

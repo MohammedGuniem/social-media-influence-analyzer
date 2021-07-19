@@ -169,9 +169,9 @@ def index():
         abort(404, description=e)
 
 
-@ app.route('/user_graph')
+@ app.route('/influence_graph')
 @ cache.cached(timeout=cache_timeout, query_string=True)
-def user_graph():
+def influence_graph():
     try:
         data_format = request.args.get('format', None)
         score_type = request.args.get('score_type', 'total')
@@ -184,7 +184,12 @@ def user_graph():
             network_name=network_name, submissions_type=submissions_type, date=date, relation_type="Influences")
 
         if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
-            return F"Users Graph not found, make sure you use the correct network name and crawling date in the 'graph' url parameter"
+            return render_template(
+                "not_found.html",
+                message={
+                    "header": "Influence Graph not found",
+                    "body": "Make sure you use the correct combination of network- and group- name, along with the crawling date in the graph identifying URL parameter"
+                })
         elif data_format == 'json':
             return jsonify(neo4j_graph)
         else:
@@ -221,7 +226,12 @@ def path():
         )
 
         if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
-            return F"No path is found between {source_name} and {target_name}"
+            return render_template(
+                "not_found.html",
+                message={
+                    "header": "No path is found",
+                    "body": F"No path is found between {source_name} and {target_name} in the specified influence graph"
+                })
         elif data_format == 'json':
             return jsonify(neo4j_graph)
         else:
@@ -259,7 +269,12 @@ def score():
         )
 
         if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
-            return F"No edges having the score between {min_score} and {max_score} was found"
+            return render_template(
+                "not_found.html",
+                message={
+                    "header": "Score range does not contain any edges",
+                    "body": F"No edges having the score between {min_score} and {max_score} was found in the specified influence graph"
+                })
         elif data_format == 'json':
             return jsonify(neo4j_graph)
         else:
@@ -299,7 +314,12 @@ def influence_area():
         )
 
         if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
-            return F"No edges having the influence area(s) {influence_areas} was found using {operation} operation"
+            return render_template(
+                "not_found.html",
+                message={
+                    "header": "Specified influence field(s) not found",
+                    "body": F"No edges having the influence area(s) {influence_areas} was found using {operation} operation"
+                })
         elif data_format == 'json':
             return jsonify(neo4j_graph)
         else:
@@ -328,7 +348,12 @@ def centrality_report():
             network_name=network_name, submissions_type=submissions_type, date=date, relation_type="Influences")
 
         if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
-            return "Activities Graph not found, make sure you use the correct network name and crawling date in the 'graph' url parameter"
+            return render_template(
+                "not_found.html",
+                message={
+                    "header": "Influence Graph not found",
+                    "body": "Make sure you use the correct combination of network- and group- name, along with the crawling date in the graph identifying URL parameter"
+                })
 
         user_centrality_report = {
             "degree_centrality": {},
@@ -362,7 +387,8 @@ def centrality_report():
 
         if data_format == 'json':
             return jsonify(centrality)
-        return render_template("centrality_report.html", centrality=centrality)
+        else:
+            return render_template("centrality_report.html", centrality=centrality)
     except Exception as e:
         abort(404, description=e)
 
@@ -381,7 +407,12 @@ def activity_graph():
             network_name=network_name, submissions_type=submissions_type, date=date, relation_type="Has")
 
         if len(neo4j_graph['nodes']) == 0 and len(neo4j_graph['links']) == 0:
-            return "Activities Graph not found, make sure you use the correct network name and crawling date in the 'graph' url parameter"
+            return render_template(
+                "not_found.html",
+                message={
+                    "header": "Activity Graph not found",
+                    "body": "Make sure you use the correct combination of network- and group- name, along with the crawling date in the graph identifying URL parameter"
+                })
         elif data_format == 'json':
             return jsonify(neo4j_graph)
         else:
@@ -404,22 +435,29 @@ def statistics():
         network_name = request.args.get('network_name', None)
         submissions_type = request.args.get('submissions_type', None)
         date = request.args.get('crawling_date', None)
-        score_type = request.args.get('score_type', "total")
+        score_type = request.args.get('statistic_score_type', "total")
 
         plt_img_path = F"statistics_plots/{statistic_measure}/{network_name}/{date}/{submissions_type}/"
         if statistic_measure == "crawling":
             plt_img_path += F"crawling_bar_plot.jpg"
-        elif statistic_measure == "influence_areas_and_subreddits":
+        elif statistic_measure == "influence_areas_and_groups":
             plt_img_path += F"topics_and_subreddits_pie_plot.jpg"
         elif statistic_measure == "influence_scores":
-            plt_img_path += F"scores_box_plot_{score_type}.jpg"
+            plt_img_path += F"scores_box_and_hist_plot_{score_type}.jpg"
+        elif statistic_measure == "centrality":
+            plt_img_path += F"centralitys_box_and_hist_plot.jpg"
         else:
             return "Unknown type of statistics, parameters might be missing"
 
         if os.path.isfile(plt_img_path):
             return send_file(plt_img_path, mimetype="image/jpg")
         else:
-            return "Statistics from this network and date is not available, make sure you are using the correct network, submission type, date and score"
+            return render_template(
+                "not_found.html",
+                message={
+                    "header": "Statistics not found",
+                    "body": "Make sure you use the correct combination of network- and group- name, along with the crawling date and plot type in the graph identifying URL parameter"
+                })
     except Exception as e:
         abort(404, description=e)
 
@@ -437,7 +475,12 @@ def topic_detection_model():
             mongo_db_connector, network_name, submissions_type, date)
         model_status = text_classifier.prepare_model()
         if model_status == "data not found":
-            return F"data not found, the specified '{request.args.get('graph', None)}' graph is not found"
+            return render_template(
+                "not_found.html",
+                message={
+                    "header": "Text Classification Report not found",
+                    "body": F"The specified URL paramteres might not refer to any influence graph"
+                })
         evaluation_result = text_classifier.evaluate_model()
         classification_report, confusion_matrix, labels = text_classifier.get_report()
         tunning_results = text_classifier.tune_model()

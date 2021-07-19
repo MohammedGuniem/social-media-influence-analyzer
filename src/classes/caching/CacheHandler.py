@@ -62,7 +62,7 @@ class CacheHandler:
         for graph in user_influence_graphs:
             for score_type in self.score_types:
                 for centrality_measure in self.centrality_measures:
-                    url = F"{self.domain_name}/user_graph?network_name={graph['network']}&submissions_type={graph['submissions_type']}&crawling_date={graph['date']}&score_type={score_type}&centrality={centrality_measure}"
+                    url = F"{self.domain_name}/influence_graph?network_name={graph['network']}&submissions_type={graph['submissions_type']}&crawling_date={graph['date']}&score_type={score_type}&centrality={centrality_measure}"
                     response = requests.get(url, timeout=54000)
                     self.check_response(url, response)
 

@@ -1,10 +1,30 @@
 <div class="col-sm-12">
-    <div class="form-group">
-        <label for="statistic_measure">Select a statistics measure:</label>
-        <select name="statistic_measure" class="form-control" id="statistic_measure" required>
-            <option value="crawling">Crawling Statistics</option>
-            <option value="influence_areas_and_subreddits">Influence Areas vs. Subreddits Statistics</option>
-            <option value="influence_scores">Influence score Statistics</option>
-        </select>
-    </div>
+  <div class="form-group">
+    <label for="statistic_measure">Select a statistics measure:</label>
+    <select
+      name="statistic_measure"
+      class="form-control"
+      id="statistic_measure"
+      required
+    >
+      <option value="crawling">Crawling Statistics</option>
+      <option value="influence_areas_and_groups">
+        Influence Areas vs. Subreddits Statistics
+      </option>
+      <option value="influence_scores">Influence score Statistics</option>
+      <option value="centrality">Centrality Measures Statistics</option>
+    </select>
+  </div>
 </div>
+<script>
+  $( "#statistic_measure" ).ready( function() {
+    $("#statistic_score_type").hide();
+    $("#statistic_measure").change(function() {
+      if ($("#statistic_measure").val() == "influence_scores") {
+        $("#statistic_score_type").show(1000);
+      } else {
+        $("#statistic_score_type").hide(1000);
+      }
+    });
+  });
+</script>
