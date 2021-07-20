@@ -11,9 +11,9 @@
 *.pyc
 
 ## logs
-src/Logs/*
-src/cache/*
+src/logs/**
+src/cache/**
 
 ## plots
-src/statistics_plots/*
+src/statistics_plots/**
 

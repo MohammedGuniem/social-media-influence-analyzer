@@ -9,11 +9,11 @@ class LoggHandler:
         self.date = date
 
     def logg_driver_error(self, error, network_name, submissions_type):
-        log_path = F"Logs/{self.date}/{network_name}/{submissions_type}/"
+        log_path = F"logs/{self.date}/{network_name}/{submissions_type}/"
         self.logg_error(error, log_path)
 
     def logg_ui_error(self, error):
-        log_path = F"Logs/{self.date}/UI_Web_Server/"
+        log_path = F"logs/{self.date}/UI_Web_Server/"
         self.logg_error(error, log_path)
 
     def logg_error(self, error, log_path):
