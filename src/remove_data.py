@@ -115,7 +115,8 @@ try:
                                 crawling_plot_folder = F"statistics_plots/crawling/{network_name}/{collection_name}/{submissions_type}"
                                 influence_areas_plot_folder = F"statistics_plots/influence_areas_and_groups/{network_name}/{collection_name}/{submissions_type}"
                                 influence_score_plot_folder = F"statistics_plots/influence_scores/{network_name}/{collection_name}/{submissions_type}"
-                                for plot_folder in [crawling_plot_folder, influence_areas_plot_folder, influence_score_plot_folder]:
+                                centrality_plot_folder = F"statistics_plots/centrality/{network_name}/{collection_name}/{submissions_type}"
+                                for plot_folder in [crawling_plot_folder, influence_areas_plot_folder, influence_score_plot_folder, centrality_plot_folder]:
                                     try:
                                         shutil.rmtree(plot_folder)
                                         print(
