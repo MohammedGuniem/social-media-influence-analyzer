@@ -11,6 +11,7 @@ To set up the project on your preffered enviornment, please follow the steps bel
 
 - If cloning: Download and install the Git tool using this link https://git-scm.com/downloads.
 - If downloading directly: unzip the project files in your desired location on the filesystem you are using.
+- Add 3 folders at the root src called logs, statistics_plots, and cache, then make sure your web server (for example IIS) has access to read, write and modify on these folders.
 
 #### I-B: Add necessary environment variables
 

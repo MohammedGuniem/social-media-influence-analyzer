@@ -7,13 +7,15 @@
 
 ## data folders
 
-## cache
+## web interface cache
+src/cache/*
+
+## python cache files
 *.pyc
 
 ## logs
-src/logs/**
-src/cache/**
+src/Logs/*
 
 ## plots
-src/statistics_plots/**
+src/statistics_plots/*
 
