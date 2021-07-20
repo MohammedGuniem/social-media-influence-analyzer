@@ -23,12 +23,12 @@ V.		INFLUENCE GRAPH MODELLING
 		B.	SCORING INFLUENCE														- (Done)
 		C.	THE INFLUENCE GRAPH														- (Done)
 		D.	TESTING AND EVALUATION OF THE INFLUENCE SCORING TECHNIQUES              - (Done)
-		E.	TESING AND EVALUATION OF THE ACTIVITY & INFLUENCE GRAPH MODELS          - (Done)   
-		F.	INFLUENCE FIELD CLASSIFICATION			- (Done - add reference book for tf-idf)
-		G.	TESTING  OF INFLUENCE FIELD CLASSIFICATION 		  						- (Done)
-		H.	EVALUATION OF INFLUENCE FIELD CLASSIFICATION 							- (Done)
-		I.	INTRODUCING CENTRALITY MEASURES 										- (Done)
-		J.	CENTRALITY MEASURES VS. INFLUENCE EDGE SCORE 							- (Done)
+		E.	INFLUENCE FIELD CLASSIFICATION								            - (Done)   
+		F.	TESTING  OF INFLUENCE FIELD CLASSIFICATION                   			- (Done)
+		G.	EVALUATION OF INFLUENCE FIELD CLASSIFICATION 		 					- (Done)
+		H.	INTRODUCING CENTRALITY MEASURES											- (Done)
+		I.	CENTRALITY MEASURES VS. INFLUENCE EDGE SCORE 							- (Done)
+		J.	TESING AND EVALUATION OF THE ACTIVITY & INFLUENCE GRAPH MODELS			- (Done)
 		K.	FUTURE IMPROVMENTS OF THE INFLUENCE GRAPH MODEL							- (Done)
 ----------------------------------------------------------------------------------------------
 VI.		THE TECHNICAL IMPLEMENTATION
@@ -51,18 +51,21 @@ ACKNOWLEDGMENT      																 - (Done)
 ----------------------------------------------------------------------------------------------
 REFERENCES
 
---- Add refrences to documentation of 
-flask, logging, flask-caching, HTTPBasicAuth, matplotlib, pandas, 
-vis.js, bootstrap, neo4j, mongo db, praw, json, sklearn, jquery, jinja
-docker, flask-httpauth, python-dotenv, w3school, git
+- Add technology keywords - (DONE)
+- Add Reddit thesis reference to case study - (Done)
+- Move Testing & Evaluation of The Activity & Influence Graph Models. to the end of main section - (Done)
+- Add/edit tf-idf reference  - (Done)
 
---- Add stackoverflow credits
+- Add centrality box and hist plots
+- Add technology technical documentation 
+- Add online help reference 
+- Add or remove time of crawling from report. Mail sent to assistant 
+- Finally, go over Word doc and align sections.
 
---- Add reddit master thesis to chossing study case section
+- make sure to the demo technical solution is up an running - x
 
---- Put first page for master thesis
+- add standard front page - (remember to add signature and page number at the end)
+- Add and update table of content - (remember to update at the end)
 
---- adjust layout before sending to supervisor
-
---- send to "Håkon" to control references.
+- send to "Håkon" to control references.
 ----------------------------------------------------------------------------------------------
