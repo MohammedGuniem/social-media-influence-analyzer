@@ -1,0 +1,86 @@
+>> Technical Documentation << 
+
+# Stackoverflow_hjelpe_lenker.txt
+https://stackoverflow.com/questions/62220625/insert-many-documents-into-empty-collection-update-if-document-with-same-key-al
+
+https://stackoverflow.com/questions/43162506/undefinedmetricwarning-f-score-is-ill-defined-and-being-set-to-0-0-in-labels-wi
+
+https://scikit-learn.org/stable/tutorial/text_analytics/working_with_text_data.html
+
+https://stackoverflow.com/questions/40416072/reading-file-using-relative-path-in-python-project/40416154
+
+https://thispointer.com/python-how-to-copy-a-dictionary-shallow-copy-vs-deep-copy/
+
+https://stackoverflow.com/questions/56741124/how-do-i-add-percentage-in-horizontal-bar-chart
+
+https://stackoverflow.com/questions/50291923/flask-jinja2-parse-json?rq=1
+
+https://stackoverflow.com/questions/47648747/remove-duplicate-list-in-jinja
+
+
+# praw
+https://praw.readthedocs.io/en/latest/getting_started/installation.html
+
+# neo4j
+https://neo4j.com/docs/graph-data-science/current/installation/
+https://neo4j.com/docs/graph-data-science/current/algorithms/hits/
+https://neo4j.com/developer/cypher/updating/
+https://neo4j.com/developer/docker-run-neo4j/
+
+# neo4j for python
+https://neo4j.com/developer/python/
+
+# mongo db
+https://docs.mongodb.com/manual/tutorial/enable-authentication/
+
+# mongo db for python
+https://pymongo.readthedocs.io/en/stable/
+
+# python
+https://docs.python.org/3/
+
+# FLASK
+https://flask.palletsprojects.com/en/2.0.x/
+
+# Jinja
+https://jinja.palletsprojects.com/en/3.0.x/
+
+# JavaScript w3 school
+https://www.w3schools.com/js/DEFAULT.asp
+
+# css w3 school
+https://www.w3schools.com/css/
+
+# html w3 school
+https://www.w3schools.com/html/
+
+# jquery
+https://api.jquery.com/
+
+# vis.js
+https://visjs.github.io/vis-network/docs/network/
+https://visjs.github.io/vis-network/examples/
+
+# Docker
+https://docs.docker.com/get-started/
+https://docs.docker.com/compose/gettingstarted/
+https://docs.docker.com/compose/compose-file/compose-file-v3/
+
+# bootstrap
+https://www.w3schools.com/bootstrap/
+https://getbootstrap.com/docs/4.1/getting-started/introduction/
+
+# flask caching
+https://flask-caching.readthedocs.io/en/latest/
+
+# flask digest authentication
+https://flask-httpauth.readthedocs.io/en/latest/
+
+# flask error handling and logging
+https://flask.palletsprojects.com/en/1.1.x/patterns/errorpages/
+
+# iis
+https://www.iis.net/overview
+
+# Task scheduler
+https://docs.microsoft.com/en-us/windows/win32/taskschd/task-scheduler-start-page

@@ -2,3 +2,14 @@ Questions to lecturerer
 
 - Should i include the used technical technologies in the keywords of the report?
 examples mongo DB, neo4j etc,  Javascript, flask, jinija, bottstrap, vis.js, python ...
+
+- must i specify the date and time for the data of the evaluation and test plots?
+
+- Can i divide the reference list into?
+references
+reference work on the internet
+technology documentation
+
+or should i merge all of them under references?
+
+does the name of edited on stackoverflow has to also be in the reference?
