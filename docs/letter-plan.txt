@@ -59,11 +59,11 @@ REFERENCES
 - Add online help reference  - (Done)
 - Add technology technical documentation  - (Done)
 
-- Add or remove time of crawling from report. Mail sent to assistant 
+- Add or remove time of crawling from report.  - (Venter på svar fra veileder eller skrivehjelp)
 
-- Add centrality box and hist plots
+- Add centrality box and hist plots - (Venter på svar fra veileder eller skrivehjelp)
 
-- Finally, go over Word doc and align sections.
+- Finally, go over Word doc and align sections. - (Done)
 
 - Update table of content at the end
 
