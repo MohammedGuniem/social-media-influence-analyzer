@@ -56,19 +56,18 @@ REFERENCES
 - Move Testing & Evaluation of The Activity & Influence Graph Models. to the end of main section - (Done)
 - Add/edit tf-idf reference  - (Done)
 - make sure to the demo technical solution is up an running - (Done)
+- Add online help reference  - (Done)
+- Add technology technical documentation  - (Done)
 
 - Add or remove time of crawling from report. Mail sent to assistant 
 
 - Add centrality box and hist plots
 
-- Add technology technical documentation 
-- Add online help reference 
-
 - Finally, go over Word doc and align sections.
 
+- Update table of content at the end
 
-- add standard front page - (Done, but remember to add signature and page number at the end)
-- Add and update table of content - (Done, but remember to update at the end)
+- add signature and page number in the first page at the end
 
-- send to "Håkon" to control references.
+- send to "Håkon"/skrive verksted to control references.
 ----------------------------------------------------------------------------------------------
