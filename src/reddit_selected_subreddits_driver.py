@@ -227,19 +227,23 @@ try:
         else:
             print("Jumped over stage 4 as it is not in the stage configuration array.")
 
-    IS_CACHE_ON = os.environ.get('CACHE_ON')
-    if IS_CACHE_ON == "True":
-        print("\nRefreshing system cache records...")
-        cache_handler = CacheHandler(
-            domain_name=os.environ.get('DOMAIN_NAME'),
-            cache_directory_path=os.environ.get('CACHE_DIR_PATH'),
-            neo4j_db_users_connector=neo4j_db_users_connector,
-            neo4j_db_activities_connector=neo4j_db_activities_connector
-        )
-        cache_handler.refresh_system_cache(output_msg=False)
-        print("Cache successfully refreshed.")
-    else:
-        print("\nCaching not enabled")
+        IS_CACHE_ON = os.environ.get('CACHE_ON')
+        if IS_CACHE_ON == "True":
+            print("\nRefreshing system cache records...")
+            cache_handler = CacheHandler(
+                domain_name=os.environ.get('DOMAIN_NAME'),
+                cache_directory_path=os.environ.get('CACHE_DIR_PATH'),
+                neo4j_db_users_connector=neo4j_db_users_connector,
+                neo4j_db_activities_connector=neo4j_db_activities_connector,
+                network_name=network_name,
+                submissions_type=submissions_type,
+                crawling_date=str_date,
+                output_msg=False  # set to True to get better debugging and information messages
+            )
+            cache_handler.refresh_system_cache()
+            print("Cache successfully refreshed.")
+        else:
+            print("\nCaching not enabled")
 
 except Exception as e:
     logg_handler = LoggHandler(str_date)

@@ -153,7 +153,7 @@ def errorhandler(e):
 
 
 @app.route('/')
-@cache.cached(timeout=cache_timeout)
+@cache.cached(timeout=cache_timeout, query_string=True)
 def index():
     try:
         user_graphs = neo4j_db_users_connector.get_graphs()
@@ -516,13 +516,22 @@ def clear_cache():
 @ auth.login_required
 def refresh_cache():
     try:
+        network_name = request.args.get('network_name', None)
+        submissions_type = request.args.get('submissions_type', None)
+        date = request.args.get('crawling_date', None)
+
         cache_handler = CacheHandler(
             domain_name=os.environ.get('DOMAIN_NAME'),
             cache_directory_path=os.environ.get('CACHE_DIR_PATH'),
             neo4j_db_users_connector=neo4j_db_users_connector,
-            neo4j_db_activities_connector=neo4j_db_activities_connector
+            neo4j_db_activities_connector=neo4j_db_activities_connector,
+            network_name=network_name,
+            submissions_type=submissions_type,
+            crawling_date=date,
+            output_msg=False
         )
-        cache_handler.refresh_system_cache(output_msg=False)
+        cache_handler.refresh_system_cache()
+
         return "Cache successfully refreshed."
     except Exception as e:
         abort(404, description=e)

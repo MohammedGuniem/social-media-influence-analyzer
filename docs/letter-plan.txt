@@ -59,6 +59,9 @@ REFERENCES
 - Add online help reference  - (Done)
 - Add technology technical documentation  - (Done)
 
+
+- Edit cache after changing to crawling patch specidfic caching
+
 - Add or remove time of crawling from report.  - (Venter på svar fra veileder eller skrivehjelp)
 
 - Add centrality box and hist plots - (Venter på svar fra veileder eller skrivehjelp)
