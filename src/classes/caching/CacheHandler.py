@@ -5,15 +5,13 @@ import os
 
 class CacheHandler:
 
-    def __init__(self, domain_name, cache_directory_path, neo4j_db_users_connector, neo4j_db_activities_connector, network_name, submissions_type, crawling_date, output_msg=False):
+    def __init__(self, domain_name, cache_directory_path, network_name, submissions_type, crawling_date, output_msg=False):
         # create cache directory if not found
         if not os.path.exists(cache_directory_path):
             os.makedirs(cache_directory_path)
 
         self.domain_name = domain_name
         self.cache_directory_path = cache_directory_path
-        self.neo4j_db_users_connector = neo4j_db_users_connector
-        self.neo4j_db_activities_connector = neo4j_db_activities_connector
         self.network_name = network_name
         self.submissions_type = submissions_type
         self.crawling_date = crawling_date

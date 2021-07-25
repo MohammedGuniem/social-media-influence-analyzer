@@ -233,8 +233,6 @@ try:
             cache_handler = CacheHandler(
                 domain_name=os.environ.get('DOMAIN_NAME'),
                 cache_directory_path=os.environ.get('CACHE_DIR_PATH'),
-                neo4j_db_users_connector=neo4j_db_users_connector,
-                neo4j_db_activities_connector=neo4j_db_activities_connector,
                 network_name=network_name,
                 submissions_type=submissions_type,
                 crawling_date=str_date,
