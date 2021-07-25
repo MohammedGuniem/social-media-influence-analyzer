@@ -19,3 +19,5 @@ src/Logs/*
 ## plots
 src/statistics_plots/*
 
+## editors
+.vscode/
