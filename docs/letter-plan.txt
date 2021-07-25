@@ -58,19 +58,14 @@ REFERENCES
 - make sure to the demo technical solution is up an running - (Done)
 - Add online help reference  - (Done)
 - Add technology technical documentation  - (Done)
+- Edit cache after changing to crawling patch specidfic caching - (Done)
 
 
-- Edit cache after changing to crawling patch specidfic caching
 
 - Add or remove time of crawling from report.  - (Venter på svar fra veileder eller skrivehjelp)
-
 - Add centrality box and hist plots - (Venter på svar fra veileder eller skrivehjelp)
-
-- Finally, go over Word doc and align sections. - (Done)
-
-- Update table of content at the end
-
-- add signature and page number in the first page at the end
-
-- send to "Håkon"/skrive verksted to control references.
+- Finally, go over Word doc and align sections. - ()
+- Update table of content at the end - ()
+- add signature and page number in the first page at the end - ()
+- send to "Håkon"/skrive verksted to control references. - ()
 ----------------------------------------------------------------------------------------------

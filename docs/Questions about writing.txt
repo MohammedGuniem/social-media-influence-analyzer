@@ -15,4 +15,5 @@ or should i merge all of them under references?
 
 - should i add centrality box and hist plots to report?
 
-- Should i attach the source code with the pdf of the thesis or it is enough on github?
+- Should i attach the source code with the pdf of the thesis or it is enough on github? 
+not possible to attach using acrobat reader
