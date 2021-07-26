@@ -266,5 +266,5 @@ Follow the steps below to set up a production envirnoment using Windows IIS:
 
 - Click on apply to the right put the redirect rule into effect.
 - Now, you can go to localhost:5000 to view the user interface
-- To crawl the test dummpy data, run the script "test_driver.py" located in the src folder of the project
+- To crawl the test dummy data, run the script "test_driver.py" located in the src folder of the project
 - Or if you wish to use the implemented reddit crawler, then run the script "reddit_driver.py" also located in the src folder.
