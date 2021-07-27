@@ -1,19 +1,44 @@
 Questions to lecturerer
 
+https://www.uis.no/en/engineering/thesis-writing-engineering-and-science#/
+https://www.uis.no/sites/default/files/2020-11/Regulations%20for%20bachelors%20and%20masters%20thesis%202020.pdf
+https://www.uis.no/sites/default/files/2020-11/Student%20guide.pdf
+
 - Should i include the used technical technologies in the keywords of the report?
 examples mongo DB, neo4j etc,  Javascript, flask, jinija, bottstrap, vis.js, python ...
+-> keep it under 10 keywords, the 10 most relevant.
+reddit
+
+
+- Other changes
+-> Include a screen shot in the UI interface.
+-> include setup on windows server and task schedualer
+-> search for online batch learning, in crawling section.
+https://www.kaggle.com/residentmario/full-batch-mini-batch-and-online-learning
+
+
+- must i specify the date and time for the data of the evaluation and test plots?
+or should i merge all of them under references?
+-> Put a general date range, example June-July 2021, put a new experimentell setup
+
+
+- Should i attach the source code with the pdf of the thesis or it is enough on github? 
+not possible to attach using acrobat reader
+-> Send e-mail with a question on how to submit?
+-> log in on inspera and see
+-> Should i write in a single column.
+
+
+------- to library -------
+- Check references
+- Run a plagirsm check at the very end
+
 
 - Can i divide the reference list into?
 references
 reference work on the internet
 technology documentation
+-> This ok like it is
 
-- must i specify the date and time for the data of the evaluation and test plots?
-or should i merge all of them under references?
-
-- does the name of edited on stackoverflow has to also be in the reference?
-
-- should i add centrality box and hist plots to report?
-
-- Should i attach the source code with the pdf of the thesis or it is enough on github? 
-not possible to attach using acrobat reader
+- does the name of "edited by" on stackoverflow has to also be in the reference?
+-> do need edited by
