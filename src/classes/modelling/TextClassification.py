@@ -20,7 +20,7 @@ class TextClassifier:
             single=True
         )
         self.random_state = 99
-        if self.data:
+        if self.data and "_id" in self.data:
             del self.data["_id"]
             self.data = self.data["training_data"]
             random.seed(self.random_state)
@@ -46,8 +46,10 @@ class TextClassifier:
         self.text_clf.fit(features, labels)
         return "model is fitted and ready for use"
 
-    def evaluate_model(self):
-        df = pd.DataFrame(self.data)
+    def initially_evaluate_non_tuned_model(self):
+        # Only using 80% training data from all dataset under untuned initial evaluation.
+        init_eval_data = self.data[0:int(0.80*len(self.data))]
+        df = pd.DataFrame(init_eval_data)
         features = (df["title"]).to_numpy()
         labels = (df["label"]).to_numpy()
         text_clf = Pipeline([
@@ -88,7 +90,9 @@ class TextClassifier:
         return evaluation_result
 
     def tune_model(self):
-        df = pd.DataFrame(self.data)
+        # Only use 80% training data from all dataset to find tuning parameters
+        tuning_data = self.data[0:int(0.80*len(self.data))]
+        df = pd.DataFrame(tuning_data)
         features = (df["title"]).to_numpy()
         labels = (df["label"]).to_numpy()
 
@@ -107,13 +111,15 @@ class TextClassifier:
             'clf__alpha': (1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10),
         }
 
-        # Using every posssible combination in the range of tunning paramaters, 5*2*10=100 trials
+        # Using every posssible combination in the range of tunning paramaters.
+        # 5*2*10=100 trials are perfomred in this step
 
         # Using cv=5 the data is splitted into 5 equal sized chunks
-        # In every tunning trial, the model is fitted cv=5 times by using every possible split 4 chunks in training and 1 chunk in testing
-        # this guarantee that every record will be a part of the training and test set at least one time, 5 trials
+        # In every tunning trial, the model is fitted cv=5 times by using every possible split of 4 training chunks and testing chunk.
+        # this guarantee that every record will be a part of the test set just once.
+        # 5 trials are performed in this step
 
-        # The total number the model is trained under tuning is 5*100= 500 model training trial under tuning
+        # The total number the model is trained under tuning is 100*5= 500 model training trials under tuning
         gs_clf = GridSearchCV(text_clf, parameters, cv=5, n_jobs=-1)
 
         gs_clf.fit(features, labels)
@@ -124,28 +130,31 @@ class TextClassifier:
         }
         return tunning_results
 
-    def get_report(self):
-        df = pd.DataFrame(self.data)
-        features = (df["title"]).to_numpy()
-        labels = (df["label"]).to_numpy()
-
+    def finally_evaluate_tuned_model(self):
+        # Get tuned key parameters
         tuned_paramters = self.tune_model()
         alpha = tuned_paramters['best_parameters']['clf__alpha']
         use_idf = tuned_paramters['best_parameters']['tfidf__use_idf']
         ngram_range = tuned_paramters['best_parameters']['vect__ngram_range']
 
+        # Build text classifier with tuned paramerters
         text_clf = Pipeline([
             ('vect', CountVectorizer(ngram_range=ngram_range)),
             ('tfidf', TfidfTransformer(use_idf=use_idf)),
             ('clf', SGDClassifier(random_state=self.random_state, alpha=alpha)),
         ])
+
+        # perform final evaluation using 80% training data and 20% unseen test data from all dataset.
+        df = pd.DataFrame(self.data)
+        features = (df["title"]).to_numpy()
+        labels = (df["label"]).to_numpy()
         training_percentage = 0.8
         testing_percentage = 0.2
         X_train, X_test = list(features[:int(training_percentage*len(features))]
                                ), list(features[-int(testing_percentage*len(features)):])
         y_train, y_test = list(labels[:int(training_percentage*len(features))]
                                ), list(labels[-int(testing_percentage*len(features)):])
-
+        
         text_clf.fit(X_train, y_train)
         y_pred = text_clf.predict(X_test)
         labels = list(set(labels))

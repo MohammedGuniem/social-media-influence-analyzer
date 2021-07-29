@@ -12,27 +12,22 @@
   <body>
     <div class="container">
         <h1>Topic Detection Model</h1>
-        <p>At first the crawled training and testing data are shuffled using random state 99,
-          then the following processes are performed to test the reliability and quality of crawled training data
-        </p>
+        <p>- At first the crawled training and testing data are shuffled using random state 99</p>
+        <p>- The crawled dataset is divided into 80% training data used under the initial non-tuned evaluation and tuning, and 20% test data for the final tuned evaluation</p>
+        <p>- Then, the following processes are performed to test the reliability and quality of crawled training data</p>
     </div>
 
     <div class="container">
-        <h2>Evaluation - (Before Tuning)</h2>
+        <h2>1) Initial Evaluation - (Before Tuning)</h2>
         <p>
           We start by testing the initial performance capability that can be obtained by using the crawled training dataset to build a non-tuned text classifier with its default key parameters. 
-          The training data is then partitioned into 5 chunks of data.
+          The 80% training data is then partitioned into 5 equally sized folds or chunks of data.
         </p>
-        <p>
-          A text classifier is then trained and tested N-times where N is equal to the number of data chunks, 
-          and 80% or 4 chunks of data are used for training the classifier, 
-          while 20% or 1 chunk of data is used for testing the performance of the classifier. 
-          The chunk of dataset that is meant for testing will be different every time a new model is trained, 
-          this guarantees that each record in the dataset will participate at least once in the testing process and 4 times in the training process, 
-          which increase the representation of every individual dataset record in the results that is calculated as 
-          the mean values of measured accuracies, precisions, recalls and F1 scores 
-          in the N=5 times the text classifier has been trained and tested which is represented in the table below.
-        </p> 
+        <p> - A text classifier is then trained and tested 5 times.</p> 
+        <p> - In each text classifier a new unique fold of records is used in testing.</p>
+        <p> - This way each record will be part of the testing records once, and 4 times as a training record, but not both in the same classifier.</p> 
+        <p> - This increase the representation of every individual dataset record in the results that is calculated as follows:</p>
+        <p> - The mean values of measured accuracies, precisions, recalls and F1 scores after testing of the 5 text classifiers are calculated and shown in the table below.</p> 
         <table class="table table-bordered">
           <thead>
             <tr>
@@ -62,25 +57,25 @@
     </div>
 
     <div class="container">
-        <h2>Tuning</h2>
-        <p>
-          In this process, we are trying to find the best parameters to run our text classification model with. <br />
-        </p>
-        <p>
-          - we run a cross validation automated test using the following paramters:<br />
-            -> 'vect__ngram_range': [(1, 1), (1, 2), (1, 3), (1, 4), (1, 5)], (whether to use words of unigrams, bigrams, trigrams, 4-gram-sequence or 5-gram-sequence in vectorization) <br />
-            -> 'tfidf__use_idf': (True, False), (whether to use Term Frequency-Inverse Document Frequency or not) <br />
-            -> 'clf__alpha': (1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10) (penalty parameter in the classifier)<br />
-          - Using every posssible combination in the range of tunning paramaters demands 5*2*10=100 trials<br />
-            And using 5 equal sized chunks results in fitting the model 5 times for every parameter combination above, 
-            this guarantee that every record will be a part of the training and testing dataset at least one time, this step demands 5 trials<br />
-          - The total number of tuning trials would then be 5*100= 500 model training trial under tuning <br />
-        </p>
-        <p>
-          - The optimal parameters after tuning are given in the table below.
-        </p>
-          
-        </p>            
+        <h2>2) Tuning</h2>
+        <p>In this process, we are trying to find the best parameters to run our text classification model with.</p>
+        <p>- we run a cross validation automated test using the following paramters:</p>
+        <br />
+        <p>- (whether to use words of unigrams, bigrams, trigrams, 4-gram-sequence or 5-gram-sequence in vectorization)</p>
+        <p>-> 'vect__ngram_range': [(1, 1), (1, 2), (1, 3), (1, 4), (1, 5)]</p>
+        <br />
+        <p>- (whether to use Term Frequency-Inverse Document Frequency or not)</p>
+        <p>-> 'tfidf__use_idf': (True, False)</p>
+        <br />
+        <p>- (penalty parameter in the classifier)</p>
+        <p>-> 'clf__alpha': (1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10)</p>
+        <br />
+        <p>- Using every posssible combination in the range of tunning paramaters demands 5*2*10=100 trials</p>
+        <p>- And using 5 equally sized folds or chunks of data in fitting the model 5 times for every parameter combination above demands 5 trials</p>
+        <p>- The total number of tuning trials would then be 5*100= 500 model training trials under tuning</p>
+        <p>- The optimal tuned key parameters that gives the highest performance are given in the table below:</p>
+        <br />
+
         <table class="table table-bordered">
           <thead>
             <tr>
@@ -110,11 +105,11 @@
     </div>
 
     <div class="container">
+        <h2>3) Final Evaluation with Optimal Tuned Text Classifier</h2>
+        <p>- After finding the optimal key parameters, we use the 20% unseen test dataset to perform a final evaluation of the tuned text classifier.</p>
+        <br />
         <h2>Classification Report - (After Tuning)</h2>
-        <p>
-            This report contains detailed metrics measurements for each and every category, 
-            plus their weighted and macro averages.
-        </p>            
+        <p>The classification report below contains detailed metrics measurements for each and every category, plus their weighted and macro averages.</p>            
         <table class="table table-bordered">
           <thead>
             <tr>
@@ -157,11 +152,8 @@
     </div>
 
     <div class="container">
-        <h2>Confusion Matrix</h2>
-        <p>
-            This Matrix shows the number of correctly predicted/classified data points for each category in green cells, 
-            while all other incorrectly predicted data points are shown in red cells.
-        </p>            
+        <h2>Confusion Matrix - (After Tuning)</h2>
+        <p>This Confusion Matrix below shows the number of correctly predicted/classified data points for each category in green cells, while all other incorrectly predicted data points are shown in red cells.</p>           
         <table class="table table-bordered">
             <thead>
                 <tr>

@@ -481,8 +481,8 @@ def topic_detection_model():
                     "header": "Text Classification Report not found",
                     "body": F"The specified URL paramteres might not refer to any influence graph"
                 })
-        evaluation_result = text_classifier.evaluate_model()
-        classification_report, confusion_matrix, labels = text_classifier.get_report()
+        evaluation_result = text_classifier.initially_evaluate_non_tuned_model()
+        classification_report, confusion_matrix, labels = text_classifier.finally_evaluate_tuned_model()
         tunning_results = text_classifier.tune_model()
         result = {
             "labels": labels,
