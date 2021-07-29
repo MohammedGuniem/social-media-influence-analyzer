@@ -102,7 +102,7 @@ try:
 
             # Fetching training submission titles to determine influence area using machine learning
             training_data = crawler.getInfluenceAreaTrainingData(
-                submissions_limit=100,
+                submissions_limit=125,
                 submissions_type=submissions_type
             )
 
