@@ -53,10 +53,10 @@ class Statistics:
         fig, axes = plt.subplots(1, 2)
 
         runtimes_df[["date", "per group", "per submission", "per comment", "per training submission"]].plot(
-            kind="bar", stacked=True, ax=axes[0], rot='horizontal', fontsize=8, title="Average Crawling runtimes").set(ylabel='seconds')
+            kind="bar", stacked=True, ax=axes[0], rot='horizontal', fontsize=8, title="Average Crawling runtimes").set(ylabel='Seconds', xlabel='Crawling Timestamp')
 
         runtimes_df[["date", "groups", "submissions", "comments", "training submissions"]].plot(
-            kind="bar", stacked=True, ax=axes[1], rot='horizontal', fontsize=8, title="Total Crawling runtimes").set(ylabel='seconds')
+            kind="bar", stacked=True, ax=axes[1], rot='horizontal', fontsize=8, title="Total Crawling runtimes").set(ylabel='Seconds', xlabel='Crawling Timestamp')
 
         fig.suptitle('Crawling Runtimes Statistics')
 
@@ -66,7 +66,7 @@ class Statistics:
         plot_img_name = F"crawling_bar_plot.jpg"
         fig.set_size_inches(15, 10)
         plt.savefig(
-            F"{path}{plot_img_name}", format="jpg", dpi=500)
+            F"{path}{plot_img_name}", format="jpg", dpi=100)
 
     def getInfluenceArea(self):
         groups = self.mongo_db_connector.getGroups(
@@ -89,7 +89,7 @@ class Statistics:
         fig, axes = plt.subplots(1, 3)
 
         submissions_df.groupby("display_name")["display_name"].count().plot(
-            kind="pie", ax=axes[0], title="Crawled Groups", autopct='%1.1f%%').axis("off")
+            kind="pie", ax=axes[0], title="Shares of Submissions in Groups", autopct='%1.1f%%').axis("off")
 
         neo4j_graph, centralities_max = self.neo4j_db_connector.get_graph(
             network_name=self.network_name, submissions_type=self.submissions_type, date=self.date, relation_type="Influences")
@@ -104,16 +104,16 @@ class Statistics:
             groups, columns=["groups"])
 
         groups_df.groupby("groups")[
-            "groups"].count().plot(kind="pie", ax=axes[1], title="Modelled Groups", autopct='%1.1f%%').axis("off")
+            "groups"].count().plot(kind="pie", ax=axes[1], title="Detected Influence from Groups", autopct='%1.1f%%').axis("off")
 
         predicted_influence_df = pd.DataFrame(
             predicted_influence, columns=["predicted_influence"])
 
         predicted_influence_df.groupby("predicted_influence")[
-            "predicted_influence"].count().plot(kind="pie", ax=axes[2], title="Predicted Influence Areas", autopct='%1.1f%%').axis("off")
+            "predicted_influence"].count().plot(kind="pie", ax=axes[2], title="Predicted Fields of Influence in Influence graph", autopct='%1.1f%%').axis("off")
 
         fig.suptitle(
-            'Crawled Subreddits vs. Predicted Influence Area vs. Modelled Subreddits')
+            'A comparison between shares of submissions, detected influence and predicted fields of influence')
 
         path = F"{os.getcwd()}/statistics_plots/influence_areas_and_groups/{self.network_name}/{self.date}/{self.submissions_type}/"
         self.create_directory_if_not_found(
@@ -122,7 +122,7 @@ class Statistics:
 
         fig.set_size_inches(15, 10)
         plt.savefig(
-            F"{path}{plot_img_name}", format="jpg", dpi=500)
+            F"{path}{plot_img_name}", format="jpg", dpi=100)
 
     def getInfluenceScore(self, score_type):
         neo4j_graph, centralities_max = self.neo4j_db_connector.get_graph(
@@ -166,7 +166,7 @@ class Statistics:
                 ax=axes[score_types.index(score_type)],
                 title=F"{score_type.replace('_', ' ')}",
                 vert=False
-            )
+            ).set(xlabel='Scoring Values')
             y_axis = axes[score_types.index(score_type)].axes.get_yaxis()
             y_axis.set_visible(False)
 
@@ -177,7 +177,7 @@ class Statistics:
                 title=F"{score_type.replace('_', ' ')}",
                 xticks=links_df[F"{score_type}"],
                 rot=90
-            )
+            ).set(xlabel='Scoring Values')
 
         path = F"{os.getcwd()}/statistics_plots/influence_scores/{self.network_name}/{self.date}/{self.submissions_type}/"
         self.create_directory_if_not_found(
@@ -220,7 +220,7 @@ class Statistics:
                 ax=axes[centrality_types.index(centrality_type)],
                 title=F"{centrality_type.replace('_', ' ')}",
                 vert=False
-            )
+            ).set(xlabel='Scoring Values')
             y_axis = axes[centrality_types.index(
                 centrality_type)].axes.get_yaxis()
             y_axis.set_visible(False)
@@ -233,7 +233,7 @@ class Statistics:
                 title=F"{centrality_type.replace('_', ' ')}",
                 xticks=centrality_df[F"{centrality_type}"],
                 rot=90
-            )
+            ).set(xlabel='Scoring Values')
 
         path = F"{os.getcwd()}/statistics_plots/centrality/{self.network_name}/{self.date}/{self.submissions_type}/"
         self.create_directory_if_not_found(
