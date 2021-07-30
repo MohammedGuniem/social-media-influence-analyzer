@@ -4,6 +4,11 @@ https://www.uis.no/en/engineering/thesis-writing-engineering-and-science#/
 https://www.uis.no/sites/default/files/2020-11/Regulations%20for%20bachelors%20and%20masters%20thesis%202020.pdf
 https://www.uis.no/sites/default/files/2020-11/Student%20guide.pdf
 
+
+- Make all [?] with "F" style in word.
+
+- Check reference numbering
+
 - Should i include the used technical technologies in the keywords of the report?
 examples mongo DB, neo4j etc,  Javascript, flask, jinija, bottstrap, vis.js, python ...
 -> keep it under 10 keywords, the 10 most relevant.
