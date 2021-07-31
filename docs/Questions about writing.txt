@@ -7,6 +7,8 @@ https://www.uis.no/sites/default/files/2020-11/Student%20guide.pdf
 
 - Make all [?] with "F" style in word.
 
+- Make distanse between text 1.5 not 1.15
+
 - Check reference numbering
 
 - Should i include the used technical technologies in the keywords of the report?
