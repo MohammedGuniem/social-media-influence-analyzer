@@ -5,47 +5,21 @@ https://www.uis.no/sites/default/files/2020-11/Regulations%20for%20bachelors%20a
 https://www.uis.no/sites/default/files/2020-11/Student%20guide.pdf
 
 
-- Make all [?] with "F" style in word.
+- Ask Nikita about this:
 
-- Make distanse between text 1.5 not 1.15
+-> Make distanse between text 1.5 not 1.15? 
+-> what is the guidelines for size and distanse in text?
 
-- Check reference numbering
-
-- Should i include the used technical technologies in the keywords of the report?
-examples mongo DB, neo4j etc,  Javascript, flask, jinija, bottstrap, vis.js, python ...
--> keep it under 10 keywords, the 10 most relevant.
-reddit
-
-
-- Other changes
--> Include a screen shot in the UI interface.
--> include setup on windows server and task schedualer
+-> I don't find this strongly relevant to my crawling idea, should i included it as reference?
 -> search for online batch learning, in crawling section.
 https://www.kaggle.com/residentmario/full-batch-mini-batch-and-online-learning
 
+-> Run a plagirsm check at the very end
+-> I asked the helping staff at the library about this.
+-> They said this costs money and i should pay for it, and if i am confident of the ownership of my work, then this should be ok anyway.  
 
-- must i specify the date and time for the data of the evaluation and test plots?
-or should i merge all of them under references?
--> Put a general date range, example June-July 2021, put a new experimentell setup
+-> Should i put the "ACKNOWLEDGMENT" section at the beginning?
+-> I like it at the end.
 
-
-- Should i attach the source code with the pdf of the thesis or it is enough on github? 
-not possible to attach using acrobat reader
--> Send e-mail with a question on how to submit?
--> log in on inspera and see
--> Should i write in a single column.
-
-
-------- to library -------
-- Check references
-- Run a plagirsm check at the very end
-
-
-- Can i divide the reference list into?
-references
-reference work on the internet
-technology documentation
--> This ok like it is
-
-- does the name of "edited by" on stackoverflow has to also be in the reference?
--> do need edited by
+-> Can i attach the source code with the pdf of the thesis?
+-> i am waiting on an answer from the IT-department

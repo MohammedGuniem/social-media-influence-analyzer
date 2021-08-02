@@ -59,13 +59,16 @@ REFERENCES
 - Add online help reference  - (Done)
 - Add technology technical documentation  - (Done)
 - Edit cache after changing to crawling patch specidfic caching - (Done)
+- Add or remove time of crawling from report. - (Done)
 
+- Include setup section on windows server and task schedualer - ()
 
-
-- Add or remove time of crawling from report.  - (Venter på svar fra veileder eller skrivehjelp)
-- Add centrality box and hist plots - (Venter på svar fra veileder eller skrivehjelp)
+At the end
 - Finally, go over Word doc and align sections. - ()
 - Update table of content at the end - ()
 - add signature and page number in the first page at the end - ()
+- add link to smia.uis.no, and link to github source code in the first page at the end - ()
+- Check reference numbering
+
 - send to "Håkon"/skrive verksted to control references. - ()
 ----------------------------------------------------------------------------------------------
