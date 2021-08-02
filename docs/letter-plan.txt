@@ -42,8 +42,9 @@ VI.		THE TECHNICAL IMPLEMENTATION
 		H.	DATA PROTECTION 														 - (Done)
 		I.	CACHING 																 - (Done)
 		J.	SECURING UI ROUTES WITH DIGEST AUTHENTICATION 							 - (Done)
-		K.	SUPPLEMENTARY TOOLS & FEATURES											 - (Done)									 
-		L.	FUTURE IMPROVMENTS OF THE TECHNICAL IMPLEMENTATION 						 - (Done)
+		K.	SUPPLEMENTARY TOOLS & FEATURES											 - (Done)	
+		L.  THE PUBLISHED DEMONSTRATION SITE - SMIA.UIS.NO
+		M.	FUTURE IMPROVMENTS OF THE TECHNICAL IMPLEMENTATION 						 - (Done)
 ----------------------------------------------------------------------------------------------
 CONCLUSION 																			 - (Done)																
 ----------------------------------------------------------------------------------------------
@@ -60,8 +61,7 @@ REFERENCES
 - Add technology technical documentation  - (Done)
 - Edit cache after changing to crawling patch specidfic caching - (Done)
 - Add or remove time of crawling from report. - (Done)
-
-- Include setup section on windows server and task schedualer - ()
+- Include setup section on windows server and task schedualer - (Done)
 
 At the end
 - Finally, go over Word doc and align sections. - ()
