@@ -63,6 +63,10 @@ REFERENCES
 - Add or remove time of crawling from report. - (Done)
 - Include setup section on windows server and task schedualer - (Done)
 
+
+- Numbering of figures is wrong between 9 and 10
+
+
 At the end
 - Finally, go over Word doc and align sections. - ()
 - Update table of content at the end - ()
