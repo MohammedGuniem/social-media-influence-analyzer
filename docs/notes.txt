@@ -1,3 +1,0 @@
-# route specific caching
-https://github.com/sh4nks/flask-caching/blob/f11403fa0fb71e95cc73955c10b582911a613f39/flask_caching/__init__.py#L332-L339
-https://stackoverflow.com/questions/9413566/flask-cache-memoize-url-query-string-parameters-as-well/47181782

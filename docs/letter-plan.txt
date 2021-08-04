@@ -43,7 +43,7 @@ VI.		THE TECHNICAL IMPLEMENTATION
 		I.	CACHING 																 - (Done)
 		J.	SECURING UI ROUTES WITH DIGEST AUTHENTICATION 							 - (Done)
 		K.	SUPPLEMENTARY TOOLS & FEATURES											 - (Done)	
-		L.  THE PUBLISHED DEMONSTRATION SITE - SMIA.UIS.NO
+		L.  THE PUBLISHED DEMONSTRATION SITE - SMIA.UIS.NO							 - (Done)
 		M.	FUTURE IMPROVMENTS OF THE TECHNICAL IMPLEMENTATION 						 - (Done)
 ----------------------------------------------------------------------------------------------
 CONCLUSION 																			 - (Done)																
@@ -62,17 +62,18 @@ REFERENCES
 - Edit cache after changing to crawling patch specidfic caching - (Done)
 - Add or remove time of crawling from report. - (Done)
 - Include setup section on windows server and task schedualer - (Done)
+- Add link to smia.uis.no, and link to github source code in the first page at the end - (Done)
 
-
-- Numbering of figures is wrong between 9 and 10
-
+- Add links to documentation such as matplotlib, numpy, and pandas - ()
 
 At the end
+- Check Numbering of figures - ()
+- Check reference numbering
 - Finally, go over Word doc and align sections. - ()
 - Update table of content at the end - ()
-- add signature and page number in the first page at the end - ()
-- add link to smia.uis.no, and link to github source code in the first page at the end - ()
-- Check reference numbering
+- Check signature and page number in the first page at the end - ()
 
-- send to "Håkon"/skrive verksted to control references. - ()
+
+- Meeting with "Håkon"/skrive verksted to control references. - ()
+- Meeting with Nikita and Antorweep
 ----------------------------------------------------------------------------------------------

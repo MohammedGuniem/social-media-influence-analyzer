@@ -22,4 +22,4 @@ https://www.kaggle.com/residentmario/full-batch-mini-batch-and-online-learning
 -> I like it at the end.
 
 -> Can i attach the source code with the pdf of the thesis?
--> it is noe possible to attach a 7zip file to the thesis pdf, i would like to do it in addition to putting the github lenk on
+-> it is now possible to attach a 7zip file to the thesis pdf, i would like to do it in addition to putting the github lenk on
