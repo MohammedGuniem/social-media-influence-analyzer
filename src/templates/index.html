@@ -14,6 +14,9 @@
       <h2>Social Media Influence Analyzer</h2>
       <p>This solution enables you to detect influence fields and identify Influencers in a social media network</p>
         <ul class="nav nav-tabs">
+          <li>
+            <a data-toggle="tab" href="#activity_graph">Activity Graph</a>
+          </li>
           <li class="active">
             <a data-toggle="tab" href="#user_graph">Influence Graph</a>
           </li>
@@ -29,9 +32,7 @@
           <li>
             <a data-toggle="tab" href="#centrality_report">Centrality</a>
           </li>
-          <li>
-            <a data-toggle="tab" href="#activity_graph">Activity Graph</a>
-          </li>
+
           <li>
             <a data-toggle="tab" href="#statistics">Statistics</a>
           </li>
@@ -40,6 +41,9 @@
           </li>
         </ul>
         <div class="tab-content">
+          <div id="activity_graph" class="tab-pane fade">
+            {% include 'activity_form.html' %}
+          </div>
           <div id="user_graph" class="tab-pane fade in active">
             {% include 'graph_form.html' %}
           </div>
@@ -54,9 +58,6 @@
           </div>
           <div id="centrality_report" class="tab-pane fade">
             {% include 'centrality_report_form.html' %}
-          </div>
-          <div id="activity_graph" class="tab-pane fade">
-            {% include 'activity_form.html' %}
           </div>
           <div id="statistics" class="tab-pane fade">
             {% include 'statistics_form.html' %}
