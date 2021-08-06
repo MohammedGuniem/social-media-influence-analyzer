@@ -1,19 +1,23 @@
----> References
--> bruk egen nettside gofairdata.org
-[22] "FAIR data" https://en.wikipedia.org/wiki/FAIR_data (accessed July. 21, 2021).
-
--> fjerne/erstatte wikipedia kilder
--> Referanse list for wikipedia
-
-
 ---> Writing
-
--> Add page numbering 
 
 -> Grammerly
 
 -> Run a plagirsm check at the very end
 -> got mail, run test
+
+-> attach the source code with the pdf of the thesis
+
+-> Check Numbering of figures - ()
+
+-> Check Numbering of tables - ()
+
+-> Check reference numbering - ()
+
+-> Finally, go over Word doc and align sections. - ()
+
+-> Update table of content at the end - ()
+
+-> Check signature and page number in the first page at the end - ()
 
 
 ---> Code
@@ -27,3 +31,4 @@ you just have just 1 and 2
 
 
 
+---> Submit
