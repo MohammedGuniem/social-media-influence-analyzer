@@ -1,0 +1,36 @@
+Questions to supervisor
+
+
+---- Solved -----
+
+https://www.uis.no/en/engineering/thesis-writing-engineering-and-science#/
+https://www.uis.no/sites/default/files/2020-11/Regulations%20for%20bachelors%20and%20masters%20thesis%202020.pdf
+https://www.uis.no/sites/default/files/2020-11/Student%20guide.pdf
+
+-> Make distanse between text 1.5 not 1.15? 
+-> what is the guidelines for size and distanse in text?
+-> it is ok
+
+-> I don't find this strongly relevant to my crawling idea, should i included it as reference?
+-> search for online batch learning, in crawling section.
+https://www.kaggle.com/residentmario/full-batch-mini-batch-and-online-learning
+-> leave that out
+
+-> Should i put the "ACKNOWLEDGMENT" section at the beginning?
+-> I like it at the end.
+-> fine
+
+-> Can i attach the source code with the pdf of the thesis?
+-> it is now possible to attach a 7zip file to the thesis pdf, i would like to do it in addition to putting the github lenk on
+
+-> Is the evaluation of my thesis eksternal?
+-> I hope the coding and technical solution will be taken into consideration
+-> i am not very good in writting, but much better in programming.
+
+-> What grade you think i will fall into?
+
+
+- Ask Nikita about this:
+
+-> Run a plagirsm check at the very end
+-> Can i have the free-online, sent mail to Nikita

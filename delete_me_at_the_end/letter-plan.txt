@@ -1,0 +1,69 @@
+----------------------------------------------------------------------------------------------
+Abstract 																			- (Done)
+----------------------------------------------------------------------------------------------
+Keywords 																			- (Done)
+----------------------------------------------------------------------------------------------
+Motivation																			- (Done)
+----------------------------------------------------------------------------------------------
+I.		INTRODUCTION 																- (Done)
+----------------------------------------------------------------------------------------------
+II.		RELATED WORKS																- (Done)
+		A.	MEASURING INFLUENCE BETWEEN USERS OF ONLINE SOCIAL MEDIA				- (Done)
+		B.	DATA-DRIVEN INFLUENCE LEARNING                                          - (Done)
+		C.	ALTERNATIVES OF INFORMATION GATHERING									- (Done)
+		D.	TOPIC DETECTION IN SOCIAL MEDIA PLATFORMS								- (Done)
+		E.	STUDY CASE ALTERNATIVES OF ONLINE SOCIAL MEDIA							- (Done)
+----------------------------------------------------------------------------------------------
+III.	REDDIT AS A CASE STUDY SOCIAL MEDIA                                         - (Done)
+----------------------------------------------------------------------------------------------
+IV.		GROUND DATA STRUCTURE														- (Done)
+----------------------------------------------------------------------------------------------
+V.		INFLUENCE GRAPH MODELLING
+		A.	THE ACTIVITY THREAD														- (Done)
+		B.	SCORING INFLUENCE														- (Done)
+		C.	THE INFLUENCE GRAPH														- (Done)
+		D.	TESTING AND EVALUATION OF THE INFLUENCE SCORING TECHNIQUES              - (Done)
+		E.	INFLUENCE FIELD CLASSIFICATION								            - (Done)   
+		F.	TESTING  OF INFLUENCE FIELD CLASSIFICATION                   			- (Done)
+		G.	EVALUATION OF INFLUENCE FIELD CLASSIFICATION 		 					- (Done)
+		H.	INTRODUCING CENTRALITY MEASURES											- (Done)
+		I.	CENTRALITY MEASURES VS. INFLUENCE EDGE SCORE 							- (Done)
+		J.	TESING AND EVALUATION OF THE ACTIVITY & INFLUENCE GRAPH MODELS			- (Done)
+		K.	FUTURE IMPROVMENTS OF THE INFLUENCE GRAPH MODEL							- (Done)
+----------------------------------------------------------------------------------------------
+VI.		THE TECHNICAL IMPLEMENTATION
+		A.	DESIGN ARCHITECTURE                                                      - (Done)
+		B. 	CRAWLING & DATA GATHERING                                                - (Done)
+		C.	IMPLEMENTATION of GRAPH MODELLING 										 - (Done)
+		D. 	MONITORING & STATISTICAL OVERVIEW 										 - (Done)
+		E.	DEPLOYMENT & RELESASE TO THE WEB INTERFACE 								 - (Done)
+		F.	BUILDING A DRIVER SCRIPT 												 - (Done)
+		G.	LOGGING & ERROR HANDLING 												 - (Done)
+		H.	DATA PROTECTION 														 - (Done)
+		I.	CACHING 																 - (Done)
+		J.	SECURING UI ROUTES WITH DIGEST AUTHENTICATION 							 - (Done)
+		K.	SUPPLEMENTARY TOOLS & FEATURES											 - (Done)	
+		L.  THE PUBLISHED DEMONSTRATION SITE - SMIA.UIS.NO							 - (Done)
+		M.	FUTURE IMPROVMENTS OF THE TECHNICAL IMPLEMENTATION 						 - (Done)
+----------------------------------------------------------------------------------------------
+CONCLUSION 																			 - (Done)												
+----------------------------------------------------------------------------------------------
+ACKNOWLEDGMENT 																		 - (Done)               
+----------------------------------------------------------------------------------------------
+REFERENCES																			 - (Done)
+
+- mention that crawling drivers add data to previous data batches - ()
+- Add links to documentation such as matplotlib, numpy, and pandas - ()
+- Add page numbering - ()
+
+At the end
+- Check Numbering of figures - ()
+- Check reference numbering
+- Finally, go over Word doc and align sections. - ()
+- Update table of content at the end - ()
+- Check signature and page number in the first page at the end - ()
+
+
+- Meeting with "Håkon"/skrive verksted to control references. - ()
+- Meeting with Nikita and Antorweep
+----------------------------------------------------------------------------------------------
