@@ -1,3 +1,23 @@
+---> References
+-> bruk egen nettside gofairdata.org
+[22] "FAIR data" https://en.wikipedia.org/wiki/FAIR_data (accessed July. 21, 2021).
+
+-> fjerne/erstatte wikipedia kilder
+-> Referanse list for wikipedia
+
+
+---> Writing
+
+-> Add page numbering 
+
+-> Grammerly
+
+-> Run a plagirsm check at the very end
+-> got mail, run test
+
+
+---> Code
+
 -> To set up the project on your preffered enviornment, please follow the steps below:
 
 Specify depenmdecies for each section 
@@ -6,15 +26,4 @@ you just have just 1 and 2
 -> create a video of the installation process
 
 
--> highlight centrality nodes in figure 13 with color from table 9
 
-
--> Be careful with spacing
-
--> Fix background on UI screenshot
-
--> and i would like to thank every contributor for his work and dedication
-I should be capital
-
-
--> Grammerly

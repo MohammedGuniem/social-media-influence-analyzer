@@ -52,18 +52,11 @@ ACKNOWLEDGMENT 																		 - (Done)
 ----------------------------------------------------------------------------------------------
 REFERENCES																			 - (Done)
 
-- mention that crawling drivers add data to previous data batches - ()
-- Add links to documentation such as matplotlib, numpy, and pandas - ()
-- Add page numbering - ()
 
 At the end
 - Check Numbering of figures - ()
-- Check reference numbering
+- Check reference numbering - ()
 - Finally, go over Word doc and align sections. - ()
 - Update table of content at the end - ()
 - Check signature and page number in the first page at the end - ()
-
-
-- Meeting with "Håkon"/skrive verksted to control references. - ()
-- Meeting with Nikita and Antorweep
 ----------------------------------------------------------------------------------------------
