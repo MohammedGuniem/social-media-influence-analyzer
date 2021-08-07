@@ -26,7 +26,7 @@ This repository contains all project code, documents and other related files and
   1. src/reddit_most_popular_subreddits_driver.py
   2. src/reddit_selected_subreddits_driver.py
 - You can follow the steps in this video to obtain the neccessary credentials
-  - https://www.youtube.com/watch?v=gIZJQmX-55U
+  - [https://www.youtube.com/watch?v=gIZJQmX-55U](https://www.youtube.com/watch?v=gIZJQmX-55U){:target="\_blank"}
 
 To set up the project on your preffered enviornment, please follow the steps below:
 
