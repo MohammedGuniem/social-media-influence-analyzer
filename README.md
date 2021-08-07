@@ -15,10 +15,10 @@ This repository contains all project code, documents and other related files and
 
 # The guide below is divided into the following 4 parts
 
-- [I - Obtaining a registered crawling account on Reddit.](##i---obtaining-a-registered-crawling-account-on-Reddit)
-- [II - Importing the source code of this project](##ii---importing-the-source-code-of-this-project-and-adding-the-required-environment-variables)
+- [I - Obtaining a registered crawling account on Reddit.](#i---obtaining-a-registered-crawling-account-on-Reddit)
+- [II - Importing the source code of this project](#ii---importing-the-source-code-of-this-project-and-adding-the-required-environment-variables)
 - [III - Setting up a development, test or production environment (Using Docker)](#iii---setting-up-a-development-test-or-production-environment-using-docker)
-- [IV - Setting up a production environment (Using Windows IIS)](#iv---setting-up-the-production-environment-using-windows-iis)
+- [IV - Setting up a production environment (Using Windows IIS)](#iv---setting-up-a-production-environment-using-windows-iis)
 
 # I - Obtaining a registered crawling account on Reddit.
 
