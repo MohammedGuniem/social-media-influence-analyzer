@@ -26,7 +26,7 @@ This repository contains all project code, documents and other related files and
   1. src/reddit_most_popular_subreddits_driver.py
   2. src/reddit_selected_subreddits_driver.py
 - You can follow the steps in this video to obtain the neccessary credentials
-  - [https://www.youtube.com/watch?v=gIZJQmX-55U](https://www.youtube.com/watch?v=gIZJQmX-55U){:target="\_blank"}
+  - [https://www.youtube.com/watch?v=gIZJQmX-55U](https://www.youtube.com/watch?v=gIZJQmX-55U)
 
 To set up the project on your preffered enviornment, please follow the steps below:
 
@@ -41,7 +41,6 @@ To set up the project on your preffered enviornment, please follow the steps bel
 #### II-B: Add necessary environment variables
 
 - Rename the file .env.example to .env
-- If you wish to crawl reddit, please register your crawling account and obtain credentials by following the instructions on this link https://praw.readthedocs.io/en/latest/getting_started/authentication.html
 - Fill in the following necessary environment variables
 
 | Variable                    | default value | possible values                                                                                                                                       |
