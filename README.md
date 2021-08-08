@@ -3,6 +3,14 @@
 This is a project about social media influence analysis using Computer Science to detect and classify influences between users of social media. The project is carried out by Mohammed Z. Guniem to acheive the objective of his master thesis in producing a reliable and secure system for detecting and classifying influences between users on social media platforms.
 This repository contains all project code, documents and other related files and folders.
 
+# Watch this video for a demonstration on how to setup a development environment of the smia technical solution.
+
+- [https://www.youtube.com/watch?v=wqv3dQWrmZE](https://www.youtube.com/watch?v=wqv3dQWrmZE)
+
+# Watch this video for a demonstration on how to use the web user interface of SMIA for analysis of online social media
+
+- [https://www.youtube.com/watch?v=42MkS_H9Ok](https://www.youtube.com/watch?v=42MkS_H9Okw)
+
 # Development Requirements
 
 - Docker Desktop (3.5)
