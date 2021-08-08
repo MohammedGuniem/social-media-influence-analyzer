@@ -118,8 +118,12 @@ def constructJSGraph(neo4j_graph, graph_type, score_type, centrality_max, centra
         }
         if graph_type == "user_graph":
             js_node["value"] = node['props'][centrality]
+            if centrality_max == 0:
+                trans = 1
+            else:
+                trans = node['props'][centrality]/centrality_max
             js_node["color"] = {
-                "background": F"rgba(240, 52, 52, {node['props'][centrality]/centrality_max})"}
+                "background": F"rgba(240, 52, 52, {trans})"}
         elif graph_type == "activity_graph":
             node_type = node['props']['type']
             js_node["label"] = F"{node_type}\\n{js_node['label']}"
